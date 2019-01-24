@@ -9,7 +9,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Gio was here!
+        /*
+            Gio was here, still trying to figure out
+            how to commit to my own branch instead of master
+         */
         setContentView(R.layout.activity_main);
     }
 }
