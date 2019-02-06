@@ -1,3 +1,37 @@
 <resources>
-    <string name="app_name">TCSS-750-T7-2</string>
+    <string name="app_name">Blatherer</string>
+
+    <!-- Keys -->
+    <string name="credential_key">creds</string>
+
+    <!-- fragment_login.xml -->
+    <string name="login_tv_greet_msg">greet_msg</string>
+    <string name="login_switch_remember">Remember Me?</string>
+    <string name="login_hint_email">Email</string>
+    <string name="login_hint_password">Password</string>
+    <string name="login_butt_sign_in">Sign In</string>
+    <string name="login_input_email">em</string>
+    <string name="login_input_password">pw</string>
+    <string name="login_tv_new_member">New to Blatherer?</string>
+    <string name="login_butt_register">Register</string>
+    <string name="login_tv_morning">Good Morning</string>
+    <string name="login_tv_afternoon">Good Afternoon</string>
+
+    <!-- fragment_register.xml -->
+    <string name="register_hint_fname">First Name</string>
+    <string name="register_hint_lname">Last Name</string>
+    <string name="register_hint_username">Username</string>
+    <string name="register_hint_email">Email</string>
+    <string name="register_hint_password">Password</string>
+    <string name="register_hint_retype_password">Retype Password</string>
+    <string name="register_input_fname">fname</string>
+    <string name="register_input_lname">lname</string>
+    <string name="register_input_username">uname</string>
+    <string name="register_input_email">em</string>
+    <string name="register_input_password">pw</string>
+    <string name="register_butt_register">Register</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
