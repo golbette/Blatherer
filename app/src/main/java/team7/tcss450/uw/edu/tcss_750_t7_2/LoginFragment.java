@@ -2,6 +2,7 @@ package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -84,48 +85,65 @@ public class LoginFragment extends Fragment {
     }
 
     public void login(View view) {
-        if (mListener != null) {
-            boolean pass = true;
-            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
-            EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
-            String emailMessage = email.getText().toString();
-            String passwordMessage = password.getText().toString();
-            if (!emailMessage.contains("@")) {
-                email.setError("Must enter a valid email address");
-                pass = false;
-            }
-            if (emailMessage.isEmpty()) {
-                email.setError("This field cannot be empty");
-                pass = false;
-            }
-            if (passwordMessage.isEmpty()) {
-                password.setError("This field cannot be empty");
-                pass = false;
-            }
-            if (pass == true){
-                //mListener.onLoginSuccess(new Credentials.Builder(emailMessage, passwordMessage).build(), null);
-                Credentials credentials = new Credentials.Builder(emailMessage, passwordMessage).build();
+        /**
+        * Delete this when end points are connected.
+         */
+        TextView email = getActivity().findViewById(R.id.login_et_email);
+        TextView password = getActivity().findViewById(R.id.login_et_password);
+        String username = email.getText().toString();
+        String pWord = password.getText().toString();
+            Credentials.Builder credentials =
+                    new Credentials.Builder(username, pWord);
+            mListener.onLoginSuccess(credentials.build(), null);
 
-                // Build the web service URL
-                Uri uri = new Uri.Builder()
-                        .scheme("https")
-                        .appendPath(getString(R.string.ep_base_url))
-                        .appendPath(getString(R.string.ep_login))
-                        .build();
 
-                // Build the JSONObject
-                JSONObject msg = credentials.asJSONObject();
-                mCredentials = credentials;
 
-                // Instantiate and execute the AsyncTask.
-                new SendPostAsyncTask.Builder(uri.toString(), msg)
-                        .onPreExecute(this::handleLoginOnPre)
-                        .onPostExecute(this::handleLoginOnPost)
-                        .onCancelled(this::handleErrorsInTask)
-                        .build().execute();
-            }
-            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
-        }
+
+        /**
+         * Commented out until end points are set up.
+         */
+//        if (mListener != null) {
+//            boolean pass = true;
+//            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
+//            EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
+//            String emailMessage = email.getText().toString();
+//            String passwordMessage = password.getText().toString();
+//            if (!emailMessage.contains("@")) {
+//                email.setError("Must enter a valid email address");
+//                pass = false;
+//            }
+//            if (emailMessage.isEmpty()) {
+//                email.setError("This field cannot be empty");
+//                pass = false;
+//            }
+//            if (passwordMessage.isEmpty()) {
+//                password.setError("This field cannot be empty");
+//                pass = false;
+//            }
+//            if (pass == true){
+//                //mListener.onLoginSuccess(new Credentials.Builder(emailMessage, passwordMessage).build(), null);
+//                Credentials credentials = new Credentials.Builder(emailMessage, passwordMessage).build();
+//
+//                // Build the web service URL
+//                Uri uri = new Uri.Builder()
+//                        .scheme("https")
+//                        .appendPath(getString(R.string.ep_base_url))
+//                        .appendPath(getString(R.string.ep_login))
+//                        .build();
+//
+//                // Build the JSONObject
+//                JSONObject msg = credentials.asJSONObject();
+//                mCredentials = credentials;
+//
+//                // Instantiate and execute the AsyncTask.
+//                new SendPostAsyncTask.Builder(uri.toString(), msg)
+//                        .onPreExecute(this::handleLoginOnPre)
+//                        .onPostExecute(this::handleLoginOnPost)
+//                        .onCancelled(this::handleErrorsInTask)
+//                        .build().execute();
+//            }
+//            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
+//        }
     }
 
     public void register(View view) {

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout"
+    android:background="@color/weatherbackground"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WeatherFragment">
+
+
+    <TextView
+        android:id="@+id/text_weather_fragment_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_weather_fragment_temp"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/text_weather_fragment_temp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView_weather_fragment_degree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="35dp"
+        app:layout_constraintStart_toEndOf="@+id/text_weather_fragment_temp"
+        app:layout_constraintTop_toTopOf="@+id/text_weather_fragment_temp"
+        app:srcCompat="@drawable/degree" />
+
+    <TextView
+        android:id="@+id/locationValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/text_weather_fragment_location"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@+id/text_weather_fragment_temp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView_weather_fragment_cloudy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/locationValue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/cloudy_night" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+    <TextView
+        android:id="@+id/text_weather_fragment_humidityLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="21dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/text_weather_fragment_humidity"
+        android:textColor="@color/half_white"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/text_weather_fragment_temp" />
+
+    <TextView
+        android:id="@+id/text_weather_fragment_humidityValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/text_weather_fragment_humidityValue"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/text_weather_fragment_humidityLabel"
+        app:layout_constraintStart_toStartOf="@+id/text_weather_fragment_humidityLabel"
+        app:layout_constraintTop_toBottomOf="@+id/text_weather_fragment_humidityLabel" />
+
+    <TextView
+        android:id="@+id/text_weather_fragment_precipValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/text_weather_fragment_precipValue"
+        android:textColor="@android:color/white"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="@+id/text_weather_fragment_precipLable"
+        app:layout_constraintStart_toStartOf="@+id/text_weather_fragment_precipLable"
+        app:layout_constraintTop_toBottomOf="@+id/text_weather_fragment_precipLable" />
+
+    <TextView
+        android:id="@+id/text_weather_fragment_precipLable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="8dp"
+        android:text="@string/text_weather_fragment_precipLable"
+        android:textColor="@color/half_white"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/text_weather_fragment_temp" />
+
+    <TextView
+        android:id="@+id/summaryValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@{weather.summary}"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_weather_fragment_precipValue" />
+
+    <TextView
+        android:id="@+id/darkSkyAttribution"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="whichever api we get the weather from"
+        android:textColor="@color/half_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/text_weather_fragment_weather"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:text="Weather"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toTopOf="parent" />-->
+</android.support.constraint.ConstraintLayout>

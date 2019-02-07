@@ -12,7 +12,9 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 /**
  * Maurice was here. Pull request sent.
  */
-public class MainActivity extends AppCompatActivity implements LoginFragment.OnLoginFragmentInteractionListener, RegisterFragment.OnRegisterFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements
+        LoginFragment.OnLoginFragmentInteractionListener,
+        RegisterFragment.OnRegisterFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
 
         if (savedInstanceState == null) {
             if (findViewById(R.id.activity_main_container) != null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.activity_main_container, new LoginFragment()).commit();
+                getSupportFragmentManager().beginTransaction().
+                        replace(R.id.activity_main_container, new LoginFragment()).commit();
             }
         }
     }
@@ -43,7 +46,10 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
     @Override
     public void onRegisterClicked() {
         RegisterFragment registerFragment = new RegisterFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.activity_main_container, registerFragment).addToBackStack(null);
+        FragmentTransaction transaction = getSupportFragmentManager().
+                beginTransaction().
+                replace(R.id.activity_main_container,
+                        registerFragment).addToBackStack(null);
         transaction.commit();
     }
 
@@ -53,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         Bundle args = new Bundle();
         args.putSerializable(getString(R.string.credential_key), credentials);
         loginFragment.setArguments(args);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.activity_main_container, loginFragment);
+        FragmentTransaction transaction = getSupportFragmentManager().
+                beginTransaction().replace(R.id.activity_main_container, loginFragment);
         transaction.commit();
     }
 
@@ -75,6 +82,3 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
                 .commit();
     }
 }
-/**
-*Luke -> how did we get upgraded to a 700 level class lol
-*/

@@ -34,4 +34,19 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="nav_message_activity_home">Messages</string>
+    <string name="nav_weather_activity_home">Weather</string>
+    <string name="text_weather_fragment_temp">40</string>
+    <string name="text_weather_fragment_location">Tacoma, WA</string>
+    <string name="text_weather_fragment_humidity">HUMIDITY</string>
+    <string name="text_weather_fragment_humidityValue">0.20</string>
+    <string name="text_weather_fragment_precipLable">RAIN/SNOW</string>
+    <string name="text_weather_fragment_precipValue">90%</string>
 </resources>
