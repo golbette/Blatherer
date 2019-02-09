@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -53,10 +54,28 @@ public class LoginFragment extends Fragment {
 
         EditText emailMessage = getActivity().findViewById(R.id.login_et_email);
         EditText passwordMessage = getActivity().findViewById(R.id.login_et_password);
-        Switch remember = getActivity().findViewById(R.id.login_switch_remember);
+
+        Switch remember = (Switch) getActivity().findViewById(R.id.login_switch_remember);
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
 
-        if (prefs.contains(getString(R.string.keys_prefs_email)) && prefs.contains(getString(R.string.keys_prefs_password))) {
+        mRememberVal = remember.isChecked();
+        remember.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (!isChecked) {
+                    if (prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
+                        prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
+                        prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+                        prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+                    }
+                }
+                Log.wtf("REMEMBER", isChecked + " (switch listener)");
+            }
+        });
+
+        if (prefs.contains(getString(R.string.keys_prefs_email))
+                && prefs.contains(getString(R.string.keys_prefs_password))
+                && prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
             final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
             final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
             final Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
@@ -216,6 +235,10 @@ public class LoginFragment extends Fragment {
         Switch remember = getActivity().findViewById(R.id.login_switch_remember);
         Boolean rememberVal = remember.isChecked();
         mRememberVal = rememberVal;
+//        SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+//        if (!mRememberVal && prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
+//            prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
+//        }
 
         Log.wtf("REMEMBER", rememberVal.toString() + "handle login on post");
 
@@ -224,7 +247,7 @@ public class LoginFragment extends Fragment {
             boolean success = resultsJSON.getBoolean(getString(R.string.keys_json_login_success));
             if (success) {
                 mJwt = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
-                if (rememberVal) {
+                if (mRememberVal) {
                     saveCredentials(mCredentials);
                 }
                 mListener.onLoginSuccess(mCredentials, mJwt);

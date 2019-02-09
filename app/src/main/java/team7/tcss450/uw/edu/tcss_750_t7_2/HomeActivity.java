@@ -152,10 +152,13 @@ public class HomeActivity extends AppCompatActivity
      * Logs user our, clears saved credentials, and returns to the Login Screen.
      */
     private void logout() {
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
-        prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
-        prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
-
+        Boolean rememberVal = getIntent().getExtras().getBoolean(getString(R.string.login_switch_remember));
+        Log.wtf("REMEMBER", rememberVal.toString() + "(logout)");
+        if (!rememberVal) {
+            SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+            prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+            prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+        }
         // Close the app
 //        finishAndRemoveTask();
 
