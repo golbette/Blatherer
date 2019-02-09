@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.json.JSONException;
@@ -31,6 +32,7 @@ public class LoginFragment extends Fragment {
     private OnLoginFragmentInteractionListener mListener;
     private Credentials mCredentials;
     private String mJwt;
+    private Boolean mRememberVal;
 
 
     public LoginFragment() {
@@ -41,6 +43,7 @@ public class LoginFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
+        // Says Good Morning when time is AM and Good Afternoon when time is PM
         TextView greetMessage = getActivity().findViewById(R.id.login_tv_greet_msg);
         if (Calendar.getInstance().get(Calendar.AM_PM) == Calendar.AM) {
             greetMessage.setText(getString(R.string.login_tv_morning));
@@ -48,10 +51,24 @@ public class LoginFragment extends Fragment {
             greetMessage.setText(getString(R.string.login_tv_afternoon));
         }
 
+        EditText emailMessage = getActivity().findViewById(R.id.login_et_email);
+        EditText passwordMessage = getActivity().findViewById(R.id.login_et_password);
+        Switch remember = getActivity().findViewById(R.id.login_switch_remember);
+        SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+
+        if (prefs.contains(getString(R.string.keys_prefs_email)) && prefs.contains(getString(R.string.keys_prefs_password))) {
+            final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
+            final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
+            final Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
+            emailMessage.setText(email);
+            passwordMessage.setText(password);
+            remember.setChecked(rememberVal);
+
+            doLogin(new Credentials.Builder(emailMessage.getText().toString(), passwordMessage.getText().toString()).build());
+        }
+
         if (getArguments() != null) {
             Credentials creds = (Credentials) getArguments().getSerializable(getString(R.string.credential_key));
-            EditText emailMessage = getActivity().findViewById(R.id.login_et_email);
-            EditText passwordMessage = getActivity().findViewById(R.id.login_et_password);
             emailMessage.setText(creds.getEmail());
             passwordMessage.setText(creds.getPassword());
         }
@@ -123,26 +140,7 @@ public class LoginFragment extends Fragment {
 //                pass = false;
 //            }
 //            if (pass == true){
-//                //mListener.onLoginSuccess(new Credentials.Builder(emailMessage, passwordMessage).build(), null);
-//                Credentials credentials = new Credentials.Builder(emailMessage, passwordMessage).build();
-//
-//                // Build the web service URL
-//                Uri uri = new Uri.Builder()
-//                        .scheme("https")
-//                        .appendPath(getString(R.string.ep_base_url))
-//                        .appendPath(getString(R.string.ep_login))
-//                        .build();
-//
-//                // Build the JSONObject
-//                JSONObject msg = credentials.asJSONObject();
-//                mCredentials = credentials;
-//
-//                // Instantiate and execute the AsyncTask.
-//                new SendPostAsyncTask.Builder(uri.toString(), msg)
-//                        .onPreExecute(this::handleLoginOnPre)
-//                        .onPostExecute(this::handleLoginOnPost)
-//                        .onCancelled(this::handleErrorsInTask)
-//                        .build().execute();
+//                doLogin(new Credentials.Builder(emailMessage, passwordMessage).build());
 //            }
 //            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
 //        }
@@ -189,6 +187,7 @@ public class LoginFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
         prefs.edit().putString(getString(R.string.keys_prefs_email), credentials.getEmail()).apply();
         prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
+        prefs.edit().putBoolean(getString(R.string.keys_prefs_stay_logged_in), mRememberVal).apply();
     }
 
     /**
@@ -213,13 +212,22 @@ public class LoginFragment extends Fragment {
      */
     private void handleLoginOnPost(String result) {
         Log.wtf("JWTLOGIN", result);
+
+        Switch remember = getActivity().findViewById(R.id.login_switch_remember);
+        Boolean rememberVal = remember.isChecked();
+        mRememberVal = rememberVal;
+
+        Log.wtf("REMEMBER", rememberVal.toString() + "handle login on post");
+
         try {
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean(getString(R.string.keys_json_login_success));
             if (success) {
-                // Login was successful. Switch to the loadSuccessFragment.
-                //loginToken = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
-                mListener.onLoginSuccess(mCredentials, resultsJSON.getString(getString(R.string.keys_json_login_jwt)));
+                mJwt = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
+                if (rememberVal) {
+                    saveCredentials(mCredentials);
+                }
+                mListener.onLoginSuccess(mCredentials, mJwt);
                 return;
             } else {
                 // Login was unsuccessful. Don't switch fragments and inform the user

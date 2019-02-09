@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Switch;
 
 import java.io.Serializable;
 
@@ -15,6 +17,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 public class MainActivity extends AppCompatActivity implements
         LoginFragment.OnLoginFragmentInteractionListener,
         RegisterFragment.OnRegisterFragmentInteractionListener {
+    private Boolean mRemember;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +39,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoginSuccess(Credentials credentials, String jwt) {
+        Switch remember = (Switch) findViewById(R.id.login_switch_remember);
+//        mRemember = remember.isChecked();
+        Log.wtf("REMEMBER", remember.isChecked() + " (on login success)");
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(getString(R.string.keys_intent_credentials), (Serializable) credentials);
         intent.putExtra(getString(R.string.keys_intent_jwt), jwt);
+        intent.putExtra(getString(R.string.login_switch_remember_val), remember.isChecked());
         startActivity(intent);
         finish();
     }

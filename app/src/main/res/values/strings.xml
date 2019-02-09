@@ -16,6 +16,7 @@
     <string name="login_butt_register">Register</string>
     <string name="login_tv_morning">Good Morning</string>
     <string name="login_tv_afternoon">Good Afternoon</string>
+    <string name="login_switch_remember_val">switch_value</string>
 
     <!-- fragment_register.xml -->
     <string name="register_hint_fname">First Name</string>
