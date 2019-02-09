@@ -1,5 +1,8 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -99,6 +102,9 @@ public class HomeActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_logout) {
+            logout();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -139,6 +145,24 @@ public class HomeActivity extends AppCompatActivity
                 .addToBackStack(null); //// remove this adding to backstack.
         // Commit the transaction
         transaction.commit();
+    }
+
+    /**
+     * Logs user our, clears saved credentials, and returns to the Login Screen.
+     */
+    private void logout() {
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+        prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+        prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+
+        // Close the app
+//        finishAndRemoveTask();
+
+        // Or close this activity and bring back the Login
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        // End this Activity and remove it from the Activity back stack
+        finish();
     }
 
     /**
