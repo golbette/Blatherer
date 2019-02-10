@@ -49,4 +49,12 @@
     <string name="text_weather_fragment_humidityValue">0.20</string>
     <string name="text_weather_fragment_precipLable">RAIN/SNOW</string>
     <string name="text_weather_fragment_precipValue">90%</string>
+    <string name="text_home_fragment_H">H</string>
+    <string name="text_home_fragment_high">H</string>
+    <string name="text_home_weather_fragment_daily_high">35</string>
+    <string name="text_weather_fragment_daily_low">20</string>
+    <string name="nav_home_fragment">Home</string>
+    <string name="nav_settings_fragment_home_settings">Settings</string>
+    <string name="text_settings_fragment_settings">Settings</string>
+    <string name="nav_logout">Log Out</string>
 </resources>

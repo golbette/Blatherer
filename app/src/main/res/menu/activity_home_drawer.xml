@@ -4,6 +4,12 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_home_fragment"
+            android:icon="@drawable/ic_home_black_24dp"
+
+            android:title="@string/nav_home_fragment" />
         <item
             android:id="@+id/nav_message_activity_home"
             android:icon="@drawable/ic_message_black_24dp"
@@ -12,14 +18,16 @@
             android:id="@+id/nav_weather_activity_home"
             android:icon="@drawable/ic_wb_cloudy_black_24dp"
             android:title="@string/nav_weather_activity_home" />
-        <!--<item-->
-        <!--android:id="@+id/nav_slideshow"-->
-        <!--android:icon="@drawable/ic_menu_slideshow"-->
-        <!--android:title="Slideshow" />-->
-        <!--<item-->
-        <!--android:id="@+id/nav_manage"-->
-        <!--android:icon="@drawable/ic_menu_manage"-->
-        <!--android:title="Tools" />-->
+        <item
+            android:id="@+id/nav_settings_fragment"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/nav_settings_fragment_home_settings" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"
+            android:title="@string/nav_logout" />
+
+
     </group>
 
     <!--<item android:title="Communicate">-->
