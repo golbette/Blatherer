@@ -16,6 +16,7 @@
     <string name="login_butt_register">Register</string>
     <string name="login_tv_morning">Good Morning</string>
     <string name="login_tv_afternoon">Good Afternoon</string>
+    <string name="login_switch_remember_val">switch_value</string>
 
     <!-- fragment_register.xml -->
     <string name="register_hint_fname">First Name</string>
@@ -31,9 +32,7 @@
     <string name="register_input_password">pw</string>
     <string name="register_butt_register">Register</string>
 
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- activity_home.xml -->
     <string name="title_activity_home">HomeActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -41,8 +40,11 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
     <string name="nav_message_activity_home">Messages</string>
     <string name="nav_weather_activity_home">Weather</string>
+
+    <!-- fragment_weather.xml -->
     <string name="text_weather_fragment_temp">40</string>
     <string name="text_weather_fragment_location">Tacoma, WA</string>
     <string name="text_weather_fragment_humidity">HUMIDITY</string>
