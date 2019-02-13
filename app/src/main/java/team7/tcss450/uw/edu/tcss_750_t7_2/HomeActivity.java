@@ -160,18 +160,24 @@ public class HomeActivity extends AppCompatActivity
      * Logs user our, clears saved credentials, and returns to the Login Screen.
      */
     private void logout() {
-        Boolean rememberVal = getIntent().getExtras().getBoolean(getString(R.string.login_switch_remember));
+//        Boolean rememberVal = getIntent().getExtras().getBoolean(getString(R.string.login_switch_remember));
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+        Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
         Log.wtf("REMEMBER", rememberVal.toString() + "(logout)");
+
+
         if (!rememberVal) {
-            SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
             prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+            prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
             prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
         }
         // Close the app
 //        finishAndRemoveTask();
 
         // Or close this activity and bring back the Login
+        boolean loggedOutByUser = true;
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(getString(R.string.keys_logged_out_by_user), loggedOutByUser);
         startActivity(intent);
         // End this Activity and remove it from the Activity back stack
         finish();

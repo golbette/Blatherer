@@ -1,6 +1,8 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -40,8 +42,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoginSuccess(Credentials credentials, String jwt) {
-        Switch remember = (Switch) findViewById(R.id.login_switch_remember);
-        mRememberVal = remember.isChecked();
+//        Switch remember = (Switch) findViewById(R.id.login_switch_remember);
+//        mRememberVal = remember.isChecked();
+        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+        if (prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
+            mRememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
+//            prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
+        }
 
         Log.wtf("REMEMBER", mRememberVal + " (on login success)");
         Intent intent = new Intent(this, HomeActivity.class);

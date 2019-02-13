@@ -5,6 +5,7 @@
     <string name="keys_prefs_stay_logged_in">loggedIn</string>
     <string name="keys_prefs_email">traffic_light</string>
     <string name="keys_prefs_password">see_the_city</string>
+    <string name="keys_logged_out_by_user">logged_out</string>
 
     <string name="keys_fragment_login">loginFragmentTag</string>
     <string name="keys_fragment_register">registerFragmentTag</string>

@@ -33,8 +33,8 @@ public class Credentials implements Serializable {
     public static class Builder {
 
         private final String mPassword;
-        private final String mEmail;
-
+//        private final String mEmail;
+        private String mEmail = "";
         private String mFirstName = "";
         private String mLastName = "";
         private String mUsername = "";
@@ -49,11 +49,23 @@ public class Credentials implements Serializable {
          * @param email the email
          * @param password the password
          */
-        public Builder(String email, String password) {
-            mEmail = email;
+        public Builder(String password) {
             mPassword = password;
         }
+//        public Builder(String email, String password) {
+//            mEmail = email;
+//            mPassword = password;
+//        }
 
+        /**
+         * Add NON-OPTIONAL Email
+         * @param val
+         * @return
+         */
+        public Builder addEmail(final String val) {
+            mEmail = val;
+            return this;
+        }
 
         /**
          * Add an optional first name.
