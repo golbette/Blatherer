@@ -123,7 +123,8 @@ public class RegisterFragment extends Fragment {
 
             if (pass == true) {
                 //mListener.onRegisterSuccess(new Credentials.Builder(emailMessage, passwordMessage).build());
-                Credentials credentials = new Credentials.Builder(emailMessage, passwordMessage)
+                Credentials credentials = new Credentials.Builder(passwordMessage)
+                        .addEmail(emailMessage)
                         .addFirstName(fnameMessage)
                         .addLastName(lnameMessage)
                         .addUsername(usernameMessage)

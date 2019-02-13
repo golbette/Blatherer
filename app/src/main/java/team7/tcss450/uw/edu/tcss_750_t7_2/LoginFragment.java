@@ -65,6 +65,7 @@ public class LoginFragment extends Fragment {
                 if (!isChecked) {
                     if (prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
                         prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
+                        prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
                         prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
                         prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
                     }
@@ -74,21 +75,27 @@ public class LoginFragment extends Fragment {
         });
 
         if (prefs.contains(getString(R.string.keys_prefs_email))
+                && prefs.contains(getString(R.string.keys_prefs_username))
                 && prefs.contains(getString(R.string.keys_prefs_password))
                 && prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
             final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
+            final String username = prefs.getString(getString(R.string.keys_prefs_username), "");
             final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
             final Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
-            emailMessage.setText(email);
+            emailMessage.setText(username);
             passwordMessage.setText(password);
             remember.setChecked(rememberVal);
 
-            doLogin(new Credentials.Builder(emailMessage.getText().toString(), passwordMessage.getText().toString()).build());
+            boolean loggedOutByUser = (boolean) getActivity().getIntent().getBooleanExtra(getString(R.string.keys_logged_out_by_user), false);
+            Log.wtf("LOGGED OUT", loggedOutByUser + " (onStart)");
+            if (!loggedOutByUser) {
+                doLogin(new Credentials.Builder(password).addEmail(email).addUsername(username).build());
+            }
         }
 
         if (getArguments() != null) {
             Credentials creds = (Credentials) getArguments().getSerializable(getString(R.string.credential_key));
-            emailMessage.setText(creds.getEmail());
+            emailMessage.setText(creds.getUsername());
             passwordMessage.setText(creds.getPassword());
         }
     }
@@ -123,29 +130,18 @@ public class LoginFragment extends Fragment {
     }
 
     public void login(View view) {
-        /**
-        * Delete this when end points are connected.
-         */
-//    lucasg
-
-
-
-
-        /**
-         * Commented out until end points are set up.
-         */
         if (mListener != null) {
             boolean pass = true;
-            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
+            EditText username = (EditText) getActivity().findViewById(R.id.login_et_email);
             EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
-            String emailMessage = email.getText().toString();
+            String usernameMessage = username.getText().toString();
             String passwordMessage = password.getText().toString();
-            if (!emailMessage.contains("@")) {
-                email.setError("Must enter a valid email address");
-                pass = false;
-            }
-            if (emailMessage.isEmpty()) {
-                email.setError("This field cannot be empty");
+//            if (!emailMessage.contains("@")) {
+//                email.setError("Must enter a valid email address");
+//                pass = false;
+//            }
+            if (usernameMessage.isEmpty()) {
+                username.setError("This field cannot be empty");
                 pass = false;
             }
             if (passwordMessage.isEmpty()) {
@@ -153,7 +149,7 @@ public class LoginFragment extends Fragment {
                 pass = false;
             }
             if (pass == true){
-                doLogin(new Credentials.Builder(emailMessage, passwordMessage).build());
+                doLogin(new Credentials.Builder(passwordMessage).addUsername(usernameMessage).build());
             }
             // This is the builder pattern and it's good for constructor that takes a lot of parameters.
         }
@@ -199,6 +195,7 @@ public class LoginFragment extends Fragment {
     private void saveCredentials(final Credentials credentials) {
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
         prefs.edit().putString(getString(R.string.keys_prefs_email), credentials.getEmail()).apply();
+        prefs.edit().putString(getString(R.string.keys_prefs_username), credentials.getUsername()).apply();
         prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
         prefs.edit().putBoolean(getString(R.string.keys_prefs_stay_logged_in), mRememberVal).apply();
     }
@@ -234,7 +231,7 @@ public class LoginFragment extends Fragment {
 //            prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
 //        }
 
-        Log.wtf("REMEMBER", rememberVal.toString() + "handle login on post");
+        Log.wtf("REMEMBER", rememberVal.toString() + " (handle login on post)");
 
         try {
             JSONObject resultsJSON = new JSONObject(result);
@@ -243,6 +240,7 @@ public class LoginFragment extends Fragment {
                 mJwt = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
                 if (mRememberVal) {
                     saveCredentials(mCredentials);
+                    Log.wtf("CREDS", mCredentials.getUsername());
                 }
                 mListener.onLoginSuccess(mCredentials, mJwt);
                 return;
