@@ -29,11 +29,14 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
  */
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
+        HomeFragment.OnHomeFragmentInteractionListener,
         LoginFragment.OnLoginFragmentInteractionListener,
         RegisterFragment.OnRegisterFragmentInteractionListener,
         MessageFragment.OnMessageListFragmentInteractionListener,
         WeatherFragment.OnWeatherFragmentInteractionListener,
-        WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener{
+        WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
+        SettingsFragment.OnSettingsFragmentInteractionListener,
+        ConversationFragment.OnConversationFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
-        loadFragment(new WeatherFragment());
+        loadFragment(new HomeFragment());
     }
 
     @Override
@@ -102,6 +105,7 @@ public class HomeActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            loadFragment(new SettingsFragment());
             return true;
         } else if (id == R.id.action_logout) {
             logout();
@@ -122,12 +126,16 @@ public class HomeActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_message_activity_home) {
+        if(id == R.id.nav_home_fragment){
+                loadFragment(new HomeFragment());
+        } else if (id == R.id.nav_message_activity_home) {
             loadFragment(new MessageFragment());
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
-            loadFragment(new WeatherOptionsFragment());
+            loadFragment(new WeatherFragment());
 
+        } else if (id == R.id.nav_settings_fragment){
+            loadFragment(new SettingsFragment());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -175,6 +183,7 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onMessageListFragmentInteraction(DummyContent.DummyItem item) {
+        loadFragment(new ConversationFragment());
 
     }
 
@@ -225,6 +234,21 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onWeatherOptionsFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onHomeFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onSettingsFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onConversationFragmentInteraction(Uri uri) {
 
     }
 }
