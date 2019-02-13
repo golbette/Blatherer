@@ -126,13 +126,7 @@ public class LoginFragment extends Fragment {
         /**
         * Delete this when end points are connected.
          */
-        TextView email = getActivity().findViewById(R.id.login_et_email);
-        TextView password = getActivity().findViewById(R.id.login_et_password);
-        String username = email.getText().toString();
-        String pWord = password.getText().toString();
-            Credentials.Builder credentials =
-                    new Credentials.Builder(username, pWord);
-            mListener.onLoginSuccess(credentials.build(), null);
+//    lucasg
 
 
 
@@ -140,29 +134,29 @@ public class LoginFragment extends Fragment {
         /**
          * Commented out until end points are set up.
          */
-//        if (mListener != null) {
-//            boolean pass = true;
-//            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
-//            EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
-//            String emailMessage = email.getText().toString();
-//            String passwordMessage = password.getText().toString();
-//            if (!emailMessage.contains("@")) {
-//                email.setError("Must enter a valid email address");
-//                pass = false;
-//            }
-//            if (emailMessage.isEmpty()) {
-//                email.setError("This field cannot be empty");
-//                pass = false;
-//            }
-//            if (passwordMessage.isEmpty()) {
-//                password.setError("This field cannot be empty");
-//                pass = false;
-//            }
-//            if (pass == true){
-//                doLogin(new Credentials.Builder(emailMessage, passwordMessage).build());
-//            }
-//            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
-//        }
+        if (mListener != null) {
+            boolean pass = true;
+            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
+            EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
+            String emailMessage = email.getText().toString();
+            String passwordMessage = password.getText().toString();
+            if (!emailMessage.contains("@")) {
+                email.setError("Must enter a valid email address");
+                pass = false;
+            }
+            if (emailMessage.isEmpty()) {
+                email.setError("This field cannot be empty");
+                pass = false;
+            }
+            if (passwordMessage.isEmpty()) {
+                password.setError("This field cannot be empty");
+                pass = false;
+            }
+            if (pass == true){
+                doLogin(new Credentials.Builder(emailMessage, passwordMessage).build());
+            }
+            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
+        }
     }
 
     /**
