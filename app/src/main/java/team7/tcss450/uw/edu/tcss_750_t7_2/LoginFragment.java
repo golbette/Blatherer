@@ -236,6 +236,7 @@ public class LoginFragment extends Fragment {
         try {
             JSONObject resultsJSON = new JSONObject(result);
             boolean success = resultsJSON.getBoolean(getString(R.string.keys_json_login_success));
+            String message = resultsJSON.getString("message");
             if (success) {
                 mJwt = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
                 if (mRememberVal) {
@@ -246,7 +247,7 @@ public class LoginFragment extends Fragment {
                 return;
             } else {
                 // Login was unsuccessful. Don't switch fragments and inform the user
-                ((TextView) getView().findViewById(R.id.login_et_email)).setError("Login Unsuccessful");
+                ((TextView) getView().findViewById(R.id.login_et_email)).setError("Login Unsuccessful: " + message);
             }
             mListener.onWaitFragmentInteractionHide();
         } catch (JSONException e) {
