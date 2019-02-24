@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/text_margin"
-            android:text="@string/msg_chat"
+            android:text="@string/contact_people"
             android:textSize="30sp"
             android:textStyle="bold"
             android:textColor="@android:color/black"/>
@@ -31,20 +31,21 @@
             android:layout_marginEnd="@dimen/text_margin"
             android:background="@drawable/circle_small"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_new_message" />
+            android:src="@drawable/ic_new_contact" />
 
     </LinearLayout>
+
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/list"
-        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.MessageFragment"
+        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.ContactFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="56dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".MessageFragment"
-        tools:listitem="@layout/fragment_messages" />
+        tools:context=".ContactFragment"
+        tools:listitem="@layout/fragment_contact" />
 
 </LinearLayout>

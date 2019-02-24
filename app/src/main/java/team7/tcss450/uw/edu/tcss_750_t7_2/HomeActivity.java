@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 
@@ -62,6 +64,17 @@ public class HomeActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        if (savedInstanceState == null) {
+            if (findViewById(R.id.fragmentContainer) != null) {
+                if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
+                    ChatFragment chatFragment = new ChatFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
+                } else {
+                    loadFragment(new HomeFragment());
+                }
+            }
+        }
     }
 
     /**
@@ -71,7 +84,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
-        loadFragment(new HomeFragment());
+
     }
 
     @Override
@@ -129,7 +142,8 @@ public class HomeActivity extends AppCompatActivity
         if(id == R.id.nav_home_fragment){
                 loadFragment(new HomeFragment());
         } else if (id == R.id.nav_message_activity_home) {
-            loadFragment(new MessageFragment());
+            loadFragment(new ChatFragment());
+//            loadFragment(new MessageFragment());
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
             loadFragment(new WeatherFragment());
@@ -160,27 +174,48 @@ public class HomeActivity extends AppCompatActivity
      * Logs user our, clears saved credentials, and returns to the Login Screen.
      */
     private void logout() {
-//        Boolean rememberVal = getIntent().getExtras().getBoolean(getString(R.string.login_switch_remember));
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
-        Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
-        Log.wtf("REMEMBER", rememberVal.toString() + "(logout)");
+        new DeleteTokenAsyncTask().execute();
+    }
 
-
-        if (!rememberVal) {
-            prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
-            prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
-            prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+    class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            onWaitFragmentInteractionShow();
         }
-        // Close the app
-//        finishAndRemoveTask();
 
-        // Or close this activity and bring back the Login
-        boolean loggedOutByUser = true;
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(getString(R.string.keys_logged_out_by_user), loggedOutByUser);
-        startActivity(intent);
-        // End this Activity and remove it from the Activity back stack
-        finish();
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Since we are already doing stuff in the background, go ahead and remove the credentials from shared prefs here.
+            SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+            Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
+            Log.wtf("REMEMBER", rememberVal.toString() + "(logout)");
+
+            if (!rememberVal) {
+                prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+//                prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
+                prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+            }
+
+            // Unregister the device from the Pushy servers
+            Pushy.unregister(HomeActivity.this);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            // Close this activity and bring back the Login
+            boolean loggedOutByUser = true;
+
+            Intent intent = new Intent(HomeActivity.this, MainActivity.class);
+            intent.putExtra(getString(R.string.keys_logged_out_by_user), loggedOutByUser);
+            startActivity(intent);
+            // End this Activity and remove it from the Activity back stack
+            finish();
+        }
     }
 
     /**
@@ -222,16 +257,19 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onWaitFragmentInteractionShow() {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragmentContainer, new WaitFragment(), "WAIT")
+                .addToBackStack(null)
+                .commit();
     }
 
-    /**
-     * Wait fragments handles time between calls
-     * to get or post.
-     */
     @Override
     public void onWaitFragmentInteractionHide() {
-
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(getSupportFragmentManager().findFragmentByTag("WAIT"))
+                .commit();
     }
 
     /**

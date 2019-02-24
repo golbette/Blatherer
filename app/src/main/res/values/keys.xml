@@ -37,8 +37,8 @@
     <string name="keys_json_set_setlistnotes">setlistnotes</string>
     <string name="keys_json_set_url">url</string>
 
-    <!--Added these myself-->
     <string name="keys_intent_fname">intent key for fname</string>
     <string name="keys_intent_lname">intent key for lname</string>
     <string name="keys_intent_username">intent key for username</string>
+    <string name="keys_intent_notification_msg">was app started from message notification?</string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
+
+import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
@@ -65,7 +68,7 @@ public class LoginFragment extends Fragment {
                 if (!isChecked) {
                     if (prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
                         prefs.edit().remove(getString(R.string.keys_prefs_stay_logged_in)).apply();
-                        prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
+//                        prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
                         prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
                         prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
                     }
@@ -75,21 +78,20 @@ public class LoginFragment extends Fragment {
         });
 
         if (prefs.contains(getString(R.string.keys_prefs_email))
-                && prefs.contains(getString(R.string.keys_prefs_username))
                 && prefs.contains(getString(R.string.keys_prefs_password))
                 && prefs.contains(getString(R.string.keys_prefs_stay_logged_in))) {
             final String email = prefs.getString(getString(R.string.keys_prefs_email), "");
-            final String username = prefs.getString(getString(R.string.keys_prefs_username), "");
+//            final String username = prefs.getString(getString(R.string.keys_prefs_username), "");
             final String password = prefs.getString(getString(R.string.keys_prefs_password), "");
             final Boolean rememberVal = prefs.getBoolean(getString(R.string.keys_prefs_stay_logged_in), false);
-            emailMessage.setText(username);
+            emailMessage.setText(email);
             passwordMessage.setText(password);
             remember.setChecked(rememberVal);
 
             boolean loggedOutByUser = (boolean) getActivity().getIntent().getBooleanExtra(getString(R.string.keys_logged_out_by_user), false);
             Log.wtf("LOGGED OUT", loggedOutByUser + " (onStart)");
             if (!loggedOutByUser) {
-                doLogin(new Credentials.Builder(password).addEmail(email).addUsername(username).build());
+                doLogin(new Credentials.Builder(email, password).build());
             }
         }
 
@@ -132,16 +134,16 @@ public class LoginFragment extends Fragment {
     public void login(View view) {
         if (mListener != null) {
             boolean pass = true;
-            EditText username = (EditText) getActivity().findViewById(R.id.login_et_email);
+            EditText email = (EditText) getActivity().findViewById(R.id.login_et_email);
             EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
-            String usernameMessage = username.getText().toString();
+            String emailMessage = email.getText().toString();
             String passwordMessage = password.getText().toString();
 //            if (!emailMessage.contains("@")) {
 //                email.setError("Must enter a valid email address");
 //                pass = false;
 //            }
-            if (usernameMessage.isEmpty()) {
-                username.setError("This field cannot be empty");
+            if (emailMessage.isEmpty()) {
+                email.setError("This field cannot be empty");
                 pass = false;
             }
             if (passwordMessage.isEmpty()) {
@@ -149,7 +151,7 @@ public class LoginFragment extends Fragment {
                 pass = false;
             }
             if (pass == true){
-                doLogin(new Credentials.Builder(passwordMessage).addUsername(usernameMessage).build());
+                doLogin(new Credentials.Builder(emailMessage, passwordMessage).build());
             }
             // This is the builder pattern and it's good for constructor that takes a lot of parameters.
         }
@@ -195,7 +197,7 @@ public class LoginFragment extends Fragment {
     private void saveCredentials(final Credentials credentials) {
         SharedPreferences prefs = getActivity().getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
         prefs.edit().putString(getString(R.string.keys_prefs_email), credentials.getEmail()).apply();
-        prefs.edit().putString(getString(R.string.keys_prefs_username), credentials.getUsername()).apply();
+//        prefs.edit().putString(getString(R.string.keys_prefs_username), credentials.getUsername()).apply();
         prefs.edit().putString(getString(R.string.keys_prefs_password), credentials.getPassword()).apply();
         prefs.edit().putBoolean(getString(R.string.keys_prefs_stay_logged_in), mRememberVal).apply();
     }
@@ -243,7 +245,8 @@ public class LoginFragment extends Fragment {
                     saveCredentials(mCredentials);
                     Log.wtf("CREDS", mCredentials.getUsername());
                 }
-                mListener.onLoginSuccess(mCredentials, mJwt);
+//                mListener.onLoginSuccess(mCredentials, mJwt);
+                new RegisterForPushNotificationsAsync().execute();
                 return;
             } else {
                 // Login was unsuccessful. Don't switch fragments and inform the user
@@ -261,5 +264,75 @@ public class LoginFragment extends Fragment {
     public interface OnLoginFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener{
         void onLoginSuccess(Credentials credentials, String jwt);
         void onRegisterClicked();
+    }
+
+    private void handlePushyTokenOnPost(String result) {
+        try {
+            Log.d("JSON result", result);
+            JSONObject resultsJSON = new JSONObject(result);
+            boolean success = resultsJSON.getBoolean("success");
+            if (success) {
+                saveCredentials(mCredentials);
+                mListener.onLoginSuccess(mCredentials, mJwt);
+                return;
+            } else {
+                // Saving the token wrong. Don't switch fragments and inform the user
+                ((TextView) getView().findViewById(R.id.login_et_email)).setError("Login Unsuccessful");
+            }
+            mListener.onWaitFragmentInteractionHide();
+        } catch (JSONException e) {
+            // It appears that the web service didn't return a JSON formatted String or it didn't have what we expected in it.
+            Log.e("JSON_PARSE_ERROR", result + System.lineSeparator() + e.getMessage());
+            mListener.onWaitFragmentInteractionHide();
+            ((TextView) getView().findViewById(R.id.login_et_email)).setError("Login Unsuccessful");
+        }
+    }
+
+    private class RegisterForPushNotificationsAsync extends AsyncTask<Void, String, String> {
+        protected String doInBackground(Void... params) {
+            String deviceToken = "";
+            try {
+                // Assign a unique token to this device
+                deviceToken = Pushy.register(getActivity().getApplicationContext());
+                // Subscribe to a topic (this is a blocking call)
+                Pushy.subscribe("all", getActivity().getApplicationContext());
+            } catch (Exception e) {
+                cancel(true);
+                // Return e to onCancelled
+                return e.getMessage();
+            }
+            // Success
+            return deviceToken;
+        }
+
+        @Override
+        protected void onCancelled(String errorMsg) {
+            super.onCancelled(errorMsg);
+            Log.d("Blatherer", "Error getting Pushy device token: " + errorMsg);
+        }
+
+        @Override
+        protected void onPostExecute(String deviceToken) {
+            // Log it for debugging purposes
+            Log.d("Blatherer", "Pushy device token: " + deviceToken);
+            Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_pushy))
+                    .appendPath(getString(R.string.ep_token))
+                    .build();
+            JSONObject msg = mCredentials.asJSONObject();
+            Log.wtf("MSG", msg.toString());
+            try {
+                msg.put("token", deviceToken);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPostExecute(LoginFragment.this::handlePushyTokenOnPost)
+                    .onCancelled(LoginFragment.this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwt)
+                    .build().execute();
+//            saveCredentials(mCredentials);
+//            mListener.onLoginSuccess(mCredentials, mJwt);
+        }
     }
 }
