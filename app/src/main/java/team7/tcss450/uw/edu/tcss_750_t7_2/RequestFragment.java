@@ -10,7 +10,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
+import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
 
 import java.util.List;
 
@@ -20,9 +21,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ContactFragment extends Fragment {
-    public static final String ARG_CONTACT_LIST = "contacts lists";
-    private List<Contact> mContacts;
+public class RequestFragment extends Fragment {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -34,13 +33,13 @@ public class ContactFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ContactFragment() {
+    public RequestFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ContactFragment newInstance(int columnCount) {
-        ContactFragment fragment = new ContactFragment();
+    public static RequestFragment newInstance(int columnCount) {
+        RequestFragment fragment = new RequestFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -59,7 +58,7 @@ public class ContactFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_request_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -70,7 +69,7 @@ public class ContactFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyContactRecyclerViewAdapter(mContacts, mListener));
+            recyclerView.setAdapter(new MyRequestRecyclerViewAdapter(DummyContent.ITEMS, mListener));
         }
         return view;
     }
@@ -105,6 +104,6 @@ public class ContactFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(Contact item);
+        void onListFragmentInteraction(DummyItem item);
     }
 }

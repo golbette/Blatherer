@@ -10,8 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 
 /**
  * A fragment representing a list of Items.
@@ -20,6 +25,8 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
  * interface.
  */
 public class MessageFragment extends Fragment {
+    public static final String ARG_MESSAGE_LIST = "message lists";
+    private List<Message> mMessages;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -50,6 +57,7 @@ public class MessageFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mMessages = new ArrayList<Message>(Arrays.asList((Message[]) getArguments().getSerializable(ARG_MESSAGE_LIST)));
         }
     }
 
@@ -67,7 +75,7 @@ public class MessageFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyMessagesRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyMessagesRecyclerViewAdapter(mMessages, mListener));
         }
         return view;
     }
@@ -102,6 +110,6 @@ public class MessageFragment extends Fragment {
      */
     public interface OnMessageListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onMessageListFragmentInteraction(DummyItem item);
+        void onMessageListFragmentInteraction(Message item);
     }
 }

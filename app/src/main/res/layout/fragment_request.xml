@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal">
+    android:orientation="vertical">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,7 +15,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/msg_contact_initials"
+                android:id="@+id/request_initials"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_textview"
@@ -26,43 +26,53 @@
                 android:layout_marginBottom="@dimen/text_margin"
                 android:layout_marginStart="@dimen/text_margin"
                 android:padding="1dp"
-                android:text="@string/msg_tv_contact_initials"
+                android:text="@string/request_tv_contact_initials"
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:textSize="35sp"
                 android:textColor="@color/colorContactInitials"/>
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_gravity="center_vertical">
 
                 <TextView
-                    android:id="@+id/msg_contact_name"
-                    android:layout_width="match_parent"
+                    android:id="@+id/request_contact_name"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/text_margin"
                     android:layout_marginLeft="@dimen/text_margin"
                     android:layout_marginRight="@dimen/text_margin"
                     android:padding="1dp"
-                    android:text="@string/msg_tv_contact_name"
+                    android:text="@string/request_tv_contact_name"
                     android:textAppearance="?attr/textAppearanceListItem"
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/msg_latest"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:maxLength="40"
-                    android:layout_marginLeft="@dimen/text_margin"
-                    android:layout_marginRight="@dimen/text_margin"
-                    android:layout_marginBottom="@dimen/text_margin"
-                    android:padding="1dp"
-                    android:text="@string/msg_tv_latest"
-                    android:textAppearance="?attr/textAppearanceListItem"
-                    android:textSize="12sp"
-                    android:textColor="@color/colorSecondaryText"/>
+                android:id="@+id/request_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_margin"
+                android:layout_marginRight="@dimen/text_margin"
+                android:padding="1dp"
+                android:text="@string/request_type"
+                android:textAppearance="?attr/textAppearanceListItem"
+                android:textSize="12sp"
+                android:textColor="@color/colorSecondaryText"/>
             </LinearLayout>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/request_butt_accept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="@dimen/text_margin"
+                android:text="@string/request_butt_hint" />
+
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

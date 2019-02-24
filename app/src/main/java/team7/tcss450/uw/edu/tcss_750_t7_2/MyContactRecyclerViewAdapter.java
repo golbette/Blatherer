@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.ContactFragment.OnListFragmentInteractionListener;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 
 import java.util.List;
 
@@ -18,10 +19,10 @@ import java.util.List;
  */
 public class MyContactRecyclerViewAdapter extends RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Contact> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyContactRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyContactRecyclerViewAdapter(List<Contact> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,8 +37,9 @@ public class MyContactRecyclerViewAdapter extends RecyclerView.Adapter<MyContact
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mContactName.setText(mValues.get(position).getContactName());
+        holder.mContactInitials.setText(mValues.get(position).getInitials());
+        holder.mContactEmail.setText((mValues.get(position).getEmail()));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,20 +60,23 @@ public class MyContactRecyclerViewAdapter extends RecyclerView.Adapter<MyContact
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mContactName;
+        public final TextView mContactInitials;
+        public final TextView mContactEmail;
+
+        public Contact mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mContactName = (TextView) view.findViewById(R.id.contact_contact_name);
+            mContactInitials = (TextView) view.findViewById(R.id.contact_contact_initials);
+            mContactEmail = (TextView) view.findViewById(R.id.contact_email);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mContactEmail.getText() + "'";
         }
     }
 }

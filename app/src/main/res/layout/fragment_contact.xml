@@ -26,7 +26,7 @@
                 android:layout_marginBottom="@dimen/text_margin"
                 android:layout_marginStart="@dimen/text_margin"
                 android:padding="1dp"
-                android:text="@string/contact_list_tv_contact_initials"
+                android:text="@string/contact_tv_contact_initials"
                 android:textAppearance="?attr/textAppearanceListItem"
                 android:textSize="35sp"
                 android:textColor="@color/colorContactInitials"/>
@@ -45,7 +45,7 @@
                     android:layout_marginLeft="@dimen/text_margin"
                     android:layout_marginRight="@dimen/text_margin"
                     android:padding="1dp"
-                    android:text="@string/contact_list_tv_contact_name"
+                    android:text="@string/contact_tv_contact_name"
                     android:textAppearance="?attr/textAppearanceListItem"
                     android:textColor="@android:color/black" />
 
@@ -58,7 +58,7 @@
                     android:layout_marginRight="@dimen/text_margin"
                     android:layout_marginBottom="@dimen/text_margin"
                     android:padding="1dp"
-                    android:text="@string/contact_list_tv_email"
+                    android:text="@string/contact_tv_email"
                     android:textAppearance="?attr/textAppearanceListItem"
                     android:textSize="12sp"
                     android:textColor="@color/colorSecondaryText"/>

@@ -27,7 +27,7 @@ public class BottomNavigationFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private OnBottomNavFragmentInteractionListener mListener;
 
     public BottomNavigationFragment() {
         // Required empty public constructor
@@ -70,18 +70,18 @@ public class BottomNavigationFragment extends Fragment {
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+            mListener.onBottomFragmentInteraction(uri);
         }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnBottomNavFragmentInteractionListener) {
+            mListener = (OnBottomNavFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnBottomNavFragmentInteractionListener");
         }
     }
 
@@ -101,8 +101,8 @@ public class BottomNavigationFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
+    public interface OnBottomNavFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onBottomFragmentInteraction(Uri uri);
     }
 }

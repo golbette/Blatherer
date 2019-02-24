@@ -23,6 +23,8 @@ import android.view.MenuItem;
 
 import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 
 /**
@@ -35,10 +37,12 @@ public class HomeActivity extends AppCompatActivity
         LoginFragment.OnLoginFragmentInteractionListener,
         RegisterFragment.OnRegisterFragmentInteractionListener,
         MessageFragment.OnMessageListFragmentInteractionListener,
+        NewContactFragment.OnListFragmentInteractionListener,
         WeatherFragment.OnWeatherFragmentInteractionListener,
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
-        ConversationFragment.OnConversationFragmentInteractionListener{
+        ConversationFragment.OnConversationFragmentInteractionListener,
+        BottomNavigationFragment.OnBottomNavFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,7 +146,7 @@ public class HomeActivity extends AppCompatActivity
         if(id == R.id.nav_home_fragment){
                 loadFragment(new HomeFragment());
         } else if (id == R.id.nav_message_activity_home) {
-            loadFragment(new ChatFragment());
+            loadFragment(new BottomNavigationFragment());
 //            loadFragment(new MessageFragment());
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
@@ -175,6 +179,23 @@ public class HomeActivity extends AppCompatActivity
      */
     private void logout() {
         new DeleteTokenAsyncTask().execute();
+    }
+
+    @Override
+    public void onMessageListFragmentInteraction(Message item) {
+
+    }
+
+    @Override
+    public void onNewContactListFragmentInteraction(NewContact item) {
+
+    }
+
+    @Override
+    public void onBottomFragmentInteraction(Uri uri) {
+        final Fragment recentFrag = new MessageFragment();
+        final Fragment contactFrag = new ContactFragment();
+//        final Fragment requestFrag = new RequestFragment();
     }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -216,16 +237,6 @@ public class HomeActivity extends AppCompatActivity
             // End this Activity and remove it from the Activity back stack
             finish();
         }
-    }
-
-    /**
-     * Interaction listener for Message Fragment
-     * @param item
-     */
-    @Override
-    public void onMessageListFragmentInteraction(DummyContent.DummyItem item) {
-        loadFragment(new ConversationFragment());
-
     }
 
     /**

@@ -12,7 +12,7 @@
         android:layout_height="56dp"
         android:layout_gravity="bottom"
         android:background="@color/colorPrimary"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
         app:menu="@menu/msg_bottom_nav"/>
 </FrameLayout>
