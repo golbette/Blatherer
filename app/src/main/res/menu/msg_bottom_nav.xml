@@ -7,15 +7,15 @@
         <!--android:icon="@drawable/ic_favorite_black_24dp"-->
         <!--android:title="@string/nav_favorite" />-->
     <item
-        android:id="@+id/nav_recents"
+        android:id="@+id/nav_recents_dep"
         android:icon="@drawable/ic_recents_black_24dp"
         android:title="@string/nav_recents" />
     <item
-        android:id="@+id/nav_contacts"
+        android:id="@+id/nav_contacts_dep"
         android:icon="@drawable/ic_contacts_black_24dp"
         android:title="@string/nav_contacts" />
     <item
-        android:id="@+id/nav_requests"
+        android:id="@+id/nav_requests_dep"
         android:icon="@drawable/ic_requests"
         android:title="@string/nav_requests" />
 

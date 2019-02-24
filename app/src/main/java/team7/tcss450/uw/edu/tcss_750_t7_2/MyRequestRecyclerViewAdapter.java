@@ -6,8 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment.OnListFragmentInteractionListener;
+import team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment.OnRequestListFragmentInteractionListener;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 
 import java.util.List;
 
@@ -18,10 +19,10 @@ import java.util.List;
  */
 public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final List<Request> mValues;
+    private final OnRequestListFragmentInteractionListener mListener;
 
-    public MyRequestRecyclerViewAdapter(List<DummyItem> items, OnListFragmentInteractionListener listener) {
+    public MyRequestRecyclerViewAdapter(List<Request> items, OnRequestListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -36,8 +37,9 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).id);
-        holder.mContentView.setText(mValues.get(position).content);
+        holder.mRequestInitials.setText(mValues.get(position).getInitials());
+        holder.mRequestContactName.setText(mValues.get(position).getContactName());
+        holder.mRequestType.setText(mValues.get(position).getmRequestType());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +47,7 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onRequestListFragmentInteraction(holder.mItem);
                 }
             }
         });
@@ -58,20 +60,22 @@ public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequest
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mRequestInitials;
+        public final TextView mRequestContactName;
+        public final TextView mRequestType;
+        public Request mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.item_number);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mRequestInitials = (TextView) view.findViewById(R.id.request_initials);
+            mRequestContactName = (TextView) view.findViewById(R.id.request_contact_name);
+            mRequestType = (TextView) view.findViewById(R.id.request_type);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mRequestType.getText() + "'";
         }
     }
 }

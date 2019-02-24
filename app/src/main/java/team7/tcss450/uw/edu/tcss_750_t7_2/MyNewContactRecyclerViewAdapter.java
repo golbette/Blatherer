@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import team7.tcss450.uw.edu.tcss_750_t7_2.NewContactFragment.OnListFragmentInteractionListener;
+import team7.tcss450.uw.edu.tcss_750_t7_2.NewContactFragment.OnNewContactListFragmentInteractionListener;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 
@@ -20,9 +20,9 @@ import java.util.List;
 public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewContactRecyclerViewAdapter.ViewHolder> {
 
     private final List<NewContact> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OnNewContactListFragmentInteractionListener mListener;
 
-    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnListFragmentInteractionListener listener) {
+    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnNewContactListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

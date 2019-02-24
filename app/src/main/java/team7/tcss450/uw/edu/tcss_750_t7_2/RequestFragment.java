@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 
 import java.util.List;
 
@@ -22,12 +23,14 @@ import java.util.List;
  * interface.
  */
 public class RequestFragment extends Fragment {
+    public static final String ARG_REQUEST_LIST = "requests_list";
+    private List<Request> mRequests;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private OnRequestListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -69,7 +72,7 @@ public class RequestFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyRequestRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setAdapter(new MyRequestRecyclerViewAdapter(mRequests, mListener));
         }
         return view;
     }
@@ -78,12 +81,12 @@ public class RequestFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
+//        if (context instanceof OnRequestListFragmentInteractionListener) {
+//            mListener = (OnRequestListFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnRequestListFragmentInteractionListener");
+//        }
     }
 
     @Override
@@ -102,8 +105,8 @@ public class RequestFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
+    public interface OnRequestListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onRequestListFragmentInteraction(Request item);
     }
 }

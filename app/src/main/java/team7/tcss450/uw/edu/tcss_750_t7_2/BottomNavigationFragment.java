@@ -20,14 +20,14 @@ import android.view.ViewGroup;
 public class BottomNavigationFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+//    private static final String ARG_PARAM1 = "param1";
+//    private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+//    private String mParam1;
+//    private String mParam2;
 
-    private OnBottomNavFragmentInteractionListener mListener;
+//    private OnBottomNavFragmentInteractionListener mListener;
 
     public BottomNavigationFragment() {
         // Required empty public constructor
@@ -42,22 +42,24 @@ public class BottomNavigationFragment extends Fragment {
      * @return A new instance of fragment BottomNavigationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BottomNavigationFragment newInstance(String param1, String param2) {
+    public static BottomNavigationFragment newInstance() { //String param1, String param2
         BottomNavigationFragment fragment = new BottomNavigationFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+//        Bundle args = new Bundle();
+//        args.putString(ARG_PARAM1, param1);
+//        args.putString(ARG_PARAM2, param2);
+//        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+
+
+//        if (getArguments() != null) {
+//            mParam1 = getArguments().getString(ARG_PARAM1);
+//            mParam2 = getArguments().getString(ARG_PARAM2);
+//        }
     }
 
     @Override
@@ -68,27 +70,27 @@ public class BottomNavigationFragment extends Fragment {
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onBottomFragmentInteraction(uri);
-        }
-    }
+//    public void onButtonPressed(Uri uri) {
+//        if (mListener != null) {
+//            mListener.onBottomFragmentInteraction(uri);
+//        }
+//    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnBottomNavFragmentInteractionListener) {
-            mListener = (OnBottomNavFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnBottomNavFragmentInteractionListener");
-        }
+//        if (context instanceof OnBottomNavFragmentInteractionListener) {
+//            mListener = (OnBottomNavFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnBottomNavFragmentInteractionListener");
+//        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+//        mListener = null;
     }
 
     /**
@@ -101,8 +103,8 @@ public class BottomNavigationFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnBottomNavFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onBottomFragmentInteraction(Uri uri);
-    }
+//    public interface OnBottomNavFragmentInteractionListener {
+//        // TODO: Update argument type and name
+//        void createMessagingFragments();
+//    }
 }
