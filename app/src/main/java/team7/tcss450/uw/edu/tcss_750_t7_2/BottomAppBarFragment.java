@@ -11,8 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 
-
-
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -23,35 +21,19 @@ public class BottomAppBarFragment extends Fragment {
         // Required empty public constructor
     }
 
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//    }
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        ImageButton butt = (ImageButton) getActivity().findViewById(R.id.bottom_bar_recents);
-        Log.wtf("BUTTONTAG", butt.toString());
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_bottom_app_bar, container, false);
 
-        ImageButton butt = (ImageButton) getActivity().findViewById(R.id.bottom_bar_recents);
-//        Log.wtf("BUTTONTAG", butt.toString());
+        ImageButton butt = (ImageButton) view.findViewById(R.id.bottom_bar_recents);
         butt.setOnClickListener(this::showRecent);
 
-        butt = (ImageButton) getActivity().findViewById(R.id.bottom_bar_contacts);
+        butt = (ImageButton) view.findViewById(R.id.bottom_bar_contacts);
         butt.setOnClickListener(this::showContact);
 
-        butt = (ImageButton) getActivity().findViewById(R.id.bottom_bar_requests);
+        butt = (ImageButton) view.findViewById(R.id.bottom_bar_requests);
         butt.setOnClickListener(this::showRequest);
 
         return view;

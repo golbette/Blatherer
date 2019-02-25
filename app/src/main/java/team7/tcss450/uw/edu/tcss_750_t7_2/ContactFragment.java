@@ -1,6 +1,8 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 
@@ -17,7 +20,7 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnContactListFragmentInteractionListener}
  * interface.
  */
 public class ContactFragment extends Fragment {
@@ -28,7 +31,7 @@ public class ContactFragment extends Fragment {
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    private OnContactListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -61,6 +64,17 @@ public class ContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
 
+        ImageButton butt = (ImageButton) view.findViewById(R.id.new_contact_butt);
+        butt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    mListener.newContactClicked();
+                }
+            }
+        });
+
+
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -79,12 +93,12 @@ public class ContactFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnListFragmentInteractionListener) {
-//            mListener = (OnListFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnListFragmentInteractionListener");
-//        }
+        if (context instanceof OnContactListFragmentInteractionListener) {
+            mListener = (OnContactListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnContactListFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -103,8 +117,9 @@ public class ContactFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnListFragmentInteractionListener {
+    public interface OnContactListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(Contact item);
+        void onContactListFragmentInteraction(Contact item);
+        void newContactClicked();
     }
 }

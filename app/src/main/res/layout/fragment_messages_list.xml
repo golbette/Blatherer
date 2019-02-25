@@ -43,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="56dp"
-        app:layoutManager="LinearLayoutManager"
+
         tools:context=".MessageFragment"
         tools:listitem="@layout/fragment_messages" />
 

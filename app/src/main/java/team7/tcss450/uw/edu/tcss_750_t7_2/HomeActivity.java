@@ -25,6 +25,7 @@ import android.view.MenuItem;
 
 import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
@@ -44,7 +45,8 @@ public class HomeActivity extends AppCompatActivity
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         ConversationFragment.OnConversationFragmentInteractionListener,
-        BottomAppBarFragment.OnBottomNavFragmentInteractionListener{
+        BottomAppBarFragment.OnBottomNavFragmentInteractionListener,
+        ContactFragment.OnContactListFragmentInteractionListener{
     final Fragment bottomAppBarFrag = new BottomAppBarFragment();
 //    final Fragment recentFrag = new MessageFragment();
 //    final Fragment contactFrag = new ContactFragment();
@@ -265,6 +267,18 @@ public class HomeActivity extends AppCompatActivity
 //        fm.beginTransaction().remove(active).commit();
         fm.beginTransaction()
                 .replace(R.id.top_frag_container, new RequestFragment())
+                .addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onContactListFragmentInteraction(Contact item) {
+
+    }
+
+    @Override
+    public void newContactClicked() {
+        fm.beginTransaction()
+                .replace(R.id.top_frag_container, new NewContactFragment())
                 .addToBackStack(null).commit();
     }
 

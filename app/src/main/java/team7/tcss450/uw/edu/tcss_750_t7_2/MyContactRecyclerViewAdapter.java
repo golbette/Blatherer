@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import team7.tcss450.uw.edu.tcss_750_t7_2.ContactFragment.OnListFragmentInteractionListener;
+import team7.tcss450.uw.edu.tcss_750_t7_2.ContactFragment.OnContactListFragmentInteractionListener;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 
@@ -14,15 +14,15 @@ import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * specified {@link OnContactListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyContactRecyclerViewAdapter extends RecyclerView.Adapter<MyContactRecyclerViewAdapter.ViewHolder> {
 
     private final List<Contact> mValues;
-    private final OnListFragmentInteractionListener mListener;
+    private final OnContactListFragmentInteractionListener mListener;
 
-    public MyContactRecyclerViewAdapter(List<Contact> items, OnListFragmentInteractionListener listener) {
+    public MyContactRecyclerViewAdapter(List<Contact> items, OnContactListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }
@@ -47,7 +47,7 @@ public class MyContactRecyclerViewAdapter extends RecyclerView.Adapter<MyContact
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onContactListFragmentInteraction(holder.mItem);
                 }
             }
         });
