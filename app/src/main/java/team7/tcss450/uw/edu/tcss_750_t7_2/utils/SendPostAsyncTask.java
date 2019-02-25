@@ -1,6 +1,7 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2.utils;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -196,6 +197,7 @@ public class SendPostAsyncTask extends AsyncTask<Void, String, String> {
             while((s = buffer.readLine()) != null) {
                 response.append(s);
             }
+
             publishProgress();
         } catch (Exception e) {
             response = new StringBuilder("Unable to connect, Reason: "

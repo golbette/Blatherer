@@ -30,6 +30,16 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import me.pushy.sdk.Pushy;
@@ -38,6 +48,9 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
+import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
+import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
 /**
@@ -65,6 +78,14 @@ public class HomeActivity extends AppCompatActivity
     private PushMessageReceiver mPushMessageReceiver;
     private String mUsername;
     private JSONObject personB;
+
+    private FortyEightHourWeather[] mFortyEightHour;
+
+    private HashMap<String, String> mLocationData;
+
+    private HashMap<String, String> mCurrentObservationData;
+
+    private TenDayWeather[] mTenDay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,7 +231,24 @@ public class HomeActivity extends AppCompatActivity
 
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
-            loadFragment(new WeatherFragment());
+            //loadFragment(new WeatherFragment());
+
+            /* 98402 is hardcoded, eventually will make default
+               location based on device location
+             */
+
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_weather))
+                    .appendPath(getString(R.string.ep_location))
+                    .appendQueryParameter(getString(R.string.ep_location), "98402")
+                    .build();
+            new GetAsyncTask.Builder(uri.toString())
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleWeatherGetOnPostExecute)
+                    .build().execute();
+
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
         } else if (id == R.id.nav_logout){
@@ -309,13 +347,6 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
-    /**
-     * Handle errors that may occur during the AsyncTask.
-     * @param result the error message provided from the AsyncTask
-     */
-    private void handleErrorsInTask(String result) {
-        Log.e("ASYNC_TASK_ERROR", result);
-    }
 
 
     private void handleContactGetOnPostExecute(final String result) {
@@ -499,7 +530,160 @@ public class HomeActivity extends AppCompatActivity
             // End this Activity and remove it from the Activity back stack
             finish();
         }
+
     }
+
+    private void handleWeatherGetOnPostExecute(final String result) {
+        //parse JSON
+        try {
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_location))
+                    && root.getJSONObject(getString(R.string.keys_json_weather_location)).length() != 0) {
+                Iterator<?> keys;
+                //Handle location JSONObject
+                JSONObject location = root.getJSONObject(getString(R.string.keys_json_weather_location));
+                mLocationData = new HashMap<>();
+                keys = location.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    String value = location.getString(key);
+                    mLocationData.put(key, value);
+                }
+
+                //Handle current observation JSONObject
+                JSONObject currentObservation = root.getJSONObject(getString(R.string.keys_json_weather_current_observation));
+                mCurrentObservationData = new HashMap<>();
+                keys = currentObservation.keys();
+                while(keys.hasNext()) {
+                    String outerKey = (String) keys.next();
+                    if (!outerKey.equals("pubDate")) {
+                        JSONObject innerObject = currentObservation.getJSONObject(outerKey);
+                        Iterator<?> innerKeys = innerObject.keys();
+                        while (innerKeys.hasNext()) {
+                            String innerKey = (String) innerKeys.next();
+                            String value = innerObject.getString(innerKey);
+                            mCurrentObservationData.put(outerKey + innerKey, value);
+                        }
+                    } else {
+                        mCurrentObservationData.put(outerKey, currentObservation.getString(outerKey));
+                    }
+                }
+                //public Builder(String date, String weatherText, int weatherCode, String weatherTemp)
+                //Handle forecasts JSONObject
+                JSONArray forecasts = root.getJSONArray(getString(R.string.keys_json_weather_forecasts));
+                List<TenDayWeather> tenDay = new ArrayList<>();
+                for (int i = 0; i < forecasts.length(); i++) {
+                    JSONObject weather = forecasts.getJSONObject(i);
+                    tenDay.add(new TenDayWeather.Builder(
+                            weather.getString(
+                                    getString(R.string.keys_json_weather_date)),
+                            weather.getString(
+                                    getString(R.string.keys_json_weather_text)
+                            ),
+                            Integer.parseInt(weather.getString(
+                                    getString(R.string.keys_json_weather_code)
+                            )),
+                            weather.getString(
+                                        getString(R.string.keys_json_weather_high)
+                            ) + "\u00B0"
+                                    +  "\n"
+                                    + weather.getString(
+                                    getString(R.string.keys_json_weather_low)
+                            ) + "\u00B0")
+                            .build());
+                }
+                mTenDay = new TenDayWeather[tenDay.size()];
+                mTenDay = tenDay.toArray(mTenDay);
+                String lat = mLocationData.get("lat");
+                String lon = mLocationData.get("long");
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_hourly))
+                        .appendQueryParameter("lat", lat)
+                        .appendQueryParameter("lon", lon)
+                        .build();
+                Log.e("url", uri.toString());
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handleHourlyOnPost)
+                        .build().execute();
+
+
+            } else {
+                Log.e("ERROR!", "Invalid location entered");
+
+                //notify user
+                onWaitFragmentInteractionHide();
+            }
+
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
+
+            //notify user
+            onWaitFragmentInteractionHide();
+        }
+    }
+
+    private void handleHourlyOnPost(String result) {
+        //parse JSON
+        try {
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_hourly))) {
+                JSONObject hourly = root.getJSONObject(getString(R.string.keys_json_weather_hourly));
+                JSONArray data = hourly.getJSONArray(getString(R.string.keys_json_weather_data));
+                List<FortyEightHourWeather> fortyEightHour = new ArrayList<>();
+                //public Builder(String date, String weatherText, String weatherCode, String weatherTemp) {
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject hour = data.getJSONObject(i);
+                    fortyEightHour.add(new FortyEightHourWeather.Builder(
+                            hour.getString(
+                                    getString(R.string.keys_json_weather_time)
+                            ),
+                            hour.getString(
+                                    getString(R.string.keys_json_weather_summary)
+                            ),
+                            hour.getString(
+                                    getString(R.string.keys_json_weather_icon)
+                            ),
+                            hour.getString(
+                                    getString(R.string.keys_json_weather_temperature)
+                            )
+                    ).build());
+                }
+
+                mFortyEightHour = new FortyEightHourWeather[fortyEightHour.size()];
+                mFortyEightHour = fortyEightHour.toArray(mFortyEightHour);
+
+                Bundle args = new Bundle();
+                args.putSerializable(WeatherFragment.ARG_LOCATION, mLocationData);
+                args.putSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION, mCurrentObservationData);
+                args.putSerializable(WeatherFragment.ARG_FORECASTS, mTenDay);
+                args.putSerializable(WeatherFragment.ARG_FORTY_EIGHT_HOUR, mFortyEightHour);
+                Fragment weatherFragment = new WeatherFragment();
+                weatherFragment.setArguments(args);
+                onWaitFragmentInteractionHide();
+                loadFragment(weatherFragment);
+
+            }
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
+
+
+        }
+    }
+
+    /**
+     * Handle errors that may occur during the AsyncTask.
+     * @param result the error message provide from the AsyncTask
+     */
+    private void handleErrorsInTask(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+    }
+
 
     /**
      * Interaction listener for weather fragment that loads
