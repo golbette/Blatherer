@@ -23,11 +23,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
 /**
  * Container for fragments after user is successfully
@@ -44,24 +53,19 @@ public class HomeActivity extends AppCompatActivity
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         ConversationFragment.OnConversationFragmentInteractionListener,
-        BottomAppBarFragment.OnBottomNavFragmentInteractionListener{
+        BottomAppBarFragment.OnBottomNavFragmentInteractionListener,
+        ContactFragment.OnContactListFragmentInteractionListener{
+
     final Fragment bottomAppBarFrag = new BottomAppBarFragment();
-//    final Fragment recentFrag = new MessageFragment();
-//    final Fragment contactFrag = new ContactFragment();
-//    final Fragment requestFrag = new RequestFragment();
-//    final Fragment bottomNavFrag = new BottomNavigationFragment();
     final FragmentManager fm = getSupportFragmentManager();
-//    Fragment active;
+    private String mJwToken;
+    private Credentials mCredentials;
+    private JSONObject personB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-//        fm.beginTransaction().add(R.id.fragmentContainer, bottomNavFrag, "1").hide(bottomNavFrag).commit();
-//        fm.beginTransaction().add(R.id.fragmentContainer, requestFrag, "3").hide(requestFrag).commit();
-//        fm.beginTransaction().add(R.id.fragmentContainer, contactFrag, "2").hide(contactFrag).commit();
-//        fm.beginTransaction().add(R.id.fragmentContainer, recentFrag, "1").hide(recentFrag).commit();
-//        fm.beginTransaction().add(R.id.fragmentContainer, recentFrag, "2").commit();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,11 +88,16 @@ public class HomeActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Intent intent = getIntent();
+        Bundle args = intent.getExtras();
+        mJwToken = intent.getStringExtra(getString(R.string.keys_intent_jwt));
+        mCredentials = (Credentials) args.getSerializable(getString(R.string.keys_intent_credentials));
+
         if (savedInstanceState == null) {
-            if (findViewById(R.id.top_frag_container) != null) {
+            if (findViewById(R.id.fragmentContainer) != null) {
                 if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
                     ChatFragment chatFragment = new ChatFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.top_frag_container, chatFragment).addToBackStack(null).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
                 } else {
                     loadFragment(new HomeFragment());
                 }
@@ -163,38 +172,40 @@ public class HomeActivity extends AppCompatActivity
             loadFragment(new HomeFragment());
             fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_message_activity_home) {
-//            fm.beginTransaction().hide(active).show(bottomNavFrag).commit();
-//            fm.beginTransaction().show(recentFrag).commit();
-//            loadFragment(new BottomNavigationFragment());
-//            loadFragment(new MessageFragment());
-
-            fm.beginTransaction()
-                    .replace(R.id.top_frag_container, new MessageFragment())
-                    .addToBackStack(null).commit();
-
-            fm.beginTransaction()
-                    .replace(R.id.bottom_frag_container, bottomAppBarFrag)
-                    .addToBackStack(null).commit();
+//            Uri uri = new Uri.Builder().scheme("https")
+//                    .appendPath(R.string.ep_base_url)
+//                    .appendPath(R.string.ep_contacts_base)
+//                    .appendPath(R.string.ep_contacts_getcontacts)
+//                    .build();
+            loadFragment(new MessageFragment());
+//            fm.beginTransaction()
+//                    .replace(R.id.bottom_frag_container, bottomAppBarFrag)
+//                    .addToBackStack(null).commit();
 //            fm.popBackStack();
 
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
             loadFragment(new WeatherFragment());
-            fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
-            fm.beginTransaction().remove(bottomAppBarFrag).commit();
+        } else if (id == R.id.nav_contacts_activity_home) {
+            Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath(getString(R.string.ep_contacts_getcontacts)).build();
+
+            JSONObject msg = mCredentials.asJSONObject();
+
+            Log.wtf("CREDS", msg.toString());
+
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleContactGetOnPostExecute)
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        } else if (id == R.id.nav_requests_activity_home) {
+            loadFragment(new RequestFragment());
         }
-//        else if (id == R.id.nav_recents) {
-//            fm.beginTransaction().hide(active).show(recentFrag).commit();
-//            active = recentFrag;
-//        } else if (id == R.id.nav_contacts) {
-//            fm.beginTransaction().hide(active).show(contactFrag).commit();
-//            active = contactFrag;
-//        } else if (id == R.id.nav_requests) {
-//            fm.beginTransaction().hide(active).show(requestFrag).commit();
-//            active = requestFrag;
-//        }
 
 //        case R.id.nav_recents:
 //
@@ -221,7 +232,7 @@ public class HomeActivity extends AppCompatActivity
     private void loadFragment(Fragment frag) {
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.top_frag_container, frag)
+                .replace(R.id.fragmentContainer, frag)
                 .addToBackStack(null); //// remove this adding to backstack.
         // Commit the transaction
         transaction.commit();
@@ -246,27 +257,179 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void recentClicked() {
-//        fm.beginTransaction().remove(active).commit();
+//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
         fm.beginTransaction()
-                .replace(R.id.top_frag_container, new MessageFragment())
+                .replace(R.id.fragmentContainer, new MessageFragment())
                 .addToBackStack(null).commit();
     }
 
     @Override
     public void contactClicked() {
-//        fm.beginTransaction().remove(active).commit();
+//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
+        Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_contacts_base))
+                .appendPath(getString(R.string.ep_contacts_getcontacts)).build();
+
+        JSONObject msg = mCredentials.asJSONObject();
+
+        Log.wtf("CREDS", msg.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleContactGetOnPostExecute)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
+
+    /**
+     * Handle errors that may occur during the AsyncTask.
+     * @param result the error message provided from the AsyncTask
+     */
+    private void handleErrorsInTask(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+    }
+
+
+    private void handleContactGetOnPostExecute(final String result) {
+        Log.wtf("CONTACT_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+
+            if (response.has(getString(R.string.keys_json_contact_message))) {
+
+                JSONArray data = response.getJSONArray(getString(R.string.keys_json_contact_message));
+
+                List<Contact> contacts = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonContact = data.getJSONObject(i);
+                    contacts.add(new Contact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
+                            .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
+                            .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
+                            .build());
+                }
+                Contact[] contactsAsArray = new Contact[contacts.size()];
+                contactsAsArray = contacts.toArray(contactsAsArray);
+                Bundle args = new Bundle();
+                args.putSerializable(ContactFragment.ARG_CONTACTS_LIST, contactsAsArray);
+                Fragment frag = new ContactFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag)
+                        .addToBackStack(null);
+                transaction.commit();
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+    }
+
+
+
+    @Override
+    public void requestClicked() {
+//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
         fm.beginTransaction()
-                .replace(R.id.top_frag_container, new ContactFragment())
+                .replace(R.id.fragmentContainer, new RequestFragment())
                 .addToBackStack(null).commit();
     }
 
     @Override
-    public void requestClicked() {
-//        fm.beginTransaction().remove(active).commit();
-        fm.beginTransaction()
-                .replace(R.id.top_frag_container, new RequestFragment())
-                .addToBackStack(null).commit();
+    public void onContactListFragmentInteraction(Contact item) throws JSONException {
+        Uri uri = new Uri.Builder().scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_messaging_base))
+                .appendPath(getString(R.string.ep_messaging_getall)).build();
+
+        JSONObject msg = mCredentials.asJSONObject();
+        msg.put("contactemail", item.getEmail());
+
+        Log.wtf("CREDS", msg.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleMessageGetOnPostExecute)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+
+
+
+        Bundle data = new Bundle();
+        data.putSerializable(getString(R.string.contact_tv_contact_initials), item.getContactName());
+        data.putSerializable(getString(R.string.contact_tv_contact_name), item.getInitials());
+        data.putSerializable(getString(R.string.contact_tv_email), item.getEmail());
+        data.putSerializable(getString(R.string.contact_tv_username), item.getmUsername());
+
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(data);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
+        transaction.commit();
     }
+
+    private void handleMessageGetOnPostExecute(final String result) {
+        Log.wtf("CONTACT_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+
+            if (response.has(getString(R.string.keys_json_message_message))) {
+
+                JSONArray data = response.getJSONArray(getString(R.string.keys_json_message_message));
+
+                List<Message> messages = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonMessage = data.getJSONObject(i);
+                    messages.add(new Message.Builder(jsonMessage.getString(getString(R.string.keys_json_message_username)),
+                            jsonMessage.getString(getString(R.string.keys_json_message_message)),
+                            jsonMessage.getString(getString(R.string.keys_json_message_timestamp)))
+                            .build());
+                }
+                Message[] messagesAsArray = new Message[messages.size()];
+                messagesAsArray = messages.toArray(messagesAsArray);
+                Bundle args = new Bundle();
+                args.putSerializable(ContactFragment.ARG_CONTACTS_LIST, messagesAsArray);
+
+                Fragment frag = new ChatFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag)
+                        .addToBackStack(null);
+                transaction.commit();
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+    }
+//    @Override
+//    public void newContactClicked() {
+//        fm.beginTransaction()
+//                .replace(R.id.fragmentContainer, new NewContactFragment())
+//                .addToBackStack(null).commit();
+//    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -376,56 +539,4 @@ public class HomeActivity extends AppCompatActivity
     public void onConversationFragmentInteraction(Uri uri) {
 
     }
-
-//    private BottomNavigationFragment.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-//            = new BottomNavigationFragment().OnNavigationItemSelectedListener() {
-//
-//        @Override
-//        public boolean onNavigationItemSelected(MenuItem item) {
-//            switch (item.getItemId()) {
-//                case R.id.navigation_home:
-//                    fm.beginTransaction().hide(active).show(fragment1).commit();
-//                    active = fragment1;
-//                    return true;
-//
-//                case R.id.navigation_dashboard:
-//                    fm.beginTransaction().hide(active).show(fragment2).commit();
-//                    active = fragment2;
-//                    return true;
-//
-//                case R.id.navigation_notifications:
-//                    fm.beginTransaction().hide(active).show(fragment3).commit();
-//                    active = fragment3;
-//                    return true;
-//            }
-//            return false;
-//        }
-//    };
-
-//    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-//            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-//
-//        @Override
-//        public boolean onNavigationItemSelected(MenuItem item) {
-//            switch (item.getItemId()) {
-//                case R.id.nav_recents:
-//                    fm.beginTransaction().hide(active).show(recentFrag).commit();
-//                    active = recentFrag;
-//                    return true;
-//
-//                case R.id.nav_contacts:
-//                    fm.beginTransaction().hide(active).show(contactFrag).commit();
-//                    active = contactFrag;
-//                    return true;
-//
-//                case R.id.nav_requests:
-//                    fm.beginTransaction().hide(active).show(requestFrag).commit();
-//                    active = requestFrag;
-//                    return true;
-//            }
-//            return false;
-//        }
-//    };
-
-
 }

@@ -40,16 +40,16 @@
 
     <!--</LinearLayout>-->
 
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/list"
-    android:name="team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginBottom="56dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".RequestFragment"
-    tools:listitem="@layout/fragment_request" />
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/list"
+        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
+
+        tools:context=".RequestFragment"
+        tools:listitem="@layout/fragment_request" />
 
 </LinearLayout>
