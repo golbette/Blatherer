@@ -49,13 +49,10 @@ public class Credentials implements Serializable {
          * @param email the email
          * @param password the password
          */
-        public Builder(String password) {
+        public Builder(String email, String password) {
+            mEmail = email;
             mPassword = password;
         }
-//        public Builder(String email, String password) {
-//            mEmail = email;
-//            mPassword = password;
-//        }
 
         /**
          * Add NON-OPTIONAL Email

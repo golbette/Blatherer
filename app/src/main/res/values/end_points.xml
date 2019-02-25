@@ -3,4 +3,9 @@
     <string name="ep_base_url">blatherer-service.herokuapp.com</string>
     <string name="ep_login">login</string>
     <string name="ep_register">register</string>
+    <string name="ep_weather">weather</string>
+    <string name="ep_hourly">hourly</string>
+    <string name="ep_location">location</string>
+    <string name="ep_coordinates">coordinates</string>
+    <string name="ep_users">users</string>
 </resources>

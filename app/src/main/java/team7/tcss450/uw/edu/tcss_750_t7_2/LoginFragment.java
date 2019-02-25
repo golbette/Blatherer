@@ -89,7 +89,7 @@ public class LoginFragment extends Fragment {
             boolean loggedOutByUser = (boolean) getActivity().getIntent().getBooleanExtra(getString(R.string.keys_logged_out_by_user), false);
             Log.wtf("LOGGED OUT", loggedOutByUser + " (onStart)");
             if (!loggedOutByUser) {
-                doLogin(new Credentials.Builder(password).addEmail(email).addUsername(username).build());
+                doLogin(new Credentials.Builder(email, password).addUsername(username).build());
             }
         }
 
@@ -136,10 +136,10 @@ public class LoginFragment extends Fragment {
             EditText password = (EditText) getActivity().findViewById(R.id.login_et_password);
             String usernameMessage = username.getText().toString();
             String passwordMessage = password.getText().toString();
-//            if (!emailMessage.contains("@")) {
-//                email.setError("Must enter a valid email address");
-//                pass = false;
-//            }
+            if (!usernameMessage.contains("@")) {
+                username.setError("Must enter a valid email address");
+                pass = false;
+            }
             if (usernameMessage.isEmpty()) {
                 username.setError("This field cannot be empty");
                 pass = false;
@@ -149,7 +149,7 @@ public class LoginFragment extends Fragment {
                 pass = false;
             }
             if (pass == true){
-                doLogin(new Credentials.Builder(passwordMessage).addUsername(usernameMessage).build());
+                doLogin(new Credentials.Builder(usernameMessage, passwordMessage).build());
             }
             // This is the builder pattern and it's good for constructor that takes a lot of parameters.
         }

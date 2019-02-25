@@ -61,4 +61,7 @@
     <string name="text_settings_fragment_settings">Settings</string>
     <string name="nav_logout">Log Out</string>
     <string name="nav_header_a_title">Blatherer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

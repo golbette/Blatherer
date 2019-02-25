@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         /**
-            Gio was here, still trying to figure out
-            how to commit to my own branch instead of master
+         Gio was here, still trying to figure out
+         how to commit to my own branch instead of master
          */
         setContentView(R.layout.activity_main);
 
