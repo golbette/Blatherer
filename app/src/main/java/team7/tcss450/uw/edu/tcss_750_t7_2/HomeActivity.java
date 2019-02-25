@@ -322,13 +322,6 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
-    /**
-     * Handle errors that may occur during the AsyncTask.
-     * @param result the error message provided from the AsyncTask
-     */
-    private void handleErrorsInTask(String result) {
-        Log.e("ASYNC_TASK_ERROR", result);
-    }
 
 
     private void handleContactGetOnPostExecute(final String result) {
@@ -510,13 +503,7 @@ public class HomeActivity extends AppCompatActivity
             // End this Activity and remove it from the Activity back stack
             finish();
         }
-        // Or close this activity and bring back the Login
-        boolean loggedOutByUser = true;
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(getString(R.string.keys_logged_out_by_user), loggedOutByUser);
-        startActivity(intent);
-        // End this Activity and remove it from the Activity back stack
-        finish();
+
     }
 
     private void handleWeatherGetOnPostExecute(final String result) {
@@ -670,15 +657,6 @@ public class HomeActivity extends AppCompatActivity
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
-    /**
-     * Interaction listener for Message Fragment
-     * @param item
-     */
-    @Override
-    public void onMessageListFragmentInteraction(DummyContent.DummyItem item) {
-        loadFragment(new ConversationFragment());
-
-    }
 
     /**
      * Interaction listener for weather fragment that loads
