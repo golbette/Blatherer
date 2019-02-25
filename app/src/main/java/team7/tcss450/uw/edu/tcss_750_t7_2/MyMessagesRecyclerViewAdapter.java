@@ -37,9 +37,9 @@ public class MyMessagesRecyclerViewAdapter extends RecyclerView.Adapter<MyMessag
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mInitialsView.setText(mValues.get(position).getInitials());
-        holder.mContactNameView.setText(mValues.get(position).getContactName());
-        holder.mPreviewView.setText(mValues.get(position).getPreview());
+        holder.mUsername.setText(mValues.get(position).getUsername());
+        holder.mMessage.setText(mValues.get(position).getMessage());
+        holder.mTimestamp.setText(mValues.get(position).getTimestamp());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,22 +60,22 @@ public class MyMessagesRecyclerViewAdapter extends RecyclerView.Adapter<MyMessag
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mContactNameView;
-        public final TextView mInitialsView;
-        public final TextView mPreviewView;
+        public final TextView mUsername;
+        public final TextView mMessage;
+        public final TextView mTimestamp;
         public Message mItem;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mContactNameView = (TextView) view.findViewById(R.id.msg_contact_name);
-            mInitialsView = (TextView) view.findViewById(R.id.msg_contact_initials);
-            mPreviewView = (TextView) view.findViewById(R.id.msg_latest);
+            mUsername = (TextView) view.findViewById(R.id.msg_contact_name);
+            mMessage = (TextView) view.findViewById(R.id.msg_contact_initials);
+            mTimestamp = (TextView) view.findViewById(R.id.msg_latest);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mPreviewView.getText() + "'";
+            return super.toString() + " '" + mTimestamp.getText() + "'";
         }
     }
 }

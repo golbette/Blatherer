@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragmentContainer"
@@ -9,15 +9,18 @@
     tools:context=".HomeActivity"
     tools:showIn="@layout/app_bar_home">
 
-    <FrameLayout
-        android:id="@+id/top_frag_container"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"/>
+    <!--<FrameLayout-->
+        <!--android:id="@+id/top_frag_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--tools:context=".HomeActivity"-->
+        <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"/>-->
 
-    <FrameLayout
-        android:id="@+id/bottom_frag_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+    <!--<FrameLayout-->
+        <!--android:id="@+id/bottom_frag_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom"-->
+        <!--android:layout_alignParentBottom="true"/>-->
 
-</RelativeLayout>
+</FrameLayout>

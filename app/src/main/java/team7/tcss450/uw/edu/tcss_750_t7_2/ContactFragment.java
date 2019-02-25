@@ -1,8 +1,6 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,11 +9,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
+
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -24,7 +25,7 @@ import java.util.List;
  * interface.
  */
 public class ContactFragment extends Fragment {
-    public static final String ARG_CONTACT_LIST = "contacts lists";
+    public static final String ARG_CONTACTS_LIST = "contact_list";
     private List<Contact> mContacts;
 
     // TODO: Customize parameter argument names
@@ -56,6 +57,7 @@ public class ContactFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mContacts = new ArrayList<Contact>(Arrays.asList((Contact[]) getArguments().getSerializable(ARG_CONTACTS_LIST)));
         }
     }
 
@@ -63,17 +65,6 @@ public class ContactFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
-
-        ImageButton butt = (ImageButton) view.findViewById(R.id.new_contact_butt);
-        butt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.newContactClicked();
-                }
-            }
-        });
-
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -97,7 +88,7 @@ public class ContactFragment extends Fragment {
             mListener = (OnContactListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnContactListFragmentInteractionListener");
+                    + " must implement OnListFragmentInteractionListener");
         }
     }
 
@@ -119,7 +110,6 @@ public class ContactFragment extends Fragment {
      */
     public interface OnContactListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onContactListFragmentInteraction(Contact item);
-        void newContactClicked();
+        void onContactListFragmentInteraction(Contact item) throws JSONException;
     }
 }

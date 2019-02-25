@@ -35,7 +35,8 @@ public class Request implements Serializable {
 
     private Request(final Builder builder) {
         this.mContactName = builder.mFirstName + " " + builder.mLastName;
-        this.mInitials = builder.mInitials;
+        String initials = builder.mFirstName.charAt(0) + builder.mLastName.charAt(0) + "";
+        this.mInitials = initials.toUpperCase();
         this.mRequestType = builder.mRequestType;
     }
 

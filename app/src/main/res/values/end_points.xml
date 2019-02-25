@@ -5,7 +5,17 @@
     <string name="ep_register">register</string>
     <string name="ep_pushy">pushy</string>
     <string name="ep_token">token</string>
+
     <string name="ep_messaging_base">messaging</string>
     <string name="ep_messaging_send">send</string>
+    <string name="ep_messaging_create">create</string>
     <string name="ep_messaging_getall">getAll</string>
+
+    <string name="ep_contacts_base">contacts</string>
+    <string name="ep_contacts_searchcontacts">searchcontacts</string>
+    <string name="ep_contacts_getcontacts">getcontacts</string>
+    <string name="ep_contacts_getconnreq">getconnreq</string>
+    <string name="ep_contacts_request">request</string>
+    <string name="ep_contacts_list">list</string>
+    <string name="ep_contacts_approve">approve</string>
 </resources>

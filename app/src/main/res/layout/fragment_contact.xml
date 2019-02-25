@@ -48,7 +48,18 @@
                     android:text="@string/contact_tv_contact_name"
                     android:textAppearance="?attr/textAppearanceListItem"
                     android:textColor="@android:color/black" />
-
+                <TextView
+                    android:id="@+id/contact_username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLength="40"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin"
+                    android:padding="1dp"
+                    android:text="@string/contact_tv_username"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorSecondaryText"/>
                 <TextView
                     android:id="@+id/contact_email"
                     android:layout_width="match_parent"

@@ -6,12 +6,14 @@ public class Contact implements Serializable {
     private final String mContactName;
     private final String mInitials;
     private final String mEmail;
+    private final String mUsername;
 
     public static class Builder {
         private final String mFirstName;
         private final String mLastName;
         private String mInitials = "";
         private String mEmail = "";
+        private String mUsername = "";
 
         public Builder(String firstName, String lastName) {
             this.mFirstName = firstName;
@@ -28,6 +30,11 @@ public class Contact implements Serializable {
             return this;
         }
 
+        public Builder addUsername(final String val) {
+            this.mUsername = val;
+            return this;
+        }
+
         public Contact build() {
             return new Contact(this);
         }
@@ -35,8 +42,10 @@ public class Contact implements Serializable {
 
     private Contact(final Builder builder) {
         this.mContactName = builder.mFirstName + " " + builder.mLastName;
-        this.mInitials = builder.mInitials;
+        String initials = builder.mFirstName.substring(0, 1) + builder.mLastName.substring(0, 1) + "";
+        this.mInitials = initials.toUpperCase();
         this.mEmail = builder.mEmail;
+        this.mUsername = builder.mUsername;
     }
 
     public String getContactName() {
@@ -49,6 +58,10 @@ public class Contact implements Serializable {
 
     public String getEmail() {
         return mEmail;
+    }
+
+    public String getmUsername() {
+        return mUsername;
     }
 
 }
