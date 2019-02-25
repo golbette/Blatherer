@@ -18,9 +18,9 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 
 public class PushReceiver extends BroadcastReceiver {
 
-    public static final String RECEIVED_NEW_MESSAGE = "new message from pushy";
+    public static final String RECEIVED_NEW_MESSAGE = "New message on Blatherer";
 
-    private static final String CHANNEL_ID = "1";
+    private String mChatid ;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -67,7 +67,7 @@ public class PushReceiver extends BroadcastReceiver {
 
             //research more on notifications the how to display them
             //https://developer.android.com/guide/topics/ui/notifiers/notifications
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, mChatid)
                     .setAutoCancel(true)
                     .setSmallIcon(R.drawable.ic_chat_black)
                     .setContentTitle("Message from: " + sender)
