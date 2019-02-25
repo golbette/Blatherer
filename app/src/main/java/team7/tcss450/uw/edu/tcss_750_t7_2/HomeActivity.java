@@ -188,6 +188,8 @@ public class HomeActivity extends AppCompatActivity
             loadFragment(new WeatherFragment());
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
+        } else if (id == R.id.nav_logout){
+            logout();
         } else if (id == R.id.nav_contacts_activity_home) {
             Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
                     .appendPath(getString(R.string.ep_contacts_base))
