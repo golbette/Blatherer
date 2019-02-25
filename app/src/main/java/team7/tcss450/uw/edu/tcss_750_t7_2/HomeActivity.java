@@ -1,5 +1,6 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,8 @@ public class HomeActivity extends AppCompatActivity
     final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
     private Credentials mCredentials;
+    private PushMessageReceiver mPushMessageReceiver;
+    private String mUsername;
     private JSONObject personB;
 
     @Override
@@ -96,8 +100,29 @@ public class HomeActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
                 if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
-                    ChatFragment chatFragment = new ChatFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
+//                    Uri uri = new Uri.Builder().scheme("https")
+//                            .appendPath(getString(R.string.ep_base_url))
+//                            .appendPath(getString(R.string.ep_messaging_base))
+//                            .appendPath(getString(R.string.ep_messaging_getall)).build();
+//
+//                    JSONObject msg = mCredentials.asJSONObject();
+//                    try {
+//                        msg.put("username", mUsername);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    Log.wtf("CREDS", msg.toString());
+//
+//                    new SendPostAsyncTask.Builder(uri.toString(), msg)
+//                            .onPreExecute(this::onWaitFragmentInteractionShow)
+//                            .onPostExecute(this::handleMessageGetOnPostExecute)
+//                            .onCancelled(this::handleErrorsInTask)
+//                            .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+//                            .build().execute();
+
+//                    ChatFragment chatFragment = new ChatFragment();
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
                 } else {
                     loadFragment(new HomeFragment());
                 }
@@ -367,25 +392,27 @@ public class HomeActivity extends AppCompatActivity
                 .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                 .build().execute();
 
-
-
-        Bundle data = new Bundle();
-        data.putSerializable(getString(R.string.contact_tv_contact_initials), item.getContactName());
-        data.putSerializable(getString(R.string.contact_tv_contact_name), item.getInitials());
-        data.putSerializable(getString(R.string.contact_tv_email), item.getEmail());
-        data.putSerializable(getString(R.string.contact_tv_username), item.getmUsername());
-
-        ChatFragment chatFragment = new ChatFragment();
-        chatFragment.setArguments(data);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
-        transaction.commit();
+//        Bundle data = new Bundle();
+//        data.putSerializable(getString(R.string.contact_tv_contact_initials), item.getContactName());
+//        data.putSerializable(getString(R.string.contact_tv_contact_name), item.getInitials());
+//        data.putSerializable(getString(R.string.contact_tv_email), item.getEmail());
+//        data.putSerializable(getString(R.string.contact_tv_username), item.getmUsername());
+//
+//        ChatFragment chatFragment = new ChatFragment();
+//        chatFragment.setArguments(data);
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
+//        transaction.commit();
     }
 
     private void handleMessageGetOnPostExecute(final String result) {
-        Log.wtf("CONTACT_RESULT", result);
+        Log.wtf("MESSAGE_RESULT", result);
         try {
             JSONObject response = new JSONObject(result);
-
+            Bundle args = new Bundle();
+            if (response.has("chatid") && response.has("username")){
+                args.putSerializable("send_username", (Serializable) response.getString("username"));
+                args.putSerializable("send_chat_id", (Serializable) response.getInt("chatid"));
+            }
             if (response.has(getString(R.string.keys_json_message_message))) {
 
                 JSONArray data = response.getJSONArray(getString(R.string.keys_json_message_message));
@@ -401,8 +428,8 @@ public class HomeActivity extends AppCompatActivity
                 }
                 Message[] messagesAsArray = new Message[messages.size()];
                 messagesAsArray = messages.toArray(messagesAsArray);
-                Bundle args = new Bundle();
-                args.putSerializable(ContactFragment.ARG_CONTACTS_LIST, messagesAsArray);
+
+                args.putSerializable(MessageFragment.ARG_MESSAGE_LIST, messagesAsArray);
 
                 Fragment frag = new ChatFragment();
                 frag.setArguments(args);
@@ -540,5 +567,15 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onConversationFragmentInteraction(Uri uri) {
 
+    }
+
+    private class PushMessageReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.hasExtra("SENDER") && intent.hasExtra("MESSAGE")) {
+                mUsername = intent.getStringExtra("SENDER");
+//                String messageText = intent.getStringExtra("MESSAGE");
+            }
+        }
     }
 }

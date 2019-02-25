@@ -24,8 +24,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
@@ -38,7 +42,8 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     private String mJwt;
     private Credentials mCredentials;
     private static final String TAG = "CHAT_FRAG";
-    private static final String CHAT_ID = "1";
+    private Integer mChatid;
+    private String mUsername;
     private TextView mMessageOutputTextView;
     private EditText mMessageInputEditText;
     private String mSendUrl;
@@ -52,6 +57,11 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     @Override
     public void onStart() {
         super.onStart();
+        if (getArguments() != null) {
+            mChatid = (Integer) getArguments().getSerializable("send_chat_id");
+            mUsername = (String) getArguments().getSerializable("send_username");
+        }
+
         Intent intent = getActivity().getIntent();
         Bundle args = new Bundle();
         args = intent.getExtras();
@@ -112,10 +122,11 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     private void handleSendClick(final View theButton) {
         String msg = mMessageInputEditText.getText().toString();
         JSONObject messageJson = new JSONObject();
+        Log.wtf("SEND", mCredentials.toString());
         try {
-            messageJson.put("email", mCredentials.getEmail());
+            messageJson.put("username", mUsername);
             messageJson.put("message", msg);
-            messageJson.put("chatId", CHAT_ID);
+            messageJson.put("chatid", mChatid);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -130,6 +141,7 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         try {
             // This is the result from the web service
             JSONObject res = new JSONObject(result);
+            Log.wtf("SEND", result);
             if (res.has("success") && res.getBoolean("success")) {
                 // The web service got our message. Time to clear out the input in EditText
                 mMessageInputEditText.setText("");
@@ -141,44 +153,42 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     }
 
     private void loadChatHistory() {
-        Log.wtf("LOADCHAT", "in loadChatHistory");
-        String msg = mMessageInputEditText.getText().toString();
-        JSONObject messageJson = new JSONObject();
-        try {
-            messageJson.put("chatId", CHAT_ID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        if (getArguments() != null) {
+            Log.wtf("ARG", getArguments().toString());
 
-        new SendPostAsyncTask.Builder(mGetUrl, messageJson)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
-                .onPostExecute(this::loadChatTask)
-                .onCancelled(error -> Log.e(TAG, error))
-                .addHeaderField("authorization", mJwt)
-                .build().execute();
-    }
+            List<Message> messages = new ArrayList<Message>(Arrays.asList((Message[]) getArguments().getSerializable(MessageFragment.ARG_MESSAGE_LIST)));
 
-    private void loadChatTask(final String result) {
-        Log.wtf("LOADCHAT", "in loadChatTask");
-        try {
-            // This is the result from the web service
-            JSONObject res = new JSONObject(result);
-            Log.wtf("LOADCHAT", res.toString());
-            if (res.has("message")) {
-                JSONArray ja = (JSONArray) res.get("message");
-                for (int i = 0; i < ja.length(); i++) {
-                    JSONObject msg = ja.getJSONObject(i);
-                    mMessageOutputTextView.append(msg.getString("email") + ": " + msg.getString("message"));
-                    mMessageOutputTextView.append(System.lineSeparator());
-                    mMessageOutputTextView.append(System.lineSeparator());
-                }
+            Log.wtf("ARG", messages.toString());
+
+            for (int i = 0; i < messages.size(); i++) {
+                mMessageOutputTextView.append(messages.get(i).getUsername() + ": " + messages.get(i).getMessage());
+                mMessageOutputTextView.append(System.lineSeparator());
+                mMessageOutputTextView.append(System.lineSeparator());
             }
-            onWaitFragmentInteractionHide();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            onWaitFragmentInteractionHide();
         }
     }
+
+//    private void loadChatTask(final String result) {
+//        Log.wtf("LOADCHAT", "in loadChatTask");
+//        try {
+//            // This is the result from the web service
+//            JSONObject res = new JSONObject(result);
+//            Log.wtf("LOADCHAT", res.toString());
+//            if (res.has("message")) {
+//                JSONArray ja = (JSONArray) res.get("message");
+//                for (int i = 0; i < ja.length(); i++) {
+//                    JSONObject msg = ja.getJSONObject(i);
+//                    mMessageOutputTextView.append(msg.getString("username") + ": " + msg.getString("message"));
+//                    mMessageOutputTextView.append(System.lineSeparator());
+//                    mMessageOutputTextView.append(System.lineSeparator());
+//                }
+//            }
+//            onWaitFragmentInteractionHide();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            onWaitFragmentInteractionHide();
+//        }
+//    }
 
     @Override
     public void onWaitFragmentInteractionShow() {
