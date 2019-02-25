@@ -371,7 +371,7 @@ public class WeatherFragment extends Fragment {
                 }
                 mFortyEightHourData = new FortyEightHourWeather[fortyEightHour.size()];
                 mFortyEightHourData = fortyEightHour.toArray(mFortyEightHourData);
-
+                mListener.onWaitFragmentInteractionHide();
                 updateFields();
             }
         } catch (JSONException error) {
