@@ -1,10 +1,9 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2.model;
 
+import android.text.Editable;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.Serializable;
 
 /**
@@ -33,8 +32,8 @@ public class Credentials implements Serializable {
     public static class Builder {
 
         private final String mPassword;
-//        private final String mEmail;
-        private String mEmail = "";
+        private final String mEmail;
+
         private String mFirstName = "";
         private String mLastName = "";
         private String mUsername = "";
@@ -54,15 +53,6 @@ public class Credentials implements Serializable {
             mPassword = password;
         }
 
-        /**
-         * Add NON-OPTIONAL Email
-         * @param val
-         * @return
-         */
-        public Builder addEmail(final String val) {
-            mEmail = val;
-            return this;
-        }
 
         /**
          * Add an optional first name.

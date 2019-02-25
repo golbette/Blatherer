@@ -182,9 +182,8 @@ public class SendPostAsyncTask extends AsyncTask<Void, String, String> {
 
             for (final String key: mHeaders.keySet()) {
                 urlConnection.setRequestProperty(key, mHeaders.get(key));
-                Log.e("debbug", key+ " " + urlConnection.getRequestProperty(key));
             }
-            Log.e("debbug", urlConnection.getURL().toString());
+
             urlConnection.setDoOutput(true);
             OutputStreamWriter wr = new OutputStreamWriter(urlConnection.getOutputStream());
 

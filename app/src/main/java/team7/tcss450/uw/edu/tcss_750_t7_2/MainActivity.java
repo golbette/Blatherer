@@ -7,10 +7,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Switch;
 
 import java.io.Serializable;
+//import team7.tcss450.uw.edu.tcss_750_t7_2.R;
 
+
+import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 
 /**
@@ -18,9 +20,12 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
  */
 public class MainActivity extends AppCompatActivity implements
         LoginFragment.OnLoginFragmentInteractionListener,
-        RegisterFragment.OnRegisterFragmentInteractionListener {
+        RegisterFragment.OnRegisterFragmentInteractionListener,
+        EmailVerificationFragment.OnEmailVerificationFragmentInteractionListener{
 
     private Boolean mRememberVal;
+    private boolean mLoadFromChatNotification = false;
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +37,26 @@ public class MainActivity extends AppCompatActivity implements
          */
         setContentView(R.layout.activity_main);
 
+        // Invoke Pushy.listen(this) in your launcher activity's onCreate() method so that Pushy's internal notification listening service will restart itself, if necessary.
+        Pushy.listen(this);
+
+        if (getIntent().getExtras() != null) {
+            if (getIntent().getExtras().containsKey("type")) {
+                mLoadFromChatNotification = getIntent().getExtras().getSerializable("type").equals("msg");
+            }
+        }
+
         if (savedInstanceState == null) {
+            //vvvvv for testing vvvvv
+//            Intent intent = new Intent(this, HomeActivity.class);
+//            intent.putExtra(getString(R.string.keys_intent_credentials), (Serializable) new Credentials.Builder("morisbroderick@gmail.com", "password").build());
+//            intent.putExtra(getString(R.string.keys_intent_jwt), "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imx1a2UiLCJpYXQiOjE1NTA5OTU2NTAsImV4cCI6MTU1MTA4MjA1MH0.eeDvRUMTBOMXgSa7bWK5WqLMQbrvUB8p2wuHPFDO3a0");
+//            intent.putExtra(getString(R.string.login_switch_remember_val), true);
+//            intent.putExtra(getString(R.string.keys_intent_notification_msg), true);
+//            startActivity(intent);
+//            finish();
+            //^^^^^ for testing ^^^^^
+
             if (findViewById(R.id.activity_main_container) != null) {
                 getSupportFragmentManager().beginTransaction().
                         replace(R.id.activity_main_container, new LoginFragment()).commit();
@@ -55,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra(getString(R.string.keys_intent_credentials), (Serializable) credentials);
         intent.putExtra(getString(R.string.keys_intent_jwt), jwt);
         intent.putExtra(getString(R.string.login_switch_remember_val), mRememberVal);
+        intent.putExtra(getString(R.string.keys_intent_notification_msg), mLoadFromChatNotification);
         startActivity(intent);
         finish();
     }
@@ -71,12 +96,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRegisterSuccess(Credentials credentials) {
-        LoginFragment loginFragment = new LoginFragment();
+        EmailVerificationFragment emailVerf = new EmailVerificationFragment();
         Bundle args = new Bundle();
         args.putSerializable(getString(R.string.credential_key), credentials);
-        loginFragment.setArguments(args);
+        emailVerf.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().
-                beginTransaction().replace(R.id.activity_main_container, loginFragment);
+                beginTransaction().replace(R.id.activity_main_container, emailVerf);
         transaction.commit();
     }
 
@@ -96,5 +121,18 @@ public class MainActivity extends AppCompatActivity implements
                 .beginTransaction()
                 .remove(getSupportFragmentManager().findFragmentByTag("WAIT"))
                 .commit();
+    }
+
+    @Override
+    public void onEmailVerificationFragmentInteraction(Credentials credentials) {
+
+        LoginFragment loginFragment = new LoginFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(getString(R.string.credential_key), credentials);
+        loginFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().
+                beginTransaction().replace(R.id.activity_main_container, loginFragment);
+        transaction.commit();
+
     }
 }

@@ -3,7 +3,12 @@
     <color name="colorPrimary">#344955</color>
     <color name="colorPrimaryDark">#232F34</color>
     <color name="colorAccent">#4A6572</color>
-    <color name="colorPrimaryAlpha">#F9AA33</color>
+    <color name="colorPrimaryAlpha">#96f9aa33</color>
     <color name="half_white">#80FFFFFF</color>
     <color name="weatherbackground">#0073D2</color>
+    <color name="chatBackground">#a87788e4</color>
+    <color name="colorSecondaryText">#787878</color>
+    <color name="colorContactInitials">#ececec</color>
+    <color name="colorCircle">#9b9b9b</color>
+    <color name="colorCircleLight">#dfdfdf</color>
 </resources>
