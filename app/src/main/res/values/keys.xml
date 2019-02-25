@@ -19,6 +19,38 @@
     <string name="keys_json_register_detail">detail</string>
 
     <string name="keys_json_login_jwt">token</string>
+
+    <string name="keys_intent_fname">intent key for fname</string>
+    <string name="keys_intent_lname">intent key for lname</string>
+    <string name="keys_intent_username">intent key for username</string>
+    <string name="keys_intent_notification_msg">was app started from message notification?</string>
+
+    <!-- Contact -->
+    <string name="keys_json_contact_response">response</string>
+    <string name="keys_json_contact_message">message</string>
+    <string name="keys_json_contact_first_name">firstname</string>
+    <string name="keys_json_contact_last_name">lastname</string>
+    <string name="keys_json_contact_email">email</string>
+    <string name="keys_json_contact_username">username</string>
+
+    <!-- Message -->
+    <string name="keys_json_message_message">message</string>
+    <string name="keys_json_message_username">username</string>
+    <string name="keys_json_message_timestamp">timestamp</string>
+    <!--<string name="keys_json_message_preview">preview</string>-->
+
+    <!-- New Contacts (Request) -->
+    <string name="keys_json_new_contact_response">response</string>
+    <string name="keys_json_new_contact_first_name">firstname</string>
+    <string name="keys_json_new_contact_last_name">lastname</string>
+
+    <!-- Requests (Approve) -->
+    <string name="keys_json_request_response">response</string>
+    <string name="keys_json_request_first_name">firstname</string>
+    <string name="keys_json_request_last_name">lastname</string>
+    <string name="keys_json_request_type">type</string>
+
+    <!-- Could probably be removed. -->
     <string name="keys_json_blogs_response">response</string>
     <string name="keys_json_blogs_data">data</string>
     <string name="keys_json_blogs_pubdate">pubdate</string>
@@ -36,9 +68,4 @@
     <string name="keys_json_set_setlistdata">setlistdata</string>
     <string name="keys_json_set_setlistnotes">setlistnotes</string>
     <string name="keys_json_set_url">url</string>
-
-    <!--Added these myself-->
-    <string name="keys_intent_fname">intent key for fname</string>
-    <string name="keys_intent_lname">intent key for lname</string>
-    <string name="keys_intent_username">intent key for username</string>
 </resources>

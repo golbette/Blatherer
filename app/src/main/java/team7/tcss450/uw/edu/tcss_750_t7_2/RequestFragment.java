@@ -10,41 +10,39 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnMessageListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class MessageFragment extends Fragment {
-    public static final String ARG_MESSAGE_LIST = "message lists";
-    private List<Message> mMessages;
+public class RequestFragment extends Fragment {
+    public static final String ARG_REQUEST_LIST = "requests_list";
+    private List<Request> mRequests;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
-    private OnMessageListFragmentInteractionListener mListener;
+    private OnRequestListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public MessageFragment() {
+    public RequestFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static MessageFragment newInstance(int columnCount) {
-        MessageFragment fragment = new MessageFragment();
+    public static RequestFragment newInstance(int columnCount) {
+        RequestFragment fragment = new RequestFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -57,14 +55,13 @@ public class MessageFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mMessages = new ArrayList<Message>(Arrays.asList((Message[]) getArguments().getSerializable(ARG_MESSAGE_LIST)));
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_messages_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_request_list, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -75,7 +72,7 @@ public class MessageFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyMessagesRecyclerViewAdapter(mMessages, mListener));
+            recyclerView.setAdapter(new MyRequestRecyclerViewAdapter(mRequests, mListener));
         }
         return view;
     }
@@ -84,12 +81,12 @@ public class MessageFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMessageListFragmentInteractionListener) {
-            mListener = (OnMessageListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnMessageListFragmentInteractionListener");
-        }
+//        if (context instanceof OnRequestListFragmentInteractionListener) {
+//            mListener = (OnRequestListFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnRequestListFragmentInteractionListener");
+//        }
     }
 
     @Override
@@ -108,8 +105,8 @@ public class MessageFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnMessageListFragmentInteractionListener {
+    public interface OnRequestListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onMessageListFragmentInteraction(Message item);
+        void onRequestListFragmentInteraction(Request item);
     }
 }
