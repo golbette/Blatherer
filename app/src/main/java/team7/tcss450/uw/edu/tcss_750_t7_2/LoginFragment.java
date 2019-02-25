@@ -97,7 +97,7 @@ public class LoginFragment extends Fragment {
 
         if (getArguments() != null) {
             Credentials creds = (Credentials) getArguments().getSerializable(getString(R.string.credential_key));
-            emailMessage.setText(creds.getUsername());
+            emailMessage.setText(creds.getEmail());
             passwordMessage.setText(creds.getPassword());
         }
     }
