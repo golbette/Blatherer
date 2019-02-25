@@ -61,4 +61,12 @@
     <string name="text_settings_fragment_settings">Settings</string>
     <string name="nav_logout">Log Out</string>
     <string name="nav_header_a_title">Blatherer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_emailVerificationFragment">UserName</string>
+    <string name="text_emailVerificationFragment_welcome">Welcome to Blatherer!</string>
+    <string name="text_emailVerificationFragment_hello">Hello,</string>
+    <string name="text_emailVerificationFragment_statement">Thank for joining Blatherer chat app! Verify your account with the link sent to you email so you can login and start chatting!</string>
+    <string name="button_emailVerificationFragment_continue">Continue to login screen</string>
 </resources>

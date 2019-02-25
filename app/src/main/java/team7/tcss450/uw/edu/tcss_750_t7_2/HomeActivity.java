@@ -136,6 +136,8 @@ public class HomeActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
+        } else if (id == R.id.nav_logout){
+            logout();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

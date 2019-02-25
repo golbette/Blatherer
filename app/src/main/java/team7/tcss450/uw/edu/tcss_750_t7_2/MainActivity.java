@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Switch;
 
 import java.io.Serializable;
 
@@ -18,7 +17,8 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
  */
 public class MainActivity extends AppCompatActivity implements
         LoginFragment.OnLoginFragmentInteractionListener,
-        RegisterFragment.OnRegisterFragmentInteractionListener {
+        RegisterFragment.OnRegisterFragmentInteractionListener,
+        EmailVerificationFragment.OnEmailVerificationFragmentInteractionListener{
 
     private Boolean mRememberVal;
 
@@ -71,12 +71,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onRegisterSuccess(Credentials credentials) {
-        LoginFragment loginFragment = new LoginFragment();
+        EmailVerificationFragment emailVerf = new EmailVerificationFragment();
         Bundle args = new Bundle();
         args.putSerializable(getString(R.string.credential_key), credentials);
-        loginFragment.setArguments(args);
+        emailVerf.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().
-                beginTransaction().replace(R.id.activity_main_container, loginFragment);
+                beginTransaction().replace(R.id.activity_main_container, emailVerf);
         transaction.commit();
     }
 
@@ -96,5 +96,18 @@ public class MainActivity extends AppCompatActivity implements
                 .beginTransaction()
                 .remove(getSupportFragmentManager().findFragmentByTag("WAIT"))
                 .commit();
+    }
+
+    @Override
+    public void onEmailVerificationFragmentInteraction(Credentials credentials) {
+
+        LoginFragment loginFragment = new LoginFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(getString(R.string.credential_key), credentials);
+        loginFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().
+                beginTransaction().replace(R.id.activity_main_container, loginFragment);
+        transaction.commit();
+
     }
 }
