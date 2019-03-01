@@ -20,9 +20,6 @@
 
     <string name="keys_json_login_jwt">token</string>
 
-    <string name="keys_intent_fname">intent key for fname</string>
-    <string name="keys_intent_lname">intent key for lname</string>
-    <string name="keys_intent_username">intent key for username</string>
     <string name="keys_intent_notification_msg">was app started from message notification?</string>
 
     <!-- Contact -->
@@ -68,4 +65,25 @@
     <string name="keys_json_set_setlistdata">setlistdata</string>
     <string name="keys_json_set_setlistnotes">setlistnotes</string>
     <string name="keys_json_set_url">url</string>
+
+    <!--Added these myself-->
+    <string name="keys_intent_fname">intent key for fname</string>
+    <string name="keys_intent_lname">intent key for lname</string>
+    <string name="keys_intent_username">intent key for username</string>
+
+    <string name="keys_json_weather_location">location</string>
+    <string name="keys_json_weather_current_observation">current_observation</string>
+    <string name="keys_json_weather_forecasts">forecasts</string>
+    <string name="keys_json_weather_day">day</string>
+    <string name="keys_json_weather_date">date</string>
+    <string name="keys_json_weather_low">low</string>
+    <string name="keys_json_weather_high">high</string>
+    <string name="keys_json_weather_text">text</string>
+    <string name="keys_json_weather_code">code</string>
+    <string name="keys_json_weather_hourly">hourly</string>
+    <string name="keys_json_weather_data">data</string>
+    <string name="keys_json_weather_time">time</string>
+    <string name="keys_json_weather_summary">summary</string>
+    <string name="keys_json_weather_icon">icon</string>
+    <string name="keys_json_weather_temperature">temperature</string>
 </resources>
