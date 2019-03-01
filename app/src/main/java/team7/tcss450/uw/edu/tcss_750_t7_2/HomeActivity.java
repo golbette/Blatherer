@@ -100,26 +100,26 @@ public class HomeActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
                 if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
-//                    Uri uri = new Uri.Builder().scheme("https")
-//                            .appendPath(getString(R.string.ep_base_url))
-//                            .appendPath(getString(R.string.ep_messaging_base))
-//                            .appendPath(getString(R.string.ep_messaging_getall)).build();
-//
-//                    JSONObject msg = mCredentials.asJSONObject();
-//                    try {
-//                        msg.put("username", mUsername);
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    Log.wtf("CREDS", msg.toString());
-//
-//                    new SendPostAsyncTask.Builder(uri.toString(), msg)
-//                            .onPreExecute(this::onWaitFragmentInteractionShow)
-//                            .onPostExecute(this::handleMessageGetOnPostExecute)
-//                            .onCancelled(this::handleErrorsInTask)
-//                            .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-//                            .build().execute();
+                    Uri uri = new Uri.Builder().scheme("https")
+                            .appendPath(getString(R.string.ep_base_url))
+                            .appendPath(getString(R.string.ep_messaging_base))
+                            .appendPath(getString(R.string.ep_messaging_getall)).build();
+
+                    JSONObject msg = mCredentials.asJSONObject();
+                    try {
+                        msg.put("username", mUsername);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    Log.wtf("CREDS", msg.toString());
+
+                    new SendPostAsyncTask.Builder(uri.toString(), msg)
+                            .onPreExecute(this::onWaitFragmentInteractionShow)
+                            .onPostExecute(this::handleMessageGetOnPostExecute)
+                            .onCancelled(this::handleErrorsInTask)
+                            .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                            .build().execute();
 
 //                    ChatFragment chatFragment = new ChatFragment();
 //                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
