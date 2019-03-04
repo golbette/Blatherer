@@ -49,6 +49,9 @@ public class PushReceiver extends BroadcastReceiver {
 
             //create an Intent to broadcast a message to other parts of the app.
             Intent i = new Intent(RECEIVED_NEW_MESSAGE);
+//            i.setAction("team7.tcss450.uw.edu.tcss_750_t7_2.sendBroadcast");
+//            i.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+//            i.putExtra("MSGTYPE", typeOfMessage);
             i.putExtra("SENDER", sender);
             i.putExtra("MESSAGE", messageText);
             i.putExtras(intent.getExtras());

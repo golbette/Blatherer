@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,6 +49,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
@@ -68,10 +70,8 @@ public class HomeActivity extends AppCompatActivity
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         ConversationFragment.OnConversationFragmentInteractionListener,
-        BottomAppBarFragment.OnBottomNavFragmentInteractionListener,
         ContactFragment.OnContactListFragmentInteractionListener{
 
-    final Fragment bottomAppBarFrag = new BottomAppBarFragment();
     final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
     private Credentials mCredentials;
@@ -95,15 +95,6 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -117,6 +108,12 @@ public class HomeActivity extends AppCompatActivity
         Bundle args = intent.getExtras();
         mJwToken = intent.getStringExtra(getString(R.string.keys_intent_jwt));
         mCredentials = (Credentials) args.getSerializable(getString(R.string.keys_intent_credentials));
+
+//        BroadcastReceiver br = new PushMessageReceiver();
+//
+//        if (br.onReceive(context, intent).hasExtra("SENDER")) {
+//            mUsername = intentMsg.getStringExtra("SENDER");
+//        }
 
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
@@ -216,7 +213,7 @@ public class HomeActivity extends AppCompatActivity
         if(id == R.id.nav_home_fragment){
 
             loadFragment(new HomeFragment());
-            fm.beginTransaction().remove(bottomAppBarFrag).commit();
+//            fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_message_activity_home) {
 //            Uri uri = new Uri.Builder().scheme("https")
 //                    .appendPath(R.string.ep_base_url)
@@ -320,32 +317,32 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void recentClicked() {
-//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-        fm.beginTransaction()
-                .replace(R.id.fragmentContainer, new MessageFragment())
-                .addToBackStack(null).commit();
-    }
+//    @Override
+//    public void recentClicked() {
+////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
+//        fm.beginTransaction()
+//                .replace(R.id.fragmentContainer, new MessageFragment())
+//                .addToBackStack(null).commit();
+//    }
 
-    @Override
-    public void contactClicked() {
-//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-        Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
-                .appendPath(getString(R.string.ep_contacts_base))
-                .appendPath(getString(R.string.ep_contacts_getcontacts)).build();
-
-        JSONObject msg = mCredentials.asJSONObject();
-
-        Log.wtf("CREDS", msg.toString());
-
-        new SendPostAsyncTask.Builder(uri.toString(), msg)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
-                .onPostExecute(this::handleContactGetOnPostExecute)
-                .onCancelled(this::handleErrorsInTask)
-                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                .build().execute();
-    }
+//    @Override
+//    public void contactClicked() {
+////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
+//        Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
+//                .appendPath(getString(R.string.ep_contacts_base))
+//                .appendPath(getString(R.string.ep_contacts_getcontacts)).build();
+//
+//        JSONObject msg = mCredentials.asJSONObject();
+//
+//        Log.wtf("CREDS", msg.toString());
+//
+//        new SendPostAsyncTask.Builder(uri.toString(), msg)
+//                .onPreExecute(this::onWaitFragmentInteractionShow)
+//                .onPostExecute(this::handleContactGetOnPostExecute)
+//                .onCancelled(this::handleErrorsInTask)
+//                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+//                .build().execute();
+//    }
 
 
 
@@ -396,13 +393,13 @@ public class HomeActivity extends AppCompatActivity
 
 
 
-    @Override
-    public void requestClicked() {
-//        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-        fm.beginTransaction()
-                .replace(R.id.fragmentContainer, new RequestFragment())
-                .addToBackStack(null).commit();
-    }
+//    @Override
+//    public void requestClicked() {
+////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
+//        fm.beginTransaction()
+//                .replace(R.id.fragmentContainer, new RequestFragment())
+//                .addToBackStack(null).commit();
+//    }
 
     @Override
     public void onContactListFragmentInteraction(Contact item) throws JSONException {
@@ -754,9 +751,13 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private class PushMessageReceiver extends BroadcastReceiver {
+        public PushMessageReceiver() {
+            // Require constructor
+        }
+
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("SENDER") && intent.hasExtra("MESSAGE")) {
+            if (intent.hasExtra("SENDER")) {
                 mUsername = intent.getStringExtra("SENDER");
 //                String messageText = intent.getStringExtra("MESSAGE");
             }
