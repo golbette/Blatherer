@@ -43,14 +43,13 @@ public class PushReceiver extends BroadcastReceiver {
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);
 
-        if (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE) {
+        if (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE) { // In app notification
             //app is in the foreground so send the message to the active Activities
             Log.d("Blatherer", "Message received in foreground: " + messageText);
 
             //create an Intent to broadcast a message to other parts of the app.
             Intent i = new Intent(RECEIVED_NEW_MESSAGE);
-//            i.setAction("team7.tcss450.uw.edu.tcss_750_t7_2.sendBroadcast");
-//            i.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+//            i.putExtra("CHATID", chatid);
 //            i.putExtra("MSGTYPE", typeOfMessage);
             i.putExtra("SENDER", sender);
             i.putExtra("MESSAGE", messageText);
@@ -58,7 +57,7 @@ public class PushReceiver extends BroadcastReceiver {
 
             context.sendBroadcast(i);
 
-        } else {
+        } else { // Out-of-app notification
             //app is in the background so create and post a notification
             Log.d("Blatherer", "Message received in background: " + messageText);
 
@@ -87,6 +86,5 @@ public class PushReceiver extends BroadcastReceiver {
             // Build the notification and display it
             notificationManager.notify(1, builder.build());
         }
-
     }
 }

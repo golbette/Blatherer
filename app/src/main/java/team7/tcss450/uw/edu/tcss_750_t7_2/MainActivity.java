@@ -22,19 +22,33 @@ public class MainActivity extends AppCompatActivity implements
         EmailVerificationFragment.OnEmailVerificationFragmentInteractionListener{
 
     /**
+     * Tag used in Log statements.
+     */
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    /**
      * Saves the state of the Remember Me switch.
      */
     private Boolean mRememberVal;
 
     /**
      * True if user launches the app from the notification when app is NOT visible.
+     * When status bar is clicked, take user to the chat fragment.
      */
     private boolean mLoadFromChatNotification = false;
 
     /**
-     * Tag used in Log statements.
+     * True if user launches the app from the notification when app is NOT visible.
+     * When status bar is clicked, takes user to the request fragment.
      */
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private boolean mLoadFromRequest = false;
+
+    /**
+     * The sender's username passed in from the push notification.
+     */
+    private int mChatId;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +61,14 @@ public class MainActivity extends AppCompatActivity implements
 
         if (getIntent().getExtras() != null) {
             if (getIntent().getExtras().containsKey("type")) {
-                mLoadFromChatNotification = getIntent().getExtras().getSerializable("type").equals("msg");
+                if (getIntent().getExtras().getSerializable("type").equals("msg")) {
+                    mLoadFromChatNotification = getIntent().getExtras().getSerializable("type").equals("msg");
+                    mChatId = (int) getIntent().getExtras().getSerializable("chatid");
+                } else if (getIntent().getExtras().getSerializable("type").equals("conn")) {
+
+                } else if (getIntent().getExtras().getSerializable("type").equals("conv")) {
+
+                }
             }
         }
 
@@ -71,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra(getString(R.string.keys_intent_credentials), (Serializable) credentials);
         intent.putExtra(getString(R.string.keys_intent_jwt), jwt);
         intent.putExtra(getString(R.string.login_switch_remember_val), mRememberVal);
+        intent.putExtra("chatid", mChatId);
         intent.putExtra(getString(R.string.keys_intent_notification_msg), mLoadFromChatNotification);
         startActivity(intent);
         finish();

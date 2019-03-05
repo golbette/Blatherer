@@ -72,12 +72,12 @@ public class HomeActivity extends AppCompatActivity
         ConversationFragment.OnConversationFragmentInteractionListener,
         ContactFragment.OnContactListFragmentInteractionListener{
 
-    final FragmentManager fm = getSupportFragmentManager();
+//    final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
     private Credentials mCredentials;
     private PushMessageReceiver mPushMessageReceiver;
-    private String mUsername;
-    private JSONObject personB;
+    private int mChatId;
+//    private JSONObject personB;
 
     private FortyEightHourWeather[] mFortyEightHour;
 
@@ -118,6 +118,7 @@ public class HomeActivity extends AppCompatActivity
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
                 if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
+                    mChatId = (int) getIntent().getExtras().getSerializable("chatid");
                     Uri uri = new Uri.Builder().scheme("https")
                             .appendPath(getString(R.string.ep_base_url))
                             .appendPath(getString(R.string.ep_messaging_base))
@@ -125,7 +126,7 @@ public class HomeActivity extends AppCompatActivity
 
                     JSONObject msg = mCredentials.asJSONObject();
                     try {
-                        msg.put("username", mUsername);
+                        msg.put("chatid", mChatId);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -757,8 +758,8 @@ public class HomeActivity extends AppCompatActivity
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("SENDER")) {
-                mUsername = intent.getStringExtra("SENDER");
+            if (intent.hasExtra("CHATID")) {
+//                mChatId = intent.getStringExtra("CHATID");
 //                String messageText = intent.getStringExtra("MESSAGE");
             }
         }
