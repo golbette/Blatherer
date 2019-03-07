@@ -43,14 +43,12 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/new_contact_list"
-        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.NewContactFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        tools:context=".NewContactFragment"
-        tools:listitem="@layout/fragment_new_contact" />
+    <TextView
+        android:id="@+id/new_contact_blank_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/text_margin"
+        android:textSize="18sp" />
 
 </LinearLayout>

@@ -91,11 +91,15 @@
     <!-- fragment_new_contact.xml -->
     <string name="new_contact_tv_contact_initials">FL</string>
     <string name="new_contact_tv_contact_name">First Last</string>
+    <string name="new_contact_tv_email">Email</string>
     <string name="new_contact_butt_hint">Send Request</string>
 
     <!-- fragment_new_contact_list.xml -->
     <string name="new_contact_add_contact">Add Contact</string>
-    <string name="new_contact_et_search_hint">Search Username</string>
+    <string name="new_contact_et_search_hint">Username, Email, First or Last Name</string>
+
+    <!-- fragment_new_contact_black.xml -->
+    <string name="new_contact_status">Search / No Results</string>
 
     <!-- fragment_request.xml -->
     <string name="request_tv_contact_name">First Last</string>

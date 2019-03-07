@@ -1,9 +1,12 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.NewContactFragment.OnNewContactListFragmentInteractionListener;
@@ -39,6 +42,13 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
         holder.mItem = mValues.get(position);
         holder.mNewContactName.setText(mValues.get(position).getContactName());
         holder.mNewContactInitials.setText(mValues.get(position).getInitials());
+        holder.mNewContactEmail.setText(mValues.get(position).getEmail());
+        holder.mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onRequestSent(mValues.get(position).getEmail());
+            }
+        });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +71,8 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
         public final View mView;
         public final TextView mNewContactName;
         public final TextView mNewContactInitials;
+        public final TextView mNewContactEmail;
+        public final Button mSendButton;
 
         public NewContact mItem;
 
@@ -69,6 +81,8 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
             mView = view;
             mNewContactName = (TextView) view.findViewById(R.id.new_contact_contact_name);
             mNewContactInitials = (TextView) view.findViewById(R.id.new_contact_contact_initials);
+            mNewContactEmail = (TextView) view.findViewById(R.id.new_contact_email);
+            mSendButton = (Button) view.findViewById(R.id.new_contact_butt_send_request);
         }
 
         @Override
