@@ -89,9 +89,6 @@ public class NewContactFragment extends Fragment {
             recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener));
         }
 //        }
-
-
-
         return view;
     }
 
