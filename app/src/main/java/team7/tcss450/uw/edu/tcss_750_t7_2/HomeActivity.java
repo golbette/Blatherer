@@ -7,14 +7,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,25 +29,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import me.pushy.sdk.Pushy;
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
+import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
-import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
 /**
  * Container for fragments after user is successfully
@@ -65,6 +52,7 @@ public class HomeActivity extends AppCompatActivity
         MessageFragment.OnMessageListFragmentInteractionListener,
         NewContactFragment.OnNewContactListFragmentInteractionListener,
         WeatherFragment.OnWeatherFragmentInteractionListener,
+        TodayWeatherFragment.OnTodayWeatherFragmentInteractionListener,
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         ConversationFragment.OnConversationFragmentInteractionListener,
@@ -249,6 +237,20 @@ public class HomeActivity extends AppCompatActivity
                     .onPostExecute(this::handleWeatherGetOnPostExecute)
                     .build().execute();
 
+        } else if (id == R.id.nav_starred_weather_locations) {
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_weather))
+                    .appendPath(getString(R.string.ep_location))
+                    .appendPath(getString(R.string.ep_users))
+                    .appendQueryParameter("username", mCredentials.getUsername())
+                    .build();
+            Log.e("url", uri.toString());
+            new GetAsyncTask.Builder(uri.toString())
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleNavigationPreviousSavedLocationOnPost)
+                    .build().execute();
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
         } else if (id == R.id.nav_logout){
@@ -657,11 +659,74 @@ public class HomeActivity extends AppCompatActivity
                 mFortyEightHour = new FortyEightHourWeather[fortyEightHour.size()];
                 mFortyEightHour = fortyEightHour.toArray(mFortyEightHour);
 
-                Bundle args = new Bundle();
+//                Bundle args = new Bundle();
+//                args.putSerializable(WeatherFragment.ARG_LOCATION, mLocationData);
+//                args.putSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION, mCurrentObservationData);
+//                args.putSerializable(WeatherFragment.ARG_FORECASTS, mTenDay);
+//                args.putSerializable(WeatherFragment.ARG_FORTY_EIGHT_HOUR, mFortyEightHour);
+//                Fragment weatherFragment = new WeatherFragment();
+//                weatherFragment.setArguments(args);
+//                onWaitFragmentInteractionHide();
+//                loadFragment(weatherFragment);
+
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_location))
+                        .appendPath(getString(R.string.ep_users))
+                        .appendQueryParameter("username", mCredentials.getUsername())
+                        .build();
+                Log.e("url", uri.toString());
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handlePreviousSavedLocationOnPost)
+                        .build().execute();
+            }
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
+
+
+        }
+    }
+
+    private void handlePreviousSavedLocationOnPost(String result) {
+        //parse JSON
+        try {
+            Bundle args = new Bundle();
+            SavedLocations[] savedLocationArray;
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_status))) {
+                String status = root.getString(getString(R.string.keys_json_weather_status));
+                if (status.equals(getString(R.string.keys_json_weather_Success))) {
+                    List<SavedLocations> savedLocation = new ArrayList<>();
+                    JSONArray data = root.getJSONArray(getString(R.string.keys_json_weather_data));
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject entry = data.getJSONObject(i);
+                        savedLocation.add(new SavedLocations.Builder(
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_nickname)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_lat)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_long)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_zip)))
+                                .build());
+                    }
+                    savedLocationArray = new SavedLocations[savedLocation.size()];
+                    savedLocationArray = savedLocation.toArray(savedLocationArray);
+                    args.putSerializable(WeatherFragment.ARG_SAVED_LOCATIONS, savedLocationArray);
+
+
+                }
                 args.putSerializable(WeatherFragment.ARG_LOCATION, mLocationData);
                 args.putSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION, mCurrentObservationData);
                 args.putSerializable(WeatherFragment.ARG_FORECASTS, mTenDay);
                 args.putSerializable(WeatherFragment.ARG_FORTY_EIGHT_HOUR, mFortyEightHour);
+                args.putSerializable(WeatherFragment.ARG_CREDENTIALS, mCredentials);
+
                 Fragment weatherFragment = new WeatherFragment();
                 weatherFragment.setArguments(args);
                 onWaitFragmentInteractionHide();
@@ -671,8 +736,51 @@ public class HomeActivity extends AppCompatActivity
         } catch (JSONException error) {
             error.printStackTrace();
             Log.e("ERROR!", error.getMessage());
+        }
+    }
+
+    private void handleNavigationPreviousSavedLocationOnPost(String result) {
+        //parse JSON
+        try {
+            Bundle args = new Bundle();
+            SavedLocations[] savedLocationArray;
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_status))) {
+                String status = root.getString(getString(R.string.keys_json_weather_status));
+                if (status.equals(getString(R.string.keys_json_weather_Success))) {
+                    List<SavedLocations> savedLocation = new ArrayList<>();
+                    JSONArray data = root.getJSONArray(getString(R.string.keys_json_weather_data));
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject entry = data.getJSONObject(i);
+                        savedLocation.add(new SavedLocations.Builder(
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_nickname)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_lat)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_long)),
+                                entry.getString(
+                                        getString(R.string.keys_json_weather_zip)))
+                                .build());
+                        Log.e("test", entry.getString("nickname"));
+                    }
+                    savedLocationArray = new SavedLocations[savedLocation.size()];
+                    savedLocationArray = savedLocation.toArray(savedLocationArray);
+                    args.putSerializable(WeatherFragment.ARG_SAVED_LOCATIONS, savedLocationArray);
 
 
+                }
+                args.putSerializable(WeatherFragment.ARG_CREDENTIALS, mCredentials);
+
+                Fragment savedWeatherLocationFragment = new SavedWeatherLocationFragment();
+                savedWeatherLocationFragment.setArguments(args);
+                onWaitFragmentInteractionHide();
+                loadFragment(savedWeatherLocationFragment);
+
+            }
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
         }
     }
 
@@ -735,6 +843,15 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onWeatherOptionsFragmentInteraction(Uri uri) {
+
+    }
+    /**
+     *
+     * Weather options fragments listener
+     * @param uri
+     */
+    @Override
+    public void onTodayWeatherFragmentInteraction(Uri uri) {
 
     }
 
