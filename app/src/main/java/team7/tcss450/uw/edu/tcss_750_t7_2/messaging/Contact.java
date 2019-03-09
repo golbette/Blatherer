@@ -11,18 +11,12 @@ public class Contact implements Serializable {
     public static class Builder {
         private final String mFirstName;
         private final String mLastName;
-        private String mInitials = "";
         private String mEmail = "";
         private String mUsername = "";
 
         public Builder(String firstName, String lastName) {
             this.mFirstName = firstName;
             this.mLastName = lastName;
-        }
-
-        public Builder addInitials(final String val) {
-            this.mInitials = val;
-            return this;
         }
 
         public Builder addEmail(final String val) {

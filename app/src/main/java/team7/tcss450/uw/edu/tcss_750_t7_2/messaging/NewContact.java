@@ -5,19 +5,35 @@ import java.io.Serializable;
 public class NewContact implements Serializable {
     private final String mContactName;
     private final String mInitials;
+    private final String mUsername;
+    private final int mMemberId;
+    private final String mEmail;
+
 
     public static class Builder {
         private final String mFirstName;
         private final String mLastName;
-        private String mInitials = "";
+        private int mMemberId = -1;
+        private String mUsername = "";
+        private String mEmail = "";
 
         public Builder(String firstName, String lastName) {
             this.mFirstName = firstName;
             this.mLastName = lastName;
         }
 
-        public Builder addInitials(final String val) {
-            this.mInitials = val;
+        public Builder addMemberId(int val) {
+            this.mMemberId = val;
+            return this;
+        }
+
+        public Builder addUsername(String val) {
+            this.mUsername = val;
+            return this;
+        }
+
+        public Builder addEmail(String val) {
+            this.mEmail = val;
             return this;
         }
 
@@ -28,8 +44,11 @@ public class NewContact implements Serializable {
 
     private NewContact(final Builder builder) {
         this.mContactName = builder.mFirstName + " " + builder.mLastName;
-        String initials = builder.mFirstName.charAt(0) + builder.mLastName.charAt(0) + "";
+        String initials = builder.mFirstName.substring(0, 1) + builder.mLastName.substring(0, 1) + "";
         this.mInitials = initials.toUpperCase();
+        this.mEmail = builder.mEmail;
+        this.mUsername = builder.mUsername;
+        this.mMemberId = builder.mMemberId;
     }
 
     public String getContactName() {
@@ -38,5 +57,17 @@ public class NewContact implements Serializable {
 
     public String getInitials() {
         return mInitials;
+    }
+
+    public String getEmail() {
+        return mEmail;
+    }
+
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public int getMemberId() {
+        return mMemberId;
     }
 }
