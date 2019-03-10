@@ -19,6 +19,11 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 public class PushReceiver extends BroadcastReceiver {
 
     public static final String RECEIVED_NEW_MESSAGE = "New message on Blatherer";
+    public static final String RECEIVED_NEW_CONN_REQUEST = "New connection";
+    public static final String RECEIVED_NEW_CONVO_REQUEST = "New conversation";
+
+    /** REQUEST_ID is reserved for connection and conversation requests. */
+    public static final int REQUEST_ID = 21;
 
     private String mChatid ;
 
@@ -37,8 +42,10 @@ public class PushReceiver extends BroadcastReceiver {
 
         //The WS sent us the name of the sender
         String sender = intent.getStringExtra("sender");
-
         String messageText = intent.getStringExtra("message");
+        int chatId = intent.getExtras().getInt("chatid");
+
+        Log.wtf("ON_RECEIVE","type: " + typeOfMessage + " sender: " + sender + " message: " + messageText + " chatid: " + chatId);
 
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);
@@ -49,15 +56,15 @@ public class PushReceiver extends BroadcastReceiver {
 
             //create an Intent to broadcast a message to other parts of the app.
             Intent i = new Intent(RECEIVED_NEW_MESSAGE);
-//            i.putExtra("CHATID", chatid);
-//            i.putExtra("MSGTYPE", typeOfMessage);
+            i.putExtra("CHATID", chatId);
+            i.putExtra("MSGTYPE", typeOfMessage);
             i.putExtra("SENDER", sender);
             i.putExtra("MESSAGE", messageText);
             i.putExtras(intent.getExtras());
 
             context.sendBroadcast(i);
 
-        } else { // Out-of-app notification
+        } //else { // Out-of-app notification
             //app is in the background so create and post a notification
             Log.d("Blatherer", "Message received in background: " + messageText);
 
@@ -69,14 +76,24 @@ public class PushReceiver extends BroadcastReceiver {
 
             //research more on notifications the how to display them
             //https://developer.android.com/guide/topics/ui/notifiers/notifications
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, mChatid)
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_chat_black)
-                    .setContentTitle("Message from: " + sender)
-                    .setContentText(messageText)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(pendingIntent);
+            NotificationCompat.Builder builder;
 
+            if (chatId == REQUEST_ID) {
+                builder = new NotificationCompat.Builder(context, mChatid)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_requests)
+                        .setContentTitle("Connection request from: " + sender)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent);
+            } else {
+                builder = new NotificationCompat.Builder(context, mChatid)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_chat_black)
+                        .setContentTitle("Message from: " + sender)
+                        .setContentText(messageText)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent);
+            }
             // Automatically configure a Notification Channel for devices running Android O+
             Pushy.setNotificationChannel(builder, context);
 
@@ -85,6 +102,11 @@ public class PushReceiver extends BroadcastReceiver {
 
             // Build the notification and display it
             notificationManager.notify(1, builder.build());
-        }
+        // }
     }
+
+//    public interface OnPushReceivedInteractionListener() {
+//        void setInAppNotification();
+//        void clearInAppNotification();
+//    }
 }

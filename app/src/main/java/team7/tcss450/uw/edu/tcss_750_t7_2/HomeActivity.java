@@ -547,17 +547,6 @@ public class HomeActivity extends AppCompatActivity
                 .onCancelled(this::handleErrorsInTask)
                 .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                 .build().execute();
-
-//        Bundle data = new Bundle();
-//        data.putSerializable(getString(R.string.contact_tv_contact_initials), item.getContactName());
-//        data.putSerializable(getString(R.string.contact_tv_contact_name), item.getInitials());
-//        data.putSerializable(getString(R.string.contact_tv_email), item.getEmail());
-//        data.putSerializable(getString(R.string.contact_tv_username), item.getmUsername());
-//
-//        ChatFragment chatFragment = new ChatFragment();
-//        chatFragment.setArguments(data);
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
-//        transaction.commit();
     }
 
     @Override
@@ -885,6 +874,28 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    public void setNotification(){
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(R.string.ep_base_url)
+                .appendPath("notifications")
+                .appendPath("getcount")
+                .build();
+
+        JSONObject msg = new JSONObject();
+
+        msg.put("", item.getEmail());
+
+        Log.wtf("CREDS", msg.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleMessageGetOnPostExecute)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
+
     private class PushMessageReceiver extends BroadcastReceiver {
         public PushMessageReceiver() {
             // Require constructor
@@ -896,6 +907,7 @@ public class HomeActivity extends AppCompatActivity
 //                mChatId = intent.getStringExtra("CHATID");
 //                String messageText = intent.getStringExtra("MESSAGE");
             }
+            setNotification();
         }
     }
 }

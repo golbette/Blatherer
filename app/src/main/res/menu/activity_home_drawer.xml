@@ -3,13 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
+    <group
+        android:id="@+id/nav_group_home"
+        android:checkableBehavior="single">
 
         <item
             android:id="@+id/nav_home_fragment"
             android:icon="@drawable/ic_home_black_24dp"
-
             android:title="@string/nav_home_fragment" />
+        <item
+            android:id="@+id/nav_weather_activity_home"
+            android:icon="@drawable/ic_wb_cloudy_black_24dp"
+            android:title="@string/nav_weather_activity_home" />
+    </group>
+
+    <group
+        android:id="@+id/nav_group_contacts"
+        android:checkableBehavior="single"        >
         <item
             android:id="@+id/nav_message_activity_home"
             android:icon="@drawable/ic_message_black_24dp"
@@ -22,10 +32,10 @@
             android:id="@+id/nav_requests_activity_home"
             android:icon="@drawable/ic_requests"
             android:title="@string/nav_requests"/>
-        <item
-            android:id="@+id/nav_weather_activity_home"
-            android:icon="@drawable/ic_wb_cloudy_black_24dp"
-            android:title="@string/nav_weather_activity_home" />
+    </group>
+    <group
+        android:id="@+id/nav_group_settings"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings_fragment"
             android:icon="@drawable/ic_settings_black_24dp"
@@ -34,9 +44,9 @@
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_exit_to_app_black_24dp"
             android:title="@string/nav_logout" />
-
-
     </group>
+
+
 
     <!--<item android:title="Communicate">-->
     <!--<menu>-->
