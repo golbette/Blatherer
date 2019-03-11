@@ -151,7 +151,7 @@ public class HomeActivity extends AppCompatActivity
 //                    ChatFragment chatFragment = new ChatFragment();
 //                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
                 } else {
-                    loadFragment(new HomeFragment());
+                   loadHomeWidgets();
                 }
             }
         }
@@ -221,7 +221,8 @@ public class HomeActivity extends AppCompatActivity
 
         if(id == R.id.nav_home_fragment){
 
-            loadFragment(new HomeFragment());
+            loadHomeWidgets();
+
 //            fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_message_activity_home) {
 //            Uri uri = new Uri.Builder().scheme("https")
@@ -1079,4 +1080,73 @@ public class HomeActivity extends AppCompatActivity
             }
         }
     }
+
+
+    private void loadHomeWidgets(){
+
+        /**Start the get query to return all requests from potential
+         * contacts.
+         */
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_contacts_base))
+                .appendPath(getString(R.string.ep_contacts_getconnreq))
+                .appendQueryParameter("email", mCredentials.getEmail())
+                .build();
+
+        JSONObject creds = mCredentials.asJSONObject();
+        new GetAsyncTask.Builder(uri.toString())
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleHomeRequestGetOnPostExecute)
+                .build().execute();
+
+    }
+
+    private void handleHomeRequestGetOnPostExecute(String result) {
+        Log.wtf("REQUEST_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+            Bundle args = new Bundle();
+            boolean success = response.getBoolean("success");
+            if (success) {
+
+                JSONArray data = response.getJSONArray("message");
+
+                mRequestsRecieved = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonMessage = data.getJSONObject(i);
+                    mRequestsRecieved.add(new Request.Builder(jsonMessage.getString("email"),
+                            jsonMessage.getString(getString(R.string.keys_json_request_first_name)),
+                            jsonMessage.getString(getString(R.string.keys_json_request_last_name)),
+                            jsonMessage.getString("memberid_a"),
+                            jsonMessage.getString("memberid_b"))
+                            .addRequestType("received")
+                            .build());
+                }
+                if(null != mRequestsRecieved){
+                    args.putSerializable(HomeFragment.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
+                }
+                args.putSerializable(HomeFragment.ARG_CREDS, mCredentials);
+                args.putSerializable(HomeFragment.ARG_JWT, mJwToken);
+
+                Fragment frag = new HomeFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                loadFragment(frag);
+
+
+            } else {
+                loadFragment(new HomeFragment());
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+    }
+
 }
