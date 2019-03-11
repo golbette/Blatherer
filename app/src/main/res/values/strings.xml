@@ -119,4 +119,5 @@
     <string name="nav_recents">Recents</string>
     <string name="nav_contacts">Contacts</string>
     <string name="nav_requests">Requests</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

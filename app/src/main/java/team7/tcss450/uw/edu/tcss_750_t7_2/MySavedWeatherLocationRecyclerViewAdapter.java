@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,7 +94,6 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
             if (root.has("success")) {
                 boolean isDeleted = root.getBoolean("success");
                 if (isDeleted) {
-                    Log.e("yay", "yay");
                     Log.e("position", root.getString("nickname"));
                     String nickname = root.getString("nickname");
                     int position = 0;
@@ -106,6 +106,9 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
                     mValues.remove(position);
                     notifyItemRemoved(position);
                     notifyItemRangeChanged(position, mValues.size());
+
+                    Toast toast = Toast.makeText(mContext, "Removed " + nickname, Toast.LENGTH_LONG);
+                    toast.show();
 
                 }
             }

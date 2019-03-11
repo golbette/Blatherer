@@ -1,6 +1,7 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +9,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -57,11 +60,14 @@ public class WeatherFragment extends Fragment {
 
     public static final String ARG_CREDENTIALS = "credentials";
 
+    public static final String ARG_CURRENT_LOCATION = "current location";
+
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private Location mCurrentLocation;
 
     private HashMap<String, String> mLocationData;
 
@@ -82,6 +88,8 @@ public class WeatherFragment extends Fragment {
     private FortyEightHourWeatherFragment mFortyEightHourWeatherFragment;
 
     public static OnWeatherFragmentInteractionListener mListener;
+
+    private View mView;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -108,23 +116,37 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
+            Log.e("got it", "got something");
             mLocationData = (HashMap<String, String>) getArguments().getSerializable(ARG_LOCATION);
             mCurrentObservationData = (HashMap<String, String>) getArguments().getSerializable(ARG_CURRENT_OBSERVATION);
             mTenDayWeatherData = (TenDayWeather[]) getArguments().getSerializable(ARG_FORECASTS);
             mFortyEightHourData = (FortyEightHourWeather[]) getArguments().getSerializable(ARG_FORTY_EIGHT_HOUR);
             mSavedLocations = (SavedLocations[]) getArguments().getSerializable(ARG_SAVED_LOCATIONS);
             mCredentials = (Credentials) getArguments().getSerializable(ARG_CREDENTIALS);
+            if (getArguments().containsKey(WeatherFragment.ARG_CURRENT_LOCATION)) {
+                mCurrentLocation = (Location) getArguments().getParcelable(WeatherFragment.ARG_CURRENT_LOCATION);
+            }
         }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("resume", "resumed");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_weather, container, false);
+        mView = v;
 
+
+        Log.e("onCreateView", "weatherFragment");
         Bundle args;
 
         List<String> options = new ArrayList<>();
@@ -154,17 +176,23 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.e("click", parent.getItemAtPosition(position).toString() + " " + position);
-                SavedLocations selected = mSavedLocations[adapter.getPosition(parent.getItemAtPosition(position).toString()) - 1];
+                if (parent.getItemAtPosition(position).toString().equals("Choose on map...")) {
 
-                if (selected.getLat().equals("null") && selected.getLong().equals("null")) {
-
-                    Log.e("update", "shoould update");
-                    doUpdate(selected.getZip());
-
+                    mListener.onMapFragmentInteraction();
                 } else {
-                    doUpdateLatLon(selected.getLat(), selected.getLong());
+                    SavedLocations selected = mSavedLocations[adapter.getPosition(parent.getItemAtPosition(position).toString()) - 1];
 
+                    if (selected.getLat().equals("null") && selected.getLong().equals("null")) {
+
+                        Log.e("update", "shoould update");
+                        doUpdate(selected.getZip());
+
+                    } else {
+                        doUpdateLatLon(selected.getLat(), selected.getLong());
+
+                    }
                 }
+
                 InputMethodManager inputManager = (InputMethodManager)
                         getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
@@ -236,6 +264,8 @@ public class WeatherFragment extends Fragment {
 
         TabLayout tabLayout = (TabLayout) v.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+
         return v;
     }
     private void updateFields() {
@@ -256,11 +286,11 @@ public class WeatherFragment extends Fragment {
         args.putSerializable(ARG_FORTY_EIGHT_HOUR, mFortyEightHourData);
         mFortyEightHourWeatherFragment.updateFields(mFortyEightHourData);
 
-        ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
+        ViewPager viewPager = (ViewPager) mView.findViewById(R.id.viewpager);
         Log.e("update", viewPager.toString());
         setupViewPager(viewPager);
 
-        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) mView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -269,7 +299,9 @@ public class WeatherFragment extends Fragment {
         adapter.addFragment(mTodayWeatherFragment, "Today");
         adapter.addFragment(mFortyEightHourWeatherFragment, "Hourly");
         adapter.addFragment(mTenDayWeatherFragment, "10 days");
+
         viewPager.setAdapter(adapter);
+        viewPager.getAdapter().notifyDataSetChanged();
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -283,6 +315,11 @@ public class WeatherFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
 
         @Override
@@ -315,7 +352,7 @@ public class WeatherFragment extends Fragment {
                 .build().execute();
     }
 
-    private void doUpdateLatLon(final String lat, final String lon) {
+    public void doUpdateLatLon(final String lat, final String lon) {
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
@@ -498,8 +535,12 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        //mListener = null;
     }
+
+
+
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -514,5 +555,6 @@ public class WeatherFragment extends Fragment {
     public interface OnWeatherFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onWeatherFragmentInteraction(Uri uri);
+        void onMapFragmentInteraction();
     }
 }
