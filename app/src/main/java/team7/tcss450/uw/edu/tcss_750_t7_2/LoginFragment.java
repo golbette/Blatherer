@@ -241,6 +241,8 @@ public class LoginFragment extends Fragment {
             String message = resultsJSON.getString("message");
             if (success) {
                 mJwt = resultsJSON.getString(getString(R.string.keys_json_login_jwt));
+                String username = resultsJSON.getString("username");
+                mCredentials = new Credentials.Builder(mCredentials.getEmail(), mCredentials.getPassword()).addUsername(username).build();
                 if (mRememberVal) {
                     saveCredentials(mCredentials);
                     Log.wtf("CREDS", mCredentials.getUsername());

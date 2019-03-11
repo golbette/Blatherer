@@ -3,12 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/list"
-    android:name="team7.tcss450.uw.edu.tcss_750_t7_2.TenDayWeatherFragment"
+    android:name="team7.tcss450.uw.edu.tcss_750_t7_2.SavedWeatherLocationFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
     android:background="@color/weatherbackground"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".TenDayWeatherFragment"
-    tools:listitem="@layout/fragment_ten_day_weather" />
+    tools:context=".SavedWeatherLocationFragment"
+    tools:listitem="@layout/fragment_saved_weather_location" />

@@ -1,19 +1,33 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
+
+import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PutAsyncTask;
 
 
 /**
@@ -21,9 +35,13 @@ import java.util.Locale;
  */
 public class TodayWeatherFragment extends Fragment {
 
+    public static OnTodayWeatherFragmentInteractionListener mListener;
+
     private HashMap<String, String> mLocationData;
 
     private HashMap<String, String> mCurrentObservationData;
+
+    private Credentials mCredentials;
 
     public static final int[] CLEAR_DAY = new int[]{25, 34, 36};;
 
@@ -82,7 +100,9 @@ public class TodayWeatherFragment extends Fragment {
         if (getArguments() != null) {
             mLocationData = (HashMap<String, String>) getArguments().getSerializable(WeatherFragment.ARG_LOCATION);
             mCurrentObservationData = (HashMap<String, String>) getArguments().getSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION);
+            mCredentials = (Credentials) getArguments().getSerializable(WeatherFragment.ARG_CREDENTIALS);
         }
+
     }
 
     @Override
@@ -108,7 +128,7 @@ public class TodayWeatherFragment extends Fragment {
         windChillData.setText(mCurrentObservationData.get("windchill"));
 
         TextView cityState = mView.findViewById(R.id.city_state_data);
-        cityState.setText(mLocationData.get("city") +", " + mLocationData.get("region"));
+        cityState.setText(mLocationData.get("city") +"," + mLocationData.get("region"));
 
         TextView monthDate = mView.findViewById(R.id.date_data);
         int timeStamp = Integer.parseInt(mCurrentObservationData.get("pubDate"));
@@ -148,7 +168,87 @@ public class TodayWeatherFragment extends Fragment {
         } else if (contains(WIND, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
             weatherIcon.setImageResource(R.drawable.wind);
         }
+
+
+
+        FloatingActionButton fab = mView.findViewById(R.id.save_button);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View view = inflater.inflate(R.layout.nickname_popup, null);
+
+                EditText nicknameText = view.findViewById(R.id.nickname_text);
+                nicknameText.setText(mLocationData.get("city") + "," + mLocationData.get("region"));
+
+
+
+                PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                window.showAtLocation(mView.findViewById(R.id.constraintLayout), Gravity.CENTER, 0, 0);
+                window.setFocusable(true);
+                window.update();
+
+                Button saveButton = view.findViewById(R.id.save_button);
+                saveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        window.dismiss();
+                        doSave(nicknameText.getText().toString());
+
+                    }
+                });
+            }
+        });
+
         return mView;
+    }
+
+    private void doSave(String nickname) {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_weather))
+                .appendPath(getString(R.string.ep_coordinates))
+                .appendQueryParameter("username", mCredentials.getUsername())
+                .appendQueryParameter("lat", mLocationData.get("lat"))
+                .appendQueryParameter("lon", mLocationData.get("long"))
+                .appendQueryParameter("nickname", nickname)
+                .build();
+        new PutAsyncTask.Builder(uri.toString(), new JSONObject())
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleSaveOnPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build().execute();
+    }
+
+    private void handleSaveOnPost(final String result) {
+        //parse JSON
+        try {
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_success))
+                    && root.getBoolean(getString(R.string.keys_json_weather_success)) == true) {
+                Toast toast = Toast.makeText(getActivity(), "Location saved", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(getActivity(), "Location failed to save (nickname already exists)", Toast.LENGTH_LONG);
+                toast.show();
+            }
+            onWaitFragmentInteractionHide();
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
+            Toast toast = Toast.makeText(getActivity(), "Something went wrong", Toast.LENGTH_LONG);
+            toast.show();
+            //notify user
+            mListener.onWaitFragmentInteractionHide();
+        }
+    }
+
+    /**
+     * Handle errors that may occur during the AsyncTask.
+     * @param result the error message provide from the AsyncTask
+     */
+    private void handleErrorsInTask(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
     }
 
     public void updateFields(HashMap<String, String> locationData,HashMap<String, String> currentObservationData) {
@@ -225,4 +325,42 @@ public class TodayWeatherFragment extends Fragment {
         return result;
     }
 
+    private void onWaitFragmentInteractionShow() {
+        mListener.onWaitFragmentInteractionShow();
+    }
+
+    private void onWaitFragmentInteractionHide() {
+        mListener.onWaitFragmentInteractionHide();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnTodayWeatherFragmentInteractionListener) {
+            mListener = (OnTodayWeatherFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnWeatherFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnTodayWeatherFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener {
+        void onTodayWeatherFragmentInteraction(Uri uri);
+    }
 }

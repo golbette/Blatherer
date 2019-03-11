@@ -16,6 +16,10 @@
             android:id="@+id/nav_weather_activity_home"
             android:icon="@drawable/ic_wb_cloudy_black_24dp"
             android:title="@string/nav_weather_activity_home" />
+        <item
+            android:id="@+id/nav_starred_weather_locations"
+            android:icon="@drawable/ic_star_black_24dp"
+            android:title="@string/nav_weather_starred_locations"/>
     </group>
 
     <group
