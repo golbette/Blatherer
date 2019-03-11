@@ -314,7 +314,7 @@ public class HomeActivity extends AppCompatActivity
         if(id == R.id.nav_home_fragment){
             loadHomeWidgets();
         } else if (id == R.id.nav_message_activity_home) {
-//            clearNotification("msg", null); // TODO:
+            clearNotification("msg", null);
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath(getString(R.string.ep_base_url))
@@ -461,6 +461,7 @@ public class HomeActivity extends AppCompatActivity
                 nbciArray = namesByChatIdList.toArray(nbciArray);
                 Bundle args = new Bundle();
                 args.putSerializable(NamesByChatIdFragment.ARG_RECENT_CHATS_LIST, nbciArray);
+                args.putSerializable("username", response.getString("username"));
                 Fragment frag = new NamesByChatIdFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
@@ -782,7 +783,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRecentChatListFragmentInteraction(NamesByChatId item) throws JSONException {
+    public void onRecentChatListFragmentInteraction(NamesByChatId item, String username) throws JSONException {
         Uri uri = new Uri.Builder().scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
                 .appendPath(getString(R.string.ep_messaging_base))
@@ -790,6 +791,10 @@ public class HomeActivity extends AppCompatActivity
 
         JSONObject msg = mCredentials.asJSONObject();
         msg.put("chatid", item.getmChatId());
+        msg.put("username", username);
+
+        mChatId = item.getmChatId();
+        mMyUsername = username;
 
         Log.wtf("CREDS", msg.toString());
         if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
@@ -882,6 +887,16 @@ public class HomeActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
         transaction.commit();
     }
+
+//    @Override
+//    public void onFragmentInteraction(Uri uri) {
+//
+//    }
+//
+//    @Override
+//    public void onConfirmClicked(JSONObject msg) {
+//
+//    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -1472,6 +1487,19 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onSettingsFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onChangePasswordClicked() {
+        Bundle args = new Bundle();
+        args.putSerializable("credentials", mCredentials);
+        Fragment frag = new ChangePasswordFragment();
+        frag.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, frag)
+                .addToBackStack(null);
+        transaction.commit();
     }
 
     @Override

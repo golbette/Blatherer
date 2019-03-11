@@ -18,6 +18,7 @@
     <string name="login_tv_morning">Good Morning</string>
     <string name="login_tv_afternoon">Good Afternoon</string>
     <string name="login_switch_remember_val">switch_value</string>
+    <string name="login_forgot_password">Forgot Password</string>
 
     <!-- fragment_register.xml -->
     <string name="register_hint_fname">First Name</string>
@@ -125,6 +126,14 @@
     <string name="button_received_request_item_deny">Deny</string>
     <string name="text_home_fragment_weather_today">Weather Today</string>
     <string name="text_view_home_fragment_recyclers_new_messages">New Messages</string>
+
+    <string name="setting_reset_password">Change Password</string>
+
+    <string name="change_pw_title">Change Password</string>
+    <string name="change_pw_hint_old_pw">Old Password</string>
+    <string name="change_pw_hint_new_pw">New Password</string>
+    <string name="change_pw_hint_repeat_new_pw">Repeat New Password</string>
+    <string name="change_pw_butt_confirm">Confirm</string>
 
     <string name="empty"></string>
 </resources>
