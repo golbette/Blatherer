@@ -4,9 +4,18 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
+import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 
 
 /**
@@ -16,11 +25,34 @@ import android.view.ViewGroup;
  * to handle interaction events.
  */
 public class HomeFragment extends Fragment {
+    public static final String ARG_CREDS = "credentials";
+    public static final String ARG_RECEIVED_REQUEST = "received";
+    public static final String ARG_JWT = "jwt";
+
 
     private OnHomeFragmentInteractionListener mListener;
 
+    private RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener mReceivedListener;
+    private List<Request> mReceivedRequests;
+    private RecyclerView mReceivedReqRecyclerView;
+
+    private Credentials mCredentials;
+    private String mJwtToken;
+
     public HomeFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstances){
+        super.onCreate(savedInstances);
+        if(getArguments() != null) {
+            mReceivedRequests = (ArrayList<Request>) getArguments()
+                    .getSerializable(ARG_RECEIVED_REQUEST);
+            mCredentials = (Credentials) getArguments().getSerializable(ARG_CREDS);
+            mJwtToken = (String) getArguments().getSerializable(ARG_JWT);
+        }
+
     }
 
 
@@ -28,15 +60,28 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View v =  inflater.inflate(R.layout.fragment_home, container, false);
+        Context context = v.getContext();
+
+        if( null == mReceivedRequests){
+         TextView t =   v.findViewById(R.id.text_home_fragment_received_request_recycler_received);
+         t.setText("No Connection Requests");
+        } else {
+            mReceivedReqRecyclerView = v.findViewById(R.id.fragment_home_received_requests);
+            RecyclerView.LayoutManager receivedLayoutManager = new LinearLayoutManager(context);
+            mReceivedReqRecyclerView.setLayoutManager(receivedLayoutManager);
+            MyRequestReceivedRecyclerViewAdapter requestReceivedRecyclerViewAdapter
+                    = new MyRequestReceivedRecyclerViewAdapter(mReceivedRequests, mReceivedListener, mCredentials, mJwtToken);
+
+            mReceivedReqRecyclerView.setAdapter(requestReceivedRecyclerViewAdapter);
+        }
+
+
+
+        return v;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onHomeFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Context context) {
