@@ -48,19 +48,18 @@
                     android:textAppearance="?attr/textAppearanceListItem"
                     android:textColor="@android:color/black" />
 
-                <!--<TextView-->
-                    <!--android:id="@+id/new_contact_email"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:maxLength="40"-->
-                    <!--android:layout_marginLeft="@dimen/text_margin"-->
-                    <!--android:layout_marginRight="@dimen/text_margin"-->
-                    <!--android:layout_marginBottom="@dimen/text_margin"-->
-                    <!--android:padding="1dp"-->
-                    <!--android:text="@string/new_contact_tv_email"-->
-                    <!--android:textAppearance="?attr/textAppearanceListItem"-->
-                    <!--android:textSize="12sp"-->
-                    <!--android:textColor="@color/colorSecondaryText"/>-->
+                <TextView
+                    android:id="@+id/new_contact_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLength="40"
+                    android:layout_marginLeft="@dimen/text_margin"
+                    android:layout_marginRight="@dimen/text_margin"
+                    android:padding="1dp"
+                    android:text="@string/new_contact_tv_email"
+                    android:textAppearance="?attr/textAppearanceListItem"
+                    android:textSize="12sp"
+                    android:textColor="@color/colorSecondaryText"/>
             </LinearLayout>
             <Space
                 android:layout_width="0dp"

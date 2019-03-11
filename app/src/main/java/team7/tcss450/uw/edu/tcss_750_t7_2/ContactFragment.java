@@ -1,6 +1,7 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import org.json.JSONException;
 
@@ -27,10 +29,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 public class ContactFragment extends Fragment {
     public static final String ARG_CONTACTS_LIST = "contact_list";
     private List<Contact> mContacts;
-
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnContactListFragmentInteractionListener mListener;
 
@@ -41,7 +40,6 @@ public class ContactFragment extends Fragment {
     public ContactFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static ContactFragment newInstance(int columnCount) {
         ContactFragment fragment = new ContactFragment();
@@ -66,10 +64,19 @@ public class ContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact_list, container, false);
 
+        RecyclerView recyclerView = view.findViewById(R.id.contact_list); // With a more complex view group, this needs to be added.
+        ImageButton imageButton = view.findViewById(R.id.new_contact_butt);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onNewContactClicked();
+            }
+        });
+
         // Set the adapter
-        if (view instanceof RecyclerView) {
+        if (recyclerView instanceof RecyclerView) { // With a more complex view group, this needs to be modified.
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+//            RecyclerView recyclerView = (RecyclerView) view; // This has become redundant.
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -79,7 +86,6 @@ public class ContactFragment extends Fragment {
         }
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -109,7 +115,7 @@ public class ContactFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnContactListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onContactListFragmentInteraction(Contact item) throws JSONException;
+        void onNewContactClicked();
     }
 }

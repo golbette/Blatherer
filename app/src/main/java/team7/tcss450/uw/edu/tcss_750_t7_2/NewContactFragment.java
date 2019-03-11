@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
@@ -21,18 +23,16 @@ import java.util.List;
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnNewContactListFragmentInteractionListener}
  * interface.
  */
 public class NewContactFragment extends Fragment {
     public static final String ARG_NEW_CONTACT_LIST = "new contacts lists";
     private List<NewContact> mNewContacts;
-
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnNewContactListFragmentInteractionListener mListener;
+    private boolean mSearch = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -41,7 +41,6 @@ public class NewContactFragment extends Fragment {
     public NewContactFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static NewContactFragment newInstance(int columnCount) {
         NewContactFragment fragment = new NewContactFragment();
@@ -66,10 +65,22 @@ public class NewContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_contact_list, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
+        RecyclerView recyclerView = view.findViewById(R.id.new_contact_list);
+
+        ImageButton imageButton = view.findViewById(R.id.new_contact_search);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onSearchClicked();
+            }
+        });
+
+//        if (mNewContacts.isEmpty()) {
+//            mListener.onNoResults();
+//        } else {
+            // Set the adapter
+        if (recyclerView instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
@@ -77,6 +88,10 @@ public class NewContactFragment extends Fragment {
             }
             recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener));
         }
+//        }
+
+
+
         return view;
     }
 
@@ -109,7 +124,9 @@ public class NewContactFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnNewContactListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onNewContactListFragmentInteraction(NewContact item);
+        void onSearchClicked();
+        void onNoResults();
+        void onRequestSent(String email);
     }
 }

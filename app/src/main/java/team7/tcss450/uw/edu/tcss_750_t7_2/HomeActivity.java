@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -20,8 +22,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import android.widget.Button;
 import android.widget.TextView;
+
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,13 +69,16 @@ public class HomeActivity extends AppCompatActivity
         ContactFragment.OnContactListFragmentInteractionListener,
         RequestSentListFragment.OnRequestSentListFragmentInteractionListener,
         RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener,
-        RequestContainer.OnRequestContainerFragmentInteractionListener{
+        RequestContainer.OnRequestContainerFragmentInteractionListener,
+        NewContactBlankFragment.OnFragmentInteractionListener {
+
 
 //    final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
     private Credentials mCredentials;
     private PushMessageReceiver mPushMessageReceiver;
     private int mChatId;
+    private RecyclerView mRecyclerView;
 //    private JSONObject personB;
 
     private FortyEightHourWeather[] mFortyEightHour;
@@ -336,6 +347,126 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onSearchClicked() {
+        Uri uri = new Uri.Builder().scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_contacts_base))
+                .appendPath(getString(R.string.ep_contacts_searchcontacts)).build();
+
+        JSONObject msg = new JSONObject();
+        EditText et = findViewById(R.id.new_contact_et_search);
+
+        if (!et.getText().toString().isEmpty()) {
+            try {
+                msg.put("input", et.getText().toString());
+                msg.put("email", mCredentials.getEmail());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleSearchOnPostExecute)
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        }
+    }
+
+    @Override
+    public void onNoResults() { // TODO: Remove this.
+    }
+
+    @Override
+    public void onRequestSent(String email_b) {
+        Uri uri = new Uri.Builder().scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_contacts_base))
+                .appendPath("connReq").build();
+
+        JSONObject msg = new JSONObject();
+        try {
+            msg.put("email_a", mCredentials.getEmail());
+            msg.put("email_b", email_b);
+        } catch (JSONException e) {
+            Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleSendConnReq)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
+
+    private void handleSendConnReq(final String result){
+        Log.wtf("SEND_CONNREQ_RESULT", result);
+        onWaitFragmentInteractionHide();
+        Toast.makeText(this, "Request sent!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void handleSearchOnPostExecute(final String result) {
+        Log.wtf("SEARCH_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+
+            if (response.has(getString(R.string.keys_json_contact_message))) {
+
+                JSONArray data = response.getJSONArray(getString(R.string.keys_json_contact_message));
+
+                List<NewContact> newContacts = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonContact = data.getJSONObject(i);
+                    newContacts.add(new NewContact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
+                            .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
+                            .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
+                            .addMemberId(jsonContact.getInt("memberid"))
+                            .build());
+                }
+                NewContact[] contactsAsArray = new NewContact[newContacts.size()];
+                contactsAsArray = newContacts.toArray(contactsAsArray);
+                Bundle args = new Bundle();
+                args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
+                Fragment frag = new NewContactFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag)
+                        .addToBackStack(null);
+                transaction.commit();
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+
+                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+                Bundle args = new Bundle();
+                args.putSerializable("new_contact_status", "No results.");
+                newContactBlankFragment.setArguments(args);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+                transaction.commit();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+
+            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+            Bundle args = new Bundle();
+            args.putSerializable("new_contact_status", "No results.");
+            newContactBlankFragment.setArguments(args);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+            transaction.commit();
+        }
+    }
+
 //    @Override
 //    public void recentClicked() {
 ////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
@@ -450,6 +581,13 @@ public class HomeActivity extends AppCompatActivity
 //        chatFragment.setArguments(data);
 //        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
 //        transaction.commit();
+    }
+
+    @Override
+    public void onNewContactClicked() {
+        NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+        transaction.commit();
     }
 
     private void handleMessageGetOnPostExecute(final String result) {
