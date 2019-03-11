@@ -126,4 +126,6 @@
     <string name="button_received_request_item_deny">Deny</string>
     <string name="text_home_fragment_weather_today">Weather Today</string>
     <string name="text_view_home_fragment_recyclers_new_messages">New Messages</string>
+
+    <string name="empty"></string>
 </resources>

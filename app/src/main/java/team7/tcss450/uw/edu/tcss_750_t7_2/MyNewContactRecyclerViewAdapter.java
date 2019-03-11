@@ -24,10 +24,14 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
 
     private final List<NewContact> mValues;
     private final OnNewContactListFragmentInteractionListener mListener;
+    private final boolean mAddMember;
+    private final int mChatId;
 
-    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnNewContactListFragmentInteractionListener listener) {
+    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnNewContactListFragmentInteractionListener listener, boolean addmember, int chatid) {
         mValues = items;
         mListener = listener;
+        mAddMember = addmember;
+        mChatId = chatid;
     }
 
     @Override
@@ -46,7 +50,7 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
         holder.mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onRequestSent(mValues.get(position).getEmail());
+                mListener.onRequestSent(mValues.get(position).getEmail(), mAddMember, mChatId);
             }
         });
 
@@ -56,7 +60,7 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onNewContactListFragmentInteraction(holder.mItem);
+                    mListener.onNewContactListFragmentInteraction(holder.mItem, mAddMember);
                 }
             }
         });

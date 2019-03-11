@@ -56,6 +56,7 @@ import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.ChatCount;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NamesByChatId;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.BadgeDrawerArrowDrawable;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
@@ -87,7 +88,9 @@ public class HomeActivity extends AppCompatActivity
         RequestSentListFragment.OnRequestSentListFragmentInteractionListener,
         RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener,
         RequestContainer.OnRequestContainerFragmentInteractionListener,
-        NewContactBlankFragment.OnFragmentInteractionListener {
+        NewContactBlankFragment.OnFragmentInteractionListener,
+        NamesByChatIdFragment.OnRecentChatListFragmentInteractionListener,
+        ChatFragment.OnChatFragmentInteractionListener{
 
 
     private String mJwToken;
@@ -120,8 +123,11 @@ public class HomeActivity extends AppCompatActivity
     /** This is the hamburger that's going to be badged. */
     private BadgeDrawerArrowDrawable mBadgeDrawable;
 
-    /** Navigation Item Requests Clicked */
-    private boolean mLoadNavRequest = false;
+    /** True if user comes from a chatroom trying to add a new chat member. */
+    private boolean mAddMember;
+
+//    /** Navigation Item Requests Clicked */
+//    private boolean mLoadNavRequest = false;
 
     private FortyEightHourWeather[] mFortyEightHour;
 
@@ -214,15 +220,15 @@ public class HomeActivity extends AppCompatActivity
 
                     Log.wtf("CREDS", msg.toString());
 
+                    if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                        onWaitFragmentInteractionHide();
+                    }
                     new SendPostAsyncTask.Builder(uri.toString(), msg)
                             .onPreExecute(this::onWaitFragmentInteractionShow)
                             .onPostExecute(this::handleMessageGetOnPostExecute)
                             .onCancelled(this::handleErrorsInTask)
                             .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                             .build().execute();
-
-//                    ChatFragment chatFragment = new ChatFragment(); // TODO
-//                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
                 } else {
                    loadHomeWidgets();
                 }
@@ -351,7 +357,6 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
-//        setNotification(); // TODO
     }
 
     @Override
@@ -445,25 +450,40 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if(id == R.id.nav_home_fragment){
-
             loadHomeWidgets();
-
-//            fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_message_activity_home) {
-            clearNotification("msg", null);
-//            Uri uri = new Uri.Builder().scheme("https")
-//                    .appendPath(R.string.ep_base_url)
-//                    .appendPath(R.string.ep_contacts_base)
-//                    .appendPath(R.string.ep_contacts_getcontacts)
-//                    .build();
-            loadFragment(new MessageFragment());
-//            fm.beginTransaction()
-//                    .replace(R.id.bottom_frag_container, bottomAppBarFrag)
-//                    .addToBackStack(null).commit();
-//            fm.popBackStack();
+//            clearNotification("msg", null); // TODO:
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath("messaging")
+                    .appendPath("getchats")
+                    .build();
 
-            // Handle the camera action
-        } else if (id == R.id.nav_weather_activity_home) {
+            Log.wtf("RECENTS", uri.toString());
+
+            JSONObject msg = new JSONObject();
+
+            try {
+                msg.put("email", mCredentials.getEmail());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.wtf("RECENTS", msg.toString());
+
+            if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                onWaitFragmentInteractionHide();
+            }
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleGetChatsPost)
+                    .onCancelled(this::handleErrorsInTask)
+//                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .addHeaderField("content-type", "application/Json")
+                    .build()
+                    .execute();
+        } else if (id == R.id.nav_weather_activity_home) { // Handle the camera action
             //loadFragment(new WeatherFragment());
 
             /* 98402 is hardcoded, eventually will make default
@@ -481,7 +501,6 @@ public class HomeActivity extends AppCompatActivity
             new GetAsyncTask.Builder(uri.toString())
                     .onPostExecute(this::handleWeatherGetOnPostExecute)
                     .build().execute();
-
         } else if (id == R.id.nav_starred_weather_locations) {
             Uri uri = new Uri.Builder()
                     .scheme("https")
@@ -508,7 +527,9 @@ public class HomeActivity extends AppCompatActivity
             JSONObject msg = mCredentials.asJSONObject();
 
             Log.wtf("CREDS", msg.toString());
-
+            if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                onWaitFragmentInteractionHide();
+            }
             new SendPostAsyncTask.Builder(uri.toString(), msg)
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleContactGetOnPostExecute)
@@ -529,6 +550,9 @@ public class HomeActivity extends AppCompatActivity
                     .build();
 
             JSONObject creds = mCredentials.asJSONObject();
+            if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                onWaitFragmentInteractionHide();
+            }
             new GetAsyncTask.Builder(uri.toString())
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleRequestGetOnPostExecute)
@@ -562,18 +586,73 @@ public class HomeActivity extends AppCompatActivity
         new DeleteTokenAsyncTask().execute();
     }
 
-    @Override
-    public void onMessageListFragmentInteraction(Message item) {
+    public void handleGetChatsPost(final String result) {
+        Log.wtf("CHATS_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+            if (response.has("chatids")) {
+                JSONArray chatids = response.getJSONArray("chatids");
+                List<Integer> idsList = new ArrayList<>();
+                List<NamesByChatId> namesByChatIdList = new ArrayList<>();
+                for (int i = 0; i < chatids.length(); i++) {
+                    JSONObject chatid = chatids.getJSONObject(i);
+                    idsList.add(chatid.getInt("chatid"));
+                }
+                JSONArray memberinfos = response.getJSONArray("memberinfos");
+                for (int i = 0; i < idsList.size(); i++) {
+                    StringBuilder names = new StringBuilder();
+                    for (int j = 0; j < memberinfos.length(); j++) {
+                        if (idsList.get(i) == memberinfos.getJSONObject(j).getInt("chatid")) {
+                            names.append(memberinfos.getJSONObject(j).getString("firstname"));
+                            if (j < memberinfos.length() - 1) {
+                                names.append(", ");
+                            }
+                        }
+                    }
+                    namesByChatIdList.add(new NamesByChatId(idsList.get(i), names.toString()));
+                }
+                NamesByChatId[] nbciArray = new NamesByChatId[namesByChatIdList.size()];
+                nbciArray = namesByChatIdList.toArray(nbciArray);
+                Bundle args = new Bundle();
+                args.putSerializable(NamesByChatIdFragment.ARG_RECENT_CHATS_LIST, nbciArray);
+                Fragment frag = new NamesByChatIdFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
 
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                FragmentTransaction transaction = getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, frag)
+                        .addToBackStack(null);
+                transaction.commit();
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+
+//                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//                Bundle args = new Bundle();
+//                args.putSerializable("new_contact_status", "No results.");
+//                newContactBlankFragment.setArguments(args);
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//                transaction.commit();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+
+//            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//            Bundle args = new Bundle();
+//            args.putSerializable("new_contact_status", "No results.");
+//            newContactBlankFragment.setArguments(args);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//            transaction.commit();
+        }
     }
 
     @Override
-    public void onNewContactListFragmentInteraction(NewContact item) {
-
-    }
-
-    @Override
-    public void onSearchClicked() {
+    public void onSearchClicked(boolean addmember, int chatid) {
         Uri uri = new Uri.Builder().scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
                 .appendPath(getString(R.string.ep_contacts_base))
@@ -581,6 +660,9 @@ public class HomeActivity extends AppCompatActivity
 
         JSONObject msg = new JSONObject();
         EditText et = findViewById(R.id.new_contact_et_search);
+
+        mAddMember = addmember;
+        mChatId = chatid;
 
         if (!et.getText().toString().isEmpty()) {
             try {
@@ -590,25 +672,85 @@ public class HomeActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            new SendPostAsyncTask.Builder(uri.toString(), msg)
-                    .onPreExecute(this::onWaitFragmentInteractionShow)
-                    .onPostExecute(this::handleSearchOnPostExecute)
-                    .onCancelled(this::handleErrorsInTask)
-                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                    .build().execute();
+            if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                onWaitFragmentInteractionHide();
+            }
+//            if (addmember) {
+//                new SendPostAsyncTask.Builder(uri.toString(), msg)
+//                        .onPreExecute(this::onWaitFragmentInteractionShow)
+//                        .onPostExecute(this::handleAddSearchOnPostExecute)
+//                        .onCancelled(this::handleErrorsInTask)
+//                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+//                        .build().execute();
+//            } else {
+                new SendPostAsyncTask.Builder(uri.toString(), msg)
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handleSearchOnPostExecute)
+                        .onCancelled(this::handleErrorsInTask)
+                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                        .build().execute();
+//            }
         }
     }
 
-    @Override
-    public void onNoResults() { // TODO: Remove this.
+    public void handleAddSearchOnPostExecute(final String result) {
+//        Log.wtf("ADD_SEARCH_RESULT", result);
+//        try {
+//            JSONObject response = new JSONObject(result);
+//            if (response.has(getString(R.string.keys_json_contact_message))) {
+//                JSONArray data = response.getJSONArray(getString(R.string.keys_json_contact_message));
+//                List<NewContact> newContacts = new ArrayList<>();
+//                for (int i = 0; i < data.length(); i++) {
+//                    JSONObject jsonContact = data.getJSONObject(i);
+//                    newContacts.add(new NewContact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
+//                            .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
+//                            .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
+//                            .addMemberId(jsonContact.getInt("memberid"))
+//                            .build());
+//                }
+//                NewContact[] contactsAsArray = new NewContact[newContacts.size()];
+//                contactsAsArray = newContacts.toArray(contactsAsArray);
+//                Bundle args = new Bundle();
+//                args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
+//                Fragment frag = new NewContactFragment();
+//                frag.setArguments(args);
+//                onWaitFragmentInteractionHide();
+////                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                FragmentTransaction transaction = getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragmentContainer, frag)
+//                        .addToBackStack(null);
+//                transaction.commit();
+//            } else {
+//                Log.wtf("ERROR", "no data in array");
+//                onWaitFragmentInteractionHide();
+//
+//                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//                Bundle args = new Bundle();
+//                args.putSerializable("new_contact_status", "No results.");
+//                newContactBlankFragment.setArguments(args);
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//                transaction.commit();
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            Log.wtf("ERROR", e.getMessage());
+//            onWaitFragmentInteractionHide();
+//            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//            Bundle args = new Bundle();
+//            args.putSerializable("new_contact_status", "No results.");
+//            newContactBlankFragment.setArguments(args);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//            transaction.commit();
+//        }
     }
 
     @Override
-    public void onRequestSent(String email_b) {
-        Uri uri = new Uri.Builder().scheme("https")
-                .appendPath(getString(R.string.ep_base_url))
-                .appendPath(getString(R.string.ep_contacts_base))
-                .appendPath("connReq").build();
+    public void onRequestSent(String email_b, boolean addmember, int chatid) {
+
+
+        mAddMember = addmember;
+        mChatId = chatid;
 
         JSONObject msg = new JSONObject();
         try {
@@ -618,13 +760,45 @@ public class HomeActivity extends AppCompatActivity
             Log.wtf("JSON", "Error creating JSON: " + e.getMessage());
             e.printStackTrace();
         }
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
 
-        new SendPostAsyncTask.Builder(uri.toString(), msg)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
-                .onPostExecute(this::handleSendConnReq)
-                .onCancelled(this::handleErrorsInTask)
-                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                .build().execute();
+        if (addmember) {
+            try {
+                msg.put("email", email_b);
+                msg.put("chatID", chatid);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Uri uri = new Uri.Builder().scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath("convoAdd").build();
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleConvoAdd) // TODO: handle add member request
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        } else {
+            Uri uri = new Uri.Builder().scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath("connReq").build();
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleSendConnReq)
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        }
+    }
+
+    public void handleConvoAdd(final String result) {
+        Log.wtf("SEND_CONNREQ_RESULT", result);
+        onWaitFragmentInteractionHide();
+        Toast.makeText(this, "Member added!", Toast.LENGTH_SHORT).show();
     }
 
     private void handleSendConnReq(final String result){
@@ -656,11 +830,13 @@ public class HomeActivity extends AppCompatActivity
                 contactsAsArray = newContacts.toArray(contactsAsArray);
                 Bundle args = new Bundle();
                 args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
+                args.putSerializable("addmember", mAddMember);
+                args.putSerializable("chatid", mChatId);
                 Fragment frag = new NewContactFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
@@ -719,7 +895,7 @@ public class HomeActivity extends AppCompatActivity
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
@@ -748,7 +924,31 @@ public class HomeActivity extends AppCompatActivity
         msg.put("contactemail", item.getEmail());
 
         Log.wtf("CREDS", msg.toString());
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleMessageGetOnPostExecute)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
 
+    @Override
+    public void onRecentChatListFragmentInteraction(NamesByChatId item) throws JSONException {
+        Uri uri = new Uri.Builder().scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_messaging_base))
+                .appendPath(getString(R.string.ep_messaging_getall)).build();
+
+        JSONObject msg = mCredentials.asJSONObject();
+        msg.put("chatid", item.getmChatId());
+
+        Log.wtf("CREDS", msg.toString());
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
         new SendPostAsyncTask.Builder(uri.toString(), msg)
                 .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleMessageGetOnPostExecute)
@@ -794,7 +994,7 @@ public class HomeActivity extends AppCompatActivity
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, frag)
@@ -822,21 +1022,20 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     *
+     * @param chatid Carried over from the chat which the user wants to add another user in.
+     */
     @Override
-    public void onRequestReceivedListFragmentInteraction(Request item) {
-
+    public void onAddChatMemberClicked(int chatid) {
+        Bundle args = new Bundle();
+        args.putSerializable("chatid", chatid);
+        args.putSerializable("addmember", true);
+        NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+        newContactBlankFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+        transaction.commit();
     }
-
-    @Override
-    public void onRequestContainerFragmentInteraction(View View) {
-
-    }
-//    @Override
-//    public void newContactClicked() {
-//        fm.beginTransaction()
-//                .replace(R.id.fragmentContainer, new NewContactFragment())
-//                .addToBackStack(null).commit();
-//    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -951,6 +1150,9 @@ public class HomeActivity extends AppCompatActivity
                         .appendQueryParameter("lon", lon)
                         .build();
                 Log.e("url", uri.toString());
+                if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                    onWaitFragmentInteractionHide();
+                }
                 new GetAsyncTask.Builder(uri.toString())
                         .onPostExecute(this::handleHourlyOnPost)
                         .build().execute();
@@ -1195,6 +1397,9 @@ public class HomeActivity extends AppCompatActivity
                         .build();
 
                 JSONObject creds = mCredentials.asJSONObject();
+                if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                    onWaitFragmentInteractionHide();
+                }
                 new GetAsyncTask.Builder(uri.toString())
                         .onPreExecute(this::onWaitFragmentInteractionShow)
                         .onPostExecute(this::handleRequestSentGetOnPostExecute)
@@ -1212,6 +1417,9 @@ public class HomeActivity extends AppCompatActivity
                         .build();
 
                 JSONObject creds = mCredentials.asJSONObject();
+                if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                    onWaitFragmentInteractionHide();
+                }
                 new GetAsyncTask.Builder(uri.toString())
                         .onPreExecute(this::onWaitFragmentInteractionShow)
                         .onPostExecute(this::handleRequestSentGetOnPostExecute)
@@ -1270,7 +1478,7 @@ public class HomeActivity extends AppCompatActivity
                 Fragment frag = new RequestContainer();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 loadFragment(frag);
 
 
@@ -1282,7 +1490,7 @@ public class HomeActivity extends AppCompatActivity
                 Fragment frag = new RequestContainer();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 loadFragment(frag);
             }
 
@@ -1293,7 +1501,6 @@ public class HomeActivity extends AppCompatActivity
         }
 
     }
-
 
     /**
      * Handle errors that may occur during the AsyncTask.
@@ -1393,8 +1600,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /**
-     * Weather options fragments listener
-     * @param uri
+     * Get and set notification counts.
      */
     @Override
     public void onWeatherOptionsFragmentInteraction(Uri uri) {
@@ -1442,7 +1648,9 @@ public class HomeActivity extends AppCompatActivity
         }
 
         Log.wtf("NOTIFICATION", msg.toString());
-
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
         new SendPostAsyncTask.Builder(uri.toString(), msg)
                 .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleSetNotificationPost)
@@ -1451,6 +1659,10 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Save notification counts to member variables and displays them by calling initializeCountDrawer().
+     * @param result
+     */
     public void handleSetNotificationPost(String result) {
         Log.wtf("NOTIFICATION_COUNTS", result);
         try {
@@ -1478,7 +1690,9 @@ public class HomeActivity extends AppCompatActivity
                     mTotalChatCount = totalChatCount;
                     mTotalNotificationCount = mConnCount + mConvoCount + mTotalChatCount;
                 }
+
                 initializeCountDrawer();
+
                 if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
                     onWaitFragmentInteractionHide();
                 }
@@ -1518,7 +1732,9 @@ public class HomeActivity extends AppCompatActivity
         }
 
         Log.wtf("NOTIFICATION", msg.toString());
-
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
         new SendPostAsyncTask.Builder(uri.toString(), msg)
                 .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleClearNotificationPost)
@@ -1527,6 +1743,10 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Clear in-app notifications based on type. If new count < 0, remove in-app notifications.
+     * @param result
+     */
     public void handleClearNotificationPost(String result) {
         Log.wtf("NOTIFICATION_COUNTS", result);
         try {
@@ -1548,21 +1768,20 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Receive broadcast and perform actions.
+     */
     private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            setNotification();
-            Log.wtf("BROADCAST", "HomeActivity Broadcast Received!");
+            setNotification();
         }
     }
 
-
     private void loadHomeWidgets(){
-
-        /**Start the get query to return all requests from potential
-         * contacts.
+        /**
+         * Start the get query to return all requests from potential contacts.
          */
-        Log.e("loadHome", "loading");
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
@@ -1571,6 +1790,9 @@ public class HomeActivity extends AppCompatActivity
                 .appendQueryParameter("email", mCredentials.getEmail())
                 .build();
         JSONObject creds = mCredentials.asJSONObject();
+        if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+            onWaitFragmentInteractionHide();
+        }
         new GetAsyncTask.Builder(uri.toString())
                 .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleHomeRequestGetOnPostExecute)
@@ -1688,7 +1910,7 @@ public class HomeActivity extends AppCompatActivity
                 Fragment frag = new HomeFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 loadFragment(frag);
 
             } else {
@@ -1705,5 +1927,81 @@ public class HomeActivity extends AppCompatActivity
             //notify user
             onWaitFragmentInteractionHide();
         }
+    }
+
+    /** vvv Orphan methods vvv */
+
+    /**
+     * Weather options fragments listener
+     * @param uri
+     */
+    @Override
+    public void onWeatherOptionsFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onHomeFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onSettingsFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onConversationFragmentInteraction(Uri uri) {
+
+    }
+
+    /**
+     * Interaction listener for weather fragment that loads
+     * on homepage when user is successfully logged in.
+     * @param uri
+     */
+    @Override
+    public void onWeatherFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onLoginSuccess(Credentials credentials, String jwt) {
+
+    }
+
+    @Override
+    public void onRegisterClicked() {
+
+    }
+
+    @Override
+    public void onRegisterSuccess(Credentials credentials) {
+
+    }
+
+    @Override
+    public void onMessageListFragmentInteraction(Message item) {
+
+    }
+
+    @Override
+    public void onNewContactListFragmentInteraction(NewContact item, boolean addmember) {
+
+    }
+
+    @Override
+    public void onNoResults() { // TODO: Remove this.
+    }
+
+
+    @Override
+    public void onRequestReceivedListFragmentInteraction(Request item) {
+
+    }
+
+    @Override
+    public void onRequestContainerFragmentInteraction(View View) {
+
     }
 }
