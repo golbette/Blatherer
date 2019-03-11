@@ -1510,16 +1510,6 @@ public class HomeActivity extends AppCompatActivity
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
-    /**
-     * Interaction listener for weather fragment that loads
-     * on homepage when user is successfully logged in.
-     * @param uri
-     */
-    @Override
-    public void onWeatherFragmentInteraction(Uri uri) {
-
-    }
-
     @Override
     public void onMapFragmentInteraction() {
         if (mCurrentLocation != null) {
@@ -1564,24 +1554,7 @@ public class HomeActivity extends AppCompatActivity
         //ft.detach(frag).attach(frag).commit();
 
     }
-
-    @Override
-    public void onLoginSuccess(Credentials credentials, String jwt) {
-
-    }
-
-    @Override
-    public void onRegisterClicked() {
-
-    }
-
-
-    @Override
-    public void onRegisterSuccess(Credentials credentials) {
-
-    }
-
-
+    
     @Override
     public void onWaitFragmentInteractionShow() {
         getSupportFragmentManager()
@@ -1599,13 +1572,7 @@ public class HomeActivity extends AppCompatActivity
                 .commit();
     }
 
-    /**
-     * Get and set notification counts.
-     */
-    @Override
-    public void onWeatherOptionsFragmentInteraction(Uri uri) {
 
-    }
     /**
      *
      * Weather options fragments listener
@@ -1613,21 +1580,6 @@ public class HomeActivity extends AppCompatActivity
      */
     @Override
     public void onTodayWeatherFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onHomeFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onSettingsFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onConversationFragmentInteraction(Uri uri) {
 
     }
 
