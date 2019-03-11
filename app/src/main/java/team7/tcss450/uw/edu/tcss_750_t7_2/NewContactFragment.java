@@ -34,6 +34,7 @@ public class NewContactFragment extends Fragment {
     private OnNewContactListFragmentInteractionListener mListener;
     private boolean mSearch = false;
     private boolean mAddMember = false;
+    private int mChatId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -59,6 +60,7 @@ public class NewContactFragment extends Fragment {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mNewContacts = new ArrayList<NewContact>(Arrays.asList((NewContact[]) getArguments().getSerializable(ARG_NEW_CONTACT_LIST)));
             mAddMember = getArguments().getBoolean("addmember");
+            mChatId = getArguments().getInt("chatid");
         }
     }
 
@@ -73,7 +75,7 @@ public class NewContactFragment extends Fragment {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSearchClicked(mAddMember);
+                mListener.onSearchClicked(mAddMember, mChatId);
             }
         });
 
@@ -94,7 +96,7 @@ public class NewContactFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener, mAddMember));
+            recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener, mAddMember, mChatId));
         }
 //        }
         return view;
@@ -130,8 +132,8 @@ public class NewContactFragment extends Fragment {
      */
     public interface OnNewContactListFragmentInteractionListener {
         void onNewContactListFragmentInteraction(NewContact item, boolean addmember);
-        void onSearchClicked(boolean addmember);
+        void onSearchClicked(boolean addmember, int chatid);
         void onNoResults();
-        void onRequestSent(String email, boolean addmember);
+        void onRequestSent(String email, boolean addmember, int chatid);
     }
 }

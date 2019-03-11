@@ -81,7 +81,7 @@ public class NewContactBlankFragment extends Fragment {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSearchClicked(mAddMember);
+                mListener.onSearchClicked(mAddMember, mChatId);
             }
         });
 
@@ -118,6 +118,6 @@ public class NewContactBlankFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onSearchClicked(boolean addmember);
+        void onSearchClicked(boolean addmember, int chatid);
     }
 }
