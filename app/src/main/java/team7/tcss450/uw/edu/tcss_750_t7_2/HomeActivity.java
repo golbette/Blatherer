@@ -3,7 +3,6 @@ package team7.tcss450.uw.edu.tcss_750_t7_2;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -13,8 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -24,14 +21,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.widget.Button;
 import android.widget.TextView;
-
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -46,8 +42,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import me.pushy.sdk.Pushy;
-
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.ChatCount;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
@@ -112,11 +106,8 @@ public class HomeActivity extends AppCompatActivity
     /** This is the hamburger that's going to be badged. */
     private BadgeDrawerArrowDrawable mBadgeDrawable;
 
-//    /** Drawer Toggle that could display a badge and number. */
-//    private ActionBarDrawerToggle mToggle;
-
-//    private BadgeDrawerArrowDrawable
-//        private RecyclerView mRecyclerView;
+    /** Navigation Item Requests Clicked */
+    private boolean mLoadNavRequest = false;
 
     private FortyEightHourWeather[] mFortyEightHour;
 
@@ -335,12 +326,7 @@ public class HomeActivity extends AppCompatActivity
 
             // Handle the camera action
         } else if (id == R.id.nav_weather_activity_home) {
-            //loadFragment(new WeatherFragment());
-
-            /* 98402 is hardcoded, eventually will make default
-               location based on device location
-             */
-
+            /* 98402 is hardcoded, eventually will make default location based on device location */
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath(getString(R.string.ep_base_url))
@@ -352,7 +338,6 @@ public class HomeActivity extends AppCompatActivity
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleWeatherGetOnPostExecute)
                     .build().execute();
-
         } else if (id == R.id.nav_settings_fragment){
             loadFragment(new SettingsFragment());
         } else if (id == R.id.nav_logout){
@@ -375,11 +360,8 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_requests_activity_home) {
 
             clearNotification("connreq", null);
-            loadFragment(new RequestFragment());
 
-            /**Start the get query to return all requests from potential
-             * contacts.
-             */
+            /** tart the get query to return all requests from potential contacts. */
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath(getString(R.string.ep_base_url))
@@ -394,20 +376,6 @@ public class HomeActivity extends AppCompatActivity
                     .onPostExecute(this::handleRequestGetOnPostExecute)
                     .build().execute();
         }
-
-//        case R.id.nav_recents:
-//
-//        return true;
-
-//        case R.id.nav_contacts:
-//
-//        return true;
-
-//        case R.id.nav_requests:
-//        fm.beginTransaction().hide(active).show(requestFrag).commit();
-//        active = requestFrag;
-//        return true;
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -1163,9 +1131,8 @@ public class HomeActivity extends AppCompatActivity
                     mTotalNotificationCount = mConnCount + mConvoCount + mTotalChatCount;
                 }
                 initializeCountDrawer();
-//                onWaitFragmentInteractionShow();
                 if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
-                    onWaitFragmentInteractionHide(); // TODO: potential problems needed when first logged in but might not need it when clicked from notification.
+                    onWaitFragmentInteractionHide();
                 }
             } else {
                 Log.wtf("ERROR", "no data in array");
@@ -1224,9 +1191,7 @@ public class HomeActivity extends AppCompatActivity
                         mConnCount = 0;
                         mConvoCount = 0;
                     }
-
                     mTotalNotificationCount = mTotalChatCount + mConnCount + mConvoCount;
-
                     setNotification();
                 }
             }
