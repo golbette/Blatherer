@@ -5,14 +5,14 @@
     android:id="@+id/fragment_request_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/half_white"
+    android:background="@color/colorPrimary"
     android:overScrollMode="never"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".HomeFragment"
-    android:backgroundTint="@color/half_white">
+    android:backgroundTint="@color/colorPrimary">
 
     <LinearLayout
         android:layout_width="match_parent"
