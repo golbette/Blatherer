@@ -19,12 +19,16 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 public class PushReceiver extends BroadcastReceiver {
 
     public static final String RECEIVED_NEW_MESSAGE = "New message on Blatherer";
+    public static final String RECEIVED_NEW_CONN_REQUEST = "New connection";
+    public static final String RECEIVED_NEW_CONVO_REQUEST = "New conversation";
+
+    /** Stored as a chatid in the chats relation in the database. Reserved for request related push notifications. */
+    public static final int REQUEST_ID = 21;
 
     private String mChatid ;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
         //the following variables are used to store the information sent from Pushy
         //In the WS, you define what gets sent. You can change it there to suit your needs
         //Then here on the Android side, decide what to do with the message you got
@@ -34,11 +38,9 @@ public class PushReceiver extends BroadcastReceiver {
         //perform so logic/routing based on the "type"
         //feel free to change the key or type of values. You could use numbers like HTTP: 404 etc
         String typeOfMessage = intent.getStringExtra("type");
-
-        //The WS sent us the name of the sender
-        String sender = intent.getStringExtra("sender");
-
+        String sender = intent.getStringExtra("sender"); //The WS sent us the name of the sender
         String messageText = intent.getStringExtra("message");
+        int chatId = intent.getExtras().getInt("chatid");
 
         ActivityManager.RunningAppProcessInfo appProcessInfo = new ActivityManager.RunningAppProcessInfo();
         ActivityManager.getMyMemoryState(appProcessInfo);
@@ -49,8 +51,8 @@ public class PushReceiver extends BroadcastReceiver {
 
             //create an Intent to broadcast a message to other parts of the app.
             Intent i = new Intent(RECEIVED_NEW_MESSAGE);
-//            i.putExtra("CHATID", chatid);
-//            i.putExtra("MSGTYPE", typeOfMessage);
+            i.putExtra("CHATID", chatId);
+            i.putExtra("MSGTYPE", typeOfMessage);
             i.putExtra("SENDER", sender);
             i.putExtra("MESSAGE", messageText);
             i.putExtras(intent.getExtras());
@@ -69,14 +71,24 @@ public class PushReceiver extends BroadcastReceiver {
 
             //research more on notifications the how to display them
             //https://developer.android.com/guide/topics/ui/notifiers/notifications
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, mChatid)
-                    .setAutoCancel(true)
-                    .setSmallIcon(R.drawable.ic_chat_black)
-                    .setContentTitle("Message from: " + sender)
-                    .setContentText(messageText)
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setContentIntent(pendingIntent);
+            NotificationCompat.Builder builder;
 
+            if (chatId == REQUEST_ID) {
+                builder = new NotificationCompat.Builder(context, mChatid)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_requests)
+                        .setContentTitle("Connection request from: " + sender)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent);
+            } else {
+                builder = new NotificationCompat.Builder(context, mChatid)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.ic_chat_black)
+                        .setContentTitle("Message from: " + sender)
+                        .setContentText(messageText)
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentIntent(pendingIntent);
+            }
             // Automatically configure a Notification Channel for devices running Android O+
             Pushy.setNotificationChannel(builder, context);
 
