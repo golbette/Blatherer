@@ -25,11 +25,13 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
     private final List<NewContact> mValues;
     private final OnNewContactListFragmentInteractionListener mListener;
     private final boolean mAddMember;
+    private final int mChatId;
 
-    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnNewContactListFragmentInteractionListener listener, boolean addmember) {
+    public MyNewContactRecyclerViewAdapter(List<NewContact> items, OnNewContactListFragmentInteractionListener listener, boolean addmember, int chatid) {
         mValues = items;
         mListener = listener;
         mAddMember = addmember;
+        mChatId = chatid;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class MyNewContactRecyclerViewAdapter extends RecyclerView.Adapter<MyNewC
         holder.mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onRequestSent(mValues.get(position).getEmail(), mAddMember);
+                mListener.onRequestSent(mValues.get(position).getEmail(), mAddMember, mChatId);
             }
         });
 

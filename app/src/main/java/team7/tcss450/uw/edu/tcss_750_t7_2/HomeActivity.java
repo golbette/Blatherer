@@ -498,7 +498,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSearchClicked(boolean addmember) {
+    public void onSearchClicked(boolean addmember, int chatid) {
         Uri uri = new Uri.Builder().scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
                 .appendPath(getString(R.string.ep_contacts_base))
@@ -508,6 +508,7 @@ public class HomeActivity extends AppCompatActivity
         EditText et = findViewById(R.id.new_contact_et_search);
 
         mAddMember = addmember;
+        mChatId = chatid;
 
         if (!et.getText().toString().isEmpty()) {
             try {
@@ -591,13 +592,11 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onRequestSent(String email_b, boolean addmember) {
-        Uri uri = new Uri.Builder().scheme("https")
-                .appendPath(getString(R.string.ep_base_url))
-                .appendPath(getString(R.string.ep_contacts_base))
-                .appendPath("connReq").build();
+    public void onRequestSent(String email_b, boolean addmember, int chatid) {
+
 
         mAddMember = addmember;
+        mChatId = chatid;
 
         JSONObject msg = new JSONObject();
         try {
@@ -614,10 +613,14 @@ public class HomeActivity extends AppCompatActivity
         if (addmember) {
             try {
                 msg.put("email", email_b);
-                // TODO: need to put chatid!
+                msg.put("chatID", chatid);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            Uri uri = new Uri.Builder().scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath("convoAdd").build();
             new SendPostAsyncTask.Builder(uri.toString(), msg)
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleConvoAdd) // TODO: handle add member request
@@ -625,6 +628,10 @@ public class HomeActivity extends AppCompatActivity
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
         } else {
+            Uri uri = new Uri.Builder().scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath("connReq").build();
             new SendPostAsyncTask.Builder(uri.toString(), msg)
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleSendConnReq)
@@ -670,6 +677,7 @@ public class HomeActivity extends AppCompatActivity
                 Bundle args = new Bundle();
                 args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
                 args.putSerializable("addmember", mAddMember);
+                args.putSerializable("chatid", mChatId);
                 Fragment frag = new NewContactFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
