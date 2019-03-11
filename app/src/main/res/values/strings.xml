@@ -122,7 +122,7 @@
     <string name="nav_requests">Requests</string>
     <string name="button_request_sent_fragment_cancel">Cancel</string>
     <string name="text_sent_request_textSent">Sent</string>
-    <string name="text_received_request_recycler">Received</string>
+    <string name="text_received_request_recycler">New Friend Requests</string>
     <string name="button_request_received_cancel">Cancel</string>
     <string name="button_received_request_item_deny">Deny</string>
     <string name="text_home_fragment_weather_today">Weather Today</string>
