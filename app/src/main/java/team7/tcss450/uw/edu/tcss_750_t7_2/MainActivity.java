@@ -46,6 +46,11 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * The sender's username passed in from the push notification.
      */
+    private String mMyUsername;
+
+    /**
+     * The chatid to launch when push notification is clicked.
+     */
     private int mChatId;
 
 
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (getIntent().getExtras().getSerializable("type").equals("msg")) {
                     mLoadFromChatNotification = getIntent().getExtras().getSerializable("type").equals("msg");
                     mChatId = (int) getIntent().getExtras().getSerializable("chatid");
+                    mMyUsername = (String) getIntent().getExtras().getSerializable("receiver");
                 } else if (getIntent().getExtras().getSerializable("type").equals("conn")) {
 
                 } else if (getIntent().getExtras().getSerializable("type").equals("conv")) {
@@ -93,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements
         intent.putExtra(getString(R.string.keys_intent_jwt), jwt);
         intent.putExtra(getString(R.string.login_switch_remember_val), mRememberVal);
         intent.putExtra("chatid", mChatId);
+        intent.putExtra("username", mMyUsername);
         intent.putExtra(getString(R.string.keys_intent_notification_msg), mLoadFromChatNotification);
         startActivity(intent);
         finish();

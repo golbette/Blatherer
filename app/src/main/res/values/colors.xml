@@ -11,4 +11,6 @@
     <color name="colorContactInitials">#ececec</color>
     <color name="colorCircle">#9b9b9b</color>
     <color name="colorCircleLight">#dfdfdf</color>
+    <color name="badge_red">#ff0000</color>
+    <color name="badge_white">#ffffff</color>
 </resources>

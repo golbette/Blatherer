@@ -3,7 +3,9 @@ package team7.tcss450.uw.edu.tcss_750_t7_2;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,9 +15,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -50,9 +54,11 @@ import java.util.List;
 
 import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.ChatCount;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
+import team7.tcss450.uw.edu.tcss_750_t7_2.model.BadgeDrawerArrowDrawable;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
@@ -78,13 +84,41 @@ public class HomeActivity extends AppCompatActivity
         ContactFragment.OnContactListFragmentInteractionListener,
         NewContactBlankFragment.OnFragmentInteractionListener{
 
-//    final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
+
+    /** Credentials passed in from MainActivity when loginSuccess. */
     private Credentials mCredentials;
+
+    /** This is the receiver used to receive broadcast messages */
     private PushMessageReceiver mPushMessageReceiver;
+//    private CustomReceiver mReceiver = new CustomReceiver(); // TODO
+
+    /** This chatid is used when user comes from the push notification. This is the chatid of the chatroom that initiated the notification. */
     private int mChatId;
-    private RecyclerView mRecyclerView;
-//    private JSONObject personB;
+
+    /** This username is used when user comes from the push notification. This is the username of the user. */
+    private String mMyUsername;
+
+    /** This number is displayed on the badge on the nav drawer item when there is a new connection request. */
+    private int mConnCount;
+
+    /** This number is displayed on the badge on the nav drawer item when there is a new conversation request. */
+    private int mConvoCount;
+
+    /** This number is displayed on the badge on the nav drawer item when there is a new message. */
+    private int mTotalChatCount;
+
+    /** This is the sum of all notification counts that will be displayed on the hamburger. */
+    private int mTotalNotificationCount;
+
+    /** This is the hamburger that's going to be badged. */
+    private BadgeDrawerArrowDrawable mBadgeDrawable;
+
+//    /** Drawer Toggle that could display a badge and number. */
+//    private ActionBarDrawerToggle mToggle;
+
+//    private BadgeDrawerArrowDrawable
+//        private RecyclerView mRecyclerView;
 
     private FortyEightHourWeather[] mFortyEightHour;
 
@@ -94,38 +128,51 @@ public class HomeActivity extends AppCompatActivity
 
     private TenDayWeather[] mTenDay;
 
+    /** TextView for nav drawer items Messages, Contacts, and Requests */
+    private TextView mMessagesTV, mContactsTV, mRequestsTV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        // Setting up broadcast receiver
+//        IntentFilter filter = new IntentFilter(PushReceiver.RECEIVED_NEW_MESSAGE);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(Intent.RECEIVED_); // TODO
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        Intent intent = getIntent();
+        Intent intent = getIntent(); // intent from MainActivity
         Bundle args = intent.getExtras();
         mJwToken = intent.getStringExtra(getString(R.string.keys_intent_jwt));
         mCredentials = (Credentials) args.getSerializable(getString(R.string.keys_intent_credentials));
 
-//        BroadcastReceiver br = new PushMessageReceiver();
-//
-//        if (br.onReceive(context, intent).hasExtra("SENDER")) {
-//            mUsername = intentMsg.getStringExtra("SENDER");
-//        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        // Setting up the badge and notification count on the hamburger
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mBadgeDrawable = new BadgeDrawerArrowDrawable(getSupportActionBar().getThemedContext());
+        toggle.setDrawerArrowDrawable(mBadgeDrawable);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        // Setting up the navigation view
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        mMessagesTV = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_message_activity_home));
+        mContactsTV = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_contacts_activity_home));
+        mRequestsTV = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_requests_activity_home));
+
+        navigationView.setNavigationItemSelectedListener(this);
 
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
                 if (getIntent().getBooleanExtra(getString(R.string.keys_intent_notification_msg), false)) {
                     mChatId = (int) getIntent().getExtras().getSerializable("chatid");
+                    mMyUsername = (String) getIntent().getExtras().getSerializable("username");
                     Uri uri = new Uri.Builder().scheme("https")
                             .appendPath(getString(R.string.ep_base_url))
                             .appendPath(getString(R.string.ep_messaging_base))
@@ -134,6 +181,7 @@ public class HomeActivity extends AppCompatActivity
                     JSONObject msg = mCredentials.asJSONObject();
                     try {
                         msg.put("chatid", mChatId);
+                        msg.put("username", mMyUsername);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -147,7 +195,7 @@ public class HomeActivity extends AppCompatActivity
                             .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                             .build().execute();
 
-//                    ChatFragment chatFragment = new ChatFragment();
+//                    ChatFragment chatFragment = new ChatFragment(); // TODO
 //                    getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null).commit();
                 } else {
                     loadFragment(new HomeFragment());
@@ -163,7 +211,13 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onStart(){
         super.onStart();
+//        setNotification(); // TODO
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setNotification();
     }
 
     @Override
@@ -208,6 +262,44 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /**
+     * @author Hari Vignesh Jayapalan
+     * This tutorial is found at: https://android.jlelse.eu/android-adding-badge-or-count-to-the-navigation-drawer-84c93af1f4d9
+     */
+    private void initializeCountDrawer() {
+        if (mTotalChatCount > 0 || mConnCount > 0 || mConvoCount > 0) {
+            mBadgeDrawable.setEnabled(true);
+            mBadgeDrawable.setText(Integer.toString(mTotalChatCount + mConnCount + mConvoCount));
+        } else {
+            mBadgeDrawable.setEnabled(false);
+        }
+
+        if (mTotalChatCount > 0) {
+            mMessagesTV.setGravity(Gravity.CENTER_VERTICAL);
+            mMessagesTV.setTypeface(null, Typeface.BOLD);
+            mMessagesTV.setTextColor(getResources().getColor(R.color.badge_red));
+            mMessagesTV.setText(Integer.toString(mTotalChatCount));
+        } else {
+            mMessagesTV.setText("");
+        }
+
+//        if (mContactsTV) {
+//            mContactsTV.setGravity(Gravity.CENTER_VERTICAL);
+//            mContactsTV.setTypeface(null, Typeface.BOLD);
+//            mContactsTV.setTextColor(getResources().getColor(R.color.badge_red));
+//            mContactsTV.setText(mTotalChatCount);
+//        }
+
+        if (mConnCount > 0 || mConvoCount > 0) {
+            mRequestsTV.setGravity(Gravity.CENTER_VERTICAL);
+            mRequestsTV.setTypeface(null, Typeface.BOLD);
+            mRequestsTV.setTextColor(getResources().getColor(R.color.badge_red));
+            mRequestsTV.setText(Integer.toString(mConnCount + mConvoCount));
+        } else {
+            mRequestsTV.setText("");
+        }
+    }
+
+    /**
      * handle navigation buttons in drawer
      * @param item
      * @return
@@ -223,6 +315,7 @@ public class HomeActivity extends AppCompatActivity
             loadFragment(new HomeFragment());
 //            fm.beginTransaction().remove(bottomAppBarFrag).commit();
         } else if (id == R.id.nav_message_activity_home) {
+            clearNotification("msg", null);
 //            Uri uri = new Uri.Builder().scheme("https")
 //                    .appendPath(R.string.ep_base_url)
 //                    .appendPath(R.string.ep_contacts_base)
@@ -274,6 +367,7 @@ public class HomeActivity extends AppCompatActivity
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
         } else if (id == R.id.nav_requests_activity_home) {
+            clearNotification("connreq", null);
             loadFragment(new RequestFragment());
         }
 
@@ -445,35 +539,6 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-//    @Override
-//    public void recentClicked() {
-////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-//        fm.beginTransaction()
-//                .replace(R.id.fragmentContainer, new MessageFragment())
-//                .addToBackStack(null).commit();
-//    }
-
-//    @Override
-//    public void contactClicked() {
-////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-//        Uri uri = new Uri.Builder().scheme("https").appendPath(getString(R.string.ep_base_url))
-//                .appendPath(getString(R.string.ep_contacts_base))
-//                .appendPath(getString(R.string.ep_contacts_getcontacts)).build();
-//
-//        JSONObject msg = mCredentials.asJSONObject();
-//
-//        Log.wtf("CREDS", msg.toString());
-//
-//        new SendPostAsyncTask.Builder(uri.toString(), msg)
-//                .onPreExecute(this::onWaitFragmentInteractionShow)
-//                .onPostExecute(this::handleContactGetOnPostExecute)
-//                .onCancelled(this::handleErrorsInTask)
-//                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-//                .build().execute();
-//    }
-
-
-
     private void handleContactGetOnPostExecute(final String result) {
         Log.wtf("CONTACT_RESULT", result);
         try {
@@ -511,23 +576,12 @@ public class HomeActivity extends AppCompatActivity
                 Log.wtf("ERROR", "no data in array");
                 onWaitFragmentInteractionHide();
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.wtf("ERROR", e.getMessage());
             onWaitFragmentInteractionHide();
         }
     }
-
-
-
-//    @Override
-//    public void requestClicked() {
-////        Uri uri = new Uri.Builder().scheme().appendPath().appendPath().appendPath().build();
-//        fm.beginTransaction()
-//                .replace(R.id.fragmentContainer, new RequestFragment())
-//                .addToBackStack(null).commit();
-//    }
 
     @Override
     public void onContactListFragmentInteraction(Contact item) throws JSONException {
@@ -547,17 +601,6 @@ public class HomeActivity extends AppCompatActivity
                 .onCancelled(this::handleErrorsInTask)
                 .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                 .build().execute();
-
-//        Bundle data = new Bundle();
-//        data.putSerializable(getString(R.string.contact_tv_contact_initials), item.getContactName());
-//        data.putSerializable(getString(R.string.contact_tv_contact_name), item.getInitials());
-//        data.putSerializable(getString(R.string.contact_tv_email), item.getEmail());
-//        data.putSerializable(getString(R.string.contact_tv_username), item.getmUsername());
-//
-//        ChatFragment chatFragment = new ChatFragment();
-//        chatFragment.setArguments(data);
-//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, chatFragment).addToBackStack(null);
-//        transaction.commit();
     }
 
     @Override
@@ -575,13 +618,13 @@ public class HomeActivity extends AppCompatActivity
             if (response.has("chatid") && response.has("username")){
                 args.putSerializable("send_username", (Serializable) response.getString("username"));
                 args.putSerializable("send_chat_id", (Serializable) response.getInt("chatid"));
+            } else {
+                args.putSerializable("send_username", mMyUsername);
+                args.putSerializable("send_chat_id", mChatId);
             }
             if (response.has(getString(R.string.keys_json_message_message))) {
-
                 JSONArray data = response.getJSONArray(getString(R.string.keys_json_message_message));
-
                 List<Message> messages = new ArrayList<>();
-
                 for (int i = 0; i < data.length(); i++) {
                     JSONObject jsonMessage = data.getJSONObject(i);
                     messages.add(new Message.Builder(jsonMessage.getString(getString(R.string.keys_json_message_username)),
@@ -591,7 +634,6 @@ public class HomeActivity extends AppCompatActivity
                 }
                 Message[] messagesAsArray = new Message[messages.size()];
                 messagesAsArray = messages.toArray(messagesAsArray);
-
                 args.putSerializable(MessageFragment.ARG_MESSAGE_LIST, messagesAsArray);
 
                 Fragment frag = new ChatFragment();
@@ -599,7 +641,6 @@ public class HomeActivity extends AppCompatActivity
                 onWaitFragmentInteractionHide();
 
                 getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, frag)
@@ -609,19 +650,12 @@ public class HomeActivity extends AppCompatActivity
                 Log.wtf("ERROR", "no data in array");
                 onWaitFragmentInteractionHide();
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.wtf("ERROR", e.getMessage());
             onWaitFragmentInteractionHide();
         }
     }
-//    @Override
-//    public void newContactClicked() {
-//        fm.beginTransaction()
-//                .replace(R.id.fragmentContainer, new NewContactFragment())
-//                .addToBackStack(null).commit();
-//    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -639,7 +673,6 @@ public class HomeActivity extends AppCompatActivity
 
             if (!rememberVal) {
                 prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
-//                prefs.edit().remove(getString(R.string.keys_prefs_username)).apply();
                 prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
             }
 
@@ -816,7 +849,6 @@ public class HomeActivity extends AppCompatActivity
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
-
     /**
      * Interaction listener for weather fragment that loads
      * on homepage when user is successfully logged in.
@@ -885,17 +917,137 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    private class PushMessageReceiver extends BroadcastReceiver {
-        public PushMessageReceiver() {
-            // Require constructor
+    public void setNotification(){
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath("notifications")
+                .appendPath("getcount")
+                .build();
+
+        JSONObject msg = new JSONObject();
+
+        try {
+            msg.put("email_b", mCredentials.getEmail());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
+        Log.wtf("NOTIFICATION", msg.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleSetNotificationPost)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
+
+    public void handleSetNotificationPost(String result) {
+        Log.wtf("NOTIFICATION_COUNTS", result);
+        try {
+            JSONObject response = new JSONObject(result);
+            Bundle args = new Bundle();
+            List<ChatCount> msgCounts = new ArrayList<>();
+            if (response.has("success")){
+                if (response.getBoolean("success")) {
+                    args.putSerializable("connCount", (Serializable) response.getInt("connCount"));
+                    mConnCount = response.getInt("connCount");
+                    args.putSerializable("convoCount", (Serializable) response.getInt("convoCount"));
+                    mConvoCount = response.getInt("convoCount");
+                    JSONArray msgCountJsonArray = response.getJSONArray("msgCount");
+                    int totalChatCount = 0;
+                    for (int i = 0; i < msgCountJsonArray.length(); i++) {
+                        JSONObject jsonObject = msgCountJsonArray.getJSONObject(i);
+                        totalChatCount += jsonObject.getInt("count");
+                        msgCounts.add(new ChatCount(jsonObject.getInt("chatid"), jsonObject.getInt("count")));
+                    }
+                    ChatCount[] msgCountsArray = new ChatCount[msgCounts.size()];
+                    msgCountsArray = msgCounts.toArray(msgCountsArray);
+                    args.putSerializable("chatCountList", msgCountsArray);
+                    // TODO: a field to save the list of counts.
+                    args.putSerializable("totalChatCount", totalChatCount);
+                    mTotalChatCount = totalChatCount;
+                    mTotalNotificationCount = mConnCount + mConvoCount + mTotalChatCount;
+                }
+                initializeCountDrawer();
+//                onWaitFragmentInteractionShow();
+                if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
+                    onWaitFragmentInteractionHide(); // TODO: potential problems needed when first logged in but might not need it when clicked from notification.
+                }
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+    }
+
+    /**
+     * Clears the in-app notification of specified type.
+     * @param type can be 'msg', 'connreq', or 'convoreq'
+     */
+    public void clearNotification(String type, Integer chatid){
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath("notifications")
+                .appendPath("clearnotification")
+                .build();
+
+        JSONObject msg = new JSONObject();
+
+        try {
+            msg.put("email_b", mCredentials.getEmail());
+            msg.put("notetype", type);
+            if (chatid != null) {
+                msg.put("chatid", chatid);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.wtf("NOTIFICATION", msg.toString());
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleClearNotificationPost)
+                .onCancelled(this::handleErrorsInTask)
+                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                .build().execute();
+    }
+
+    public void handleClearNotificationPost(String result) {
+        Log.wtf("NOTIFICATION_COUNTS", result);
+        try {
+            JSONObject response = new JSONObject(result);
+            if (response.has("success")) {
+                if (response.getBoolean("success")) {
+                    if (response.getString("type") == "msg") {
+                        mTotalChatCount = 0;
+                    } else {
+                        mConnCount = 0;
+                        mConvoCount = 0;
+                    }
+
+                    mTotalNotificationCount = mTotalChatCount + mConnCount + mConvoCount;
+
+                    setNotification();
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("CHATID")) {
-//                mChatId = intent.getStringExtra("CHATID");
-//                String messageText = intent.getStringExtra("MESSAGE");
-            }
+//            setNotification();
+            Log.wtf("BROADCAST", "HomeActivity Broadcast Received!");
         }
     }
 }
