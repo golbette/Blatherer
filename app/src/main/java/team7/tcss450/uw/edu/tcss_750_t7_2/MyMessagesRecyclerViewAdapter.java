@@ -1,5 +1,6 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,9 @@ public class MyMessagesRecyclerViewAdapter extends RecyclerView.Adapter<MyMessag
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_messages, parent, false);
+
+
+
         return new ViewHolder(view);
     }
 
@@ -68,6 +72,10 @@ public class MyMessagesRecyclerViewAdapter extends RecyclerView.Adapter<MyMessag
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            if (mItem.isSender()) {
+                mView.setBackground(ContextCompat.getDrawable(view.getContext(), R.drawable.customerborderincomingmessage));
+            }
+            //if (mItem.getUsername() ==  )
 //            mUsername = (TextView) view.findViewById(R.id.msg_contact_name);
 //            mMessage = (TextView) view.findViewById(R.id.msg_contact_initials);
 //            mTimestamp = (TextView) view.findViewById(R.id.msg_latest);

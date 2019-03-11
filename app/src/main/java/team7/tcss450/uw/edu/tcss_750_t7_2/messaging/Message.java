@@ -6,11 +6,13 @@ public class Message implements Serializable {
     private final String mUsername;
     private final String mMessage;
     private final String mTimestamp;
+    private final boolean isSender;
 
     public static class Builder {
         private final String mUsername;
         private final String mMessage;
         private final String mTimestamp;
+        private final boolean isSender;
 //                mFirstName
 //                mLastName
 //        private String mInitials = "";
@@ -18,10 +20,11 @@ public class Message implements Serializable {
 //        private String mUsername ="";
 //        private String mMessage = "";
 
-        public Builder(String username, String message, String timestamp) {
+        public Builder(String username, String message, String timestamp, boolean isSender) {
             this.mUsername = username;
             this.mMessage = message;
             this.mTimestamp = timestamp;
+            this.isSender = isSender;
         }
 
 //        public Builder addInitials(final String val) {
@@ -52,6 +55,7 @@ public class Message implements Serializable {
         this.mUsername = builder.mUsername;
         this.mMessage = builder.mMessage;
         this.mTimestamp = builder.mTimestamp;
+        this.isSender = builder.isSender;
     }
 
 //    public String getContactName() {
@@ -72,6 +76,10 @@ public class Message implements Serializable {
 
     public String getMessage() {
         return mMessage;
+    }
+
+    public boolean isSender() {
+        return isSender;
     }
 
     public String getTimestamp() {
