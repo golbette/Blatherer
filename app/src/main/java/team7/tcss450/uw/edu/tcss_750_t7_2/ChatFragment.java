@@ -49,6 +49,7 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     private String mSendUrl;
     private String mGetUrl;
     private PushMessageReceiver mPushMessageReceiver;
+    private OnChatFragmentInteractionListener mListener;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -97,7 +98,14 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         mMessageOutputTextView.setMovementMethod(new ScrollingMovementMethod());
         mMessageInputEditText = view.findViewById(R.id.edit_chat_message_display);
         ImageButton butt = (ImageButton) view.findViewById(R.id.button_chat_send);
+        ImageButton addButt = (ImageButton) view.findViewById(R.id.chat_new_chatmember);
         butt.setOnClickListener(this::handleSendClick);
+        addButt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onAddChatMemberClicked(mChatid);
+            }
+        });
         return view;
     }
 
@@ -181,6 +189,27 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
                 .beginTransaction()
                 .remove(getActivity().getSupportFragmentManager().findFragmentByTag("WAIT"))
                 .commit();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnChatFragmentInteractionListener) {
+            mListener = (OnChatFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnHomeFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnChatFragmentInteractionListener {
+        void onAddChatMemberClicked(int chatid);
     }
 
     private class PushMessageReceiver extends BroadcastReceiver {

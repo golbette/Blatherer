@@ -9,42 +9,42 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
+//import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
+//import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NamesByChatId;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
- * Activities containing this fragment MUST implement the {@link OnNewContactListFragmentInteractionListener}
+ * Activities containing this fragment MUST implement the {@link OnRecentChatListFragmentInteractionListener}
  * interface.
  */
-public class NewContactFragment extends Fragment {
-    public static final String ARG_NEW_CONTACT_LIST = "new contacts lists";
-    private List<NewContact> mNewContacts;
+public class NamesByChatIdFragment extends Fragment {
+    public static final String ARG_RECENT_CHATS_LIST = "recent chats list";
+    private List<NamesByChatId> mRecentChats;
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private OnNewContactListFragmentInteractionListener mListener;
-    private boolean mSearch = false;
-    private boolean mAddMember = false;
+    private OnRecentChatListFragmentInteractionListener mListener;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public NewContactFragment() {
+    public NamesByChatIdFragment() {
     }
 
+    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static NewContactFragment newInstance(int columnCount) {
-        NewContactFragment fragment = new NewContactFragment();
+    public static NamesByChatIdFragment newInstance(int columnCount) {
+        NamesByChatIdFragment fragment = new NamesByChatIdFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -57,46 +57,28 @@ public class NewContactFragment extends Fragment {
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-            mNewContacts = new ArrayList<NewContact>(Arrays.asList((NewContact[]) getArguments().getSerializable(ARG_NEW_CONTACT_LIST)));
-            mAddMember = getArguments().getBoolean("addmember");
+            mRecentChats = new ArrayList<NamesByChatId>(Arrays.asList((NamesByChatId[]) getArguments().getSerializable(ARG_RECENT_CHATS_LIST)));
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_new_contact_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_namesbychatid_list, container, false);
 
-        RecyclerView recyclerView = view.findViewById(R.id.new_contact_list);
-
-        ImageButton imageButton = view.findViewById(R.id.new_contact_search);
-        imageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mListener.onSearchClicked(mAddMember);
-            }
-        });
-
-        if (mAddMember) {
-            TextView tv = view.findViewById(R.id.new_contact_list_title);
-            tv.setText("Add Chat Member");
-        }
-
-//        if (mNewContacts.isEmpty()) {
-//            mListener.onNoResults();
-//        } else {
+        RecyclerView recyclerView = view.findViewById(R.id.RecentsList);
 
         // Set the adapter
         if (recyclerView instanceof RecyclerView) {
             Context context = view.getContext();
+//            RecyclerView recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener, mAddMember));
+            recyclerView.setAdapter(new MyNamesByChatIdRecyclerViewAdapter(mRecentChats, mListener));
         }
-//        }
         return view;
     }
 
@@ -104,11 +86,11 @@ public class NewContactFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnNewContactListFragmentInteractionListener) {
-            mListener = (OnNewContactListFragmentInteractionListener) context;
+        if (context instanceof OnRecentChatListFragmentInteractionListener) {
+            mListener = (OnRecentChatListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnRequestSentListFragmentInteractionListener");
+                    + " must implement OnRecentChatListFragmentInteractionListener");
         }
     }
 
@@ -128,10 +110,8 @@ public class NewContactFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnNewContactListFragmentInteractionListener {
-        void onNewContactListFragmentInteraction(NewContact item, boolean addmember);
-        void onSearchClicked(boolean addmember);
-        void onNoResults();
-        void onRequestSent(String email, boolean addmember);
+    public interface OnRecentChatListFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onRecentChatListFragmentInteraction(NamesByChatId item) throws JSONException;
     }
 }

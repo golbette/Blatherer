@@ -65,8 +65,8 @@ public class MyRequestReceivedRecyclerViewAdapter extends RecyclerView.Adapter<M
                     .appendPath("blatherer-service.herokuapp.com")
                     .appendPath("contacts")
                     .appendPath("connApprove")
-                    .appendQueryParameter("email_a", mCredentials.getEmail())
-                    .appendQueryParameter("email_b", holder.mItem.getmOtherEmail())
+                    .appendQueryParameter("email_a", holder.mItem.getmOtherEmail())
+                    .appendQueryParameter("email_b", mCredentials.getEmail())
                     .build();
             new GetAsyncTask.Builder(uri.toString())
                     .onPostExecute(this::handleRequestSentAcceptGetOnPostExecute)

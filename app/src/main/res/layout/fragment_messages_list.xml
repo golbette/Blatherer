@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -25,26 +27,23 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/text_margin"
-            android:background="@drawable/circle_small"
-            android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_new_message" />
+        <!--<ImageButton-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_marginEnd="@dimen/text_margin"-->
+            <!--android:background="@drawable/circle_small"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:src="@drawable/ic_new_message" />-->
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/list"
-        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.MessageFragment"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/RecentsList"
+        android:name="team7.tcss450.uw.edu.tcss_750_t7_2.NamesByChatIdFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="56dp"
-
-        tools:context=".MessageFragment"
+        app:layoutManager="LinearLayoutManager"
+        tools:context=".NamesByChatIdFragment"
         tools:listitem="@layout/fragment_messages" />
 
 </LinearLayout>

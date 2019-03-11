@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements
                     mChatId = (int) getIntent().getExtras().getSerializable("chatid");
                     mMyUsername = (String) getIntent().getExtras().getSerializable("receiver");
                 } else if (getIntent().getExtras().getSerializable("type").equals("conn")) {
-
+                    // TODO: In case launching request fragment is implemented
                 } else if (getIntent().getExtras().getSerializable("type").equals("conv")) {
-
+                    // TODO: In case launching request fragment is implemented
                 }
             }
         }
@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onEmailVerificationFragmentInteraction(Credentials credentials) {
-
         LoginFragment loginFragment = new LoginFragment();
         Bundle args = new Bundle();
         args.putSerializable(getString(R.string.credential_key), credentials);
