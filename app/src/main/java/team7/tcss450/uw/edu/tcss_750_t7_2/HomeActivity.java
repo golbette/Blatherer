@@ -7,9 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,37 +20,28 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import me.pushy.sdk.Pushy;
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
+import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
-import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
-import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
 /**
  * Container for fragments after user is successfully
@@ -70,7 +58,10 @@ public class HomeActivity extends AppCompatActivity
         WeatherOptionsFragment.OnWeatherOptionsFragmentInteractionListener,
         SettingsFragment.OnSettingsFragmentInteractionListener,
         ConversationFragment.OnConversationFragmentInteractionListener,
-        ContactFragment.OnContactListFragmentInteractionListener{
+        ContactFragment.OnContactListFragmentInteractionListener,
+        RequestSentListFragment.OnRequestSentListFragmentInteractionListener,
+        RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener,
+        RequestContainer.OnRequestContainerFragmentInteractionListener{
 
 //    final FragmentManager fm = getSupportFragmentManager();
     private String mJwToken;
@@ -86,6 +77,12 @@ public class HomeActivity extends AppCompatActivity
     private HashMap<String, String> mCurrentObservationData;
 
     private TenDayWeather[] mTenDay;
+
+    /** List to hold JSON of user's received contact request */
+    private List<Request> mRequestsRecieved;
+
+    /** List to hold JSON of user's sent contact requests*/
+    private List<Request> mRequestsSent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,7 +264,25 @@ public class HomeActivity extends AppCompatActivity
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
         } else if (id == R.id.nav_requests_activity_home) {
-            loadFragment(new RequestFragment());
+
+            /**Start the get query to return all requests from potential
+             * contacts.
+             */
+            Uri uri = new Uri.Builder()
+                    .scheme("https")
+                    .appendPath(getString(R.string.ep_base_url))
+                    .appendPath(getString(R.string.ep_contacts_base))
+                    .appendPath(getString(R.string.ep_contacts_getconnreq))
+                    .appendQueryParameter("email", mCredentials.getEmail())
+                    .build();
+
+            JSONObject creds = mCredentials.asJSONObject();
+            new GetAsyncTask.Builder(uri.toString())
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleRequestGetOnPostExecute)
+                    .build().execute();
+
+
         }
 
 //        case R.id.nav_recents:
@@ -290,6 +305,8 @@ public class HomeActivity extends AppCompatActivity
 
     /**
      * @author Charles Bryan
+     * helper method that loads the fragment
+     * that user is navigating to.
      * @param frag
      */
     private void loadFragment(Fragment frag) {
@@ -302,7 +319,8 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /**
-     * Logs user our, clears saved credentials, and returns to the Login Screen.
+     * Logs user our, clears saved credentials,
+     * and returns to the Login Screen.
      */
     private void logout() {
         new DeleteTokenAsyncTask().execute();
@@ -360,7 +378,8 @@ public class HomeActivity extends AppCompatActivity
 
                 for (int i = 0; i < data.length(); i++) {
                     JSONObject jsonContact = data.getJSONObject(i);
-                    contacts.add(new Contact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
+                    contacts.add(new Contact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)),
+                            jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
                             .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
                             .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
                             .build());
@@ -481,6 +500,27 @@ public class HomeActivity extends AppCompatActivity
             Log.wtf("ERROR", e.getMessage());
             onWaitFragmentInteractionHide();
         }
+    }
+
+    @Override
+    public void onRequestSentListFragmentInteraction(View v, Request item) {
+
+
+        Button b = (Button) findViewById(v.getId());
+        Log.wtf("WTF", "b: " + b.getText().toString());
+        Log.wtf("WTF", "b: " + item.getContactName());
+
+
+    }
+
+    @Override
+    public void onRequestReceivedListFragmentInteraction(Request item) {
+
+    }
+
+    @Override
+    public void onRequestContainerFragmentInteraction(View View) {
+
     }
 //    @Override
 //    public void newContactClicked() {
@@ -669,10 +709,147 @@ public class HomeActivity extends AppCompatActivity
         } catch (JSONException error) {
             error.printStackTrace();
             Log.e("ERROR!", error.getMessage());
-
-
         }
     }
+
+    /**
+     * Gets the users pending friend requests from the DB
+     * @param result is list users friend requests.
+     */
+    private void handleRequestGetOnPostExecute(final String result) {
+
+        Log.wtf("REQUEST_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+//            Bundle args = new Bundle();
+            boolean success = response.getBoolean("success");
+            if (success) {
+
+                JSONArray data = response.getJSONArray("message");
+
+                mRequestsRecieved = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonMessage = data.getJSONObject(i);
+                    mRequestsRecieved.add(new Request.Builder(jsonMessage.getString("email"),
+                            jsonMessage.getString(getString(R.string.keys_json_request_first_name)),
+                            jsonMessage.getString(getString(R.string.keys_json_request_last_name)),
+                            jsonMessage.getString("memberid_a"),
+                            jsonMessage.getString("memberid_b"))
+                            .addRequestType("received")
+                            .build());
+                }
+
+
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_contacts_base))
+                        .appendPath(getString(R.string.ep_contacts_getconnreq))
+                        .appendQueryParameter("email", mCredentials.getEmail())
+                        .appendQueryParameter("pending", "1")
+                        .build();
+
+                JSONObject creds = mCredentials.asJSONObject();
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handleRequestSentGetOnPostExecute)
+                        .build().execute();
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_contacts_base))
+                        .appendPath(getString(R.string.ep_contacts_getconnreq))
+                        .appendQueryParameter("email", mCredentials.getEmail())
+                        .appendQueryParameter("pending", "1")
+                        .build();
+
+                JSONObject creds = mCredentials.asJSONObject();
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handleRequestSentGetOnPostExecute)
+                        .build().execute();
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+
+    }
+
+    /**
+     * Get the user's sent friend requests and sends
+     * both sent and received to the container.
+     *  bundles the arg to the Request Container
+     *  Returns JSON
+     * @param result
+     */
+    private void handleRequestSentGetOnPostExecute(String result){
+
+        Log.wtf("REQUEST_RESULT", result);
+        try {
+            JSONObject response = new JSONObject(result);
+            Bundle args = new Bundle();
+
+            boolean success = response.getBoolean("success");
+            if (success) {
+
+                JSONArray data = response.getJSONArray("message");
+
+                mRequestsSent = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i++) {
+                    JSONObject jsonMessage = data.getJSONObject(i);
+                    mRequestsSent.add(new Request.Builder(jsonMessage.getString("email"),
+                            jsonMessage.getString(getString(R.string.keys_json_request_first_name)),
+                            jsonMessage.getString(getString(R.string.keys_json_request_last_name)),
+                            jsonMessage.getString("memberid_a"),
+                            jsonMessage.getString("memberid_b"))
+
+                            .addRequestType("sent")
+                            .build());
+                }
+
+                args.putSerializable(RequestContainer.ARG_SENT_REQUEST,(Serializable) mRequestsSent);
+                if(null != mRequestsRecieved){
+                    args.putSerializable(RequestContainer.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
+                }
+                args.putSerializable(RequestContainer.ARG_CREDS, mCredentials);
+                args.putSerializable(RequestContainer.ARG_JWT, mJwToken);
+
+                Fragment frag = new RequestContainer();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                loadFragment(frag);
+
+
+            } else {
+                Log.wtf("ERROR", "no data in array");
+                onWaitFragmentInteractionHide();
+                args.putSerializable(RequestContainer.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
+                args.putSerializable(RequestContainer.ARG_CREDS, mCredentials);
+                Fragment frag = new RequestContainer();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                loadFragment(frag);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.wtf("ERROR", e.getMessage());
+            onWaitFragmentInteractionHide();
+        }
+
+    }
+
 
     /**
      * Handle errors that may occur during the AsyncTask.

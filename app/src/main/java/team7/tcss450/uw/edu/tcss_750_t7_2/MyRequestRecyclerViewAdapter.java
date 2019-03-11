@@ -7,14 +7,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment.OnRequestListFragmentInteractionListener;
-import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent.DummyItem;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
+ * {@link RecyclerView.Adapter} that can display a {@link} and makes a call to the
+ * specified {@link}.
  * TODO: Replace the implementation with code for your data type.
  */
 public class MyRequestRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestRecyclerViewAdapter.ViewHolder> {

@@ -88,7 +88,7 @@ public class ContactFragment extends Fragment {
             mListener = (OnContactListFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+                    + " must implement OnRequestSentListFragmentInteractionListener");
         }
     }
 
