@@ -32,6 +32,7 @@ public class NamesByChatIdFragment extends Fragment {
     private List<NamesByChatId> mRecentChats;
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
+    private String mUsername;
     private OnRecentChatListFragmentInteractionListener mListener;
 
     /**
@@ -58,6 +59,7 @@ public class NamesByChatIdFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mRecentChats = new ArrayList<NamesByChatId>(Arrays.asList((NamesByChatId[]) getArguments().getSerializable(ARG_RECENT_CHATS_LIST)));
+            mUsername = getArguments().getString("username");
         }
     }
 
@@ -77,7 +79,7 @@ public class NamesByChatIdFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyNamesByChatIdRecyclerViewAdapter(mRecentChats, mListener));
+            recyclerView.setAdapter(new MyNamesByChatIdRecyclerViewAdapter(mRecentChats, mListener, mUsername));
         }
         return view;
     }
@@ -112,6 +114,6 @@ public class NamesByChatIdFragment extends Fragment {
      */
     public interface OnRecentChatListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onRecentChatListFragmentInteraction(NamesByChatId item) throws JSONException;
+        void onRecentChatListFragmentInteraction(NamesByChatId item, String username) throws JSONException;
     }
 }
