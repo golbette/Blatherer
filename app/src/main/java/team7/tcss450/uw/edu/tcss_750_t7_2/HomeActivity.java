@@ -46,19 +46,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import me.pushy.sdk.Pushy;
-<<<<<<< HEAD
+
 import team7.tcss450.uw.edu.tcss_750_t7_2.dummy.DummyContent;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.ChatCount;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.BadgeDrawerArrowDrawable;
-=======
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Contact;
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Message;
-import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.NewContact;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
->>>>>>> master
+
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
