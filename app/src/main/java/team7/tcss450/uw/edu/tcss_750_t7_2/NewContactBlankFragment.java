@@ -25,9 +25,8 @@ public class NewContactBlankFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private boolean mAddMember = false;
+    private int mChatId;
 
     private OnFragmentInteractionListener mListener;
 
@@ -57,8 +56,8 @@ public class NewContactBlankFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mAddMember = getArguments().getBoolean("addmember");
+            mChatId = getArguments().getInt("chatid");
         }
     }
 
@@ -67,6 +66,11 @@ public class NewContactBlankFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_new_contact_blank, container, false);
+
+        if (mAddMember) {
+            TextView tv = view.findViewById(R.id.new_contact_title);
+            tv.setText("Add Chat Member");
+        }
 
         TextView tv = view.findViewById(R.id.new_contact_blank_status);
         if (getArguments() != null) {
@@ -77,7 +81,7 @@ public class NewContactBlankFragment extends Fragment {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSearchClicked();
+                mListener.onSearchClicked(mAddMember);
             }
         });
 
@@ -114,6 +118,6 @@ public class NewContactBlankFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        void onSearchClicked();
+        void onSearchClicked(boolean addmember);
     }
 }

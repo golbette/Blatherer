@@ -33,6 +33,7 @@ public class NewContactFragment extends Fragment {
     private int mColumnCount = 1;
     private OnNewContactListFragmentInteractionListener mListener;
     private boolean mSearch = false;
+    private boolean mAddMember = false;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -57,6 +58,7 @@ public class NewContactFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
             mNewContacts = new ArrayList<NewContact>(Arrays.asList((NewContact[]) getArguments().getSerializable(ARG_NEW_CONTACT_LIST)));
+            mAddMember = getArguments().getBoolean("addmember");
         }
     }
 
@@ -71,14 +73,20 @@ public class NewContactFragment extends Fragment {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.onSearchClicked();
+                mListener.onSearchClicked(mAddMember);
             }
         });
+
+        if (mAddMember) {
+            TextView tv = view.findViewById(R.id.new_contact_list_title);
+            tv.setText("Add Chat Member");
+        }
 
 //        if (mNewContacts.isEmpty()) {
 //            mListener.onNoResults();
 //        } else {
-            // Set the adapter
+
+        // Set the adapter
         if (recyclerView instanceof RecyclerView) {
             Context context = view.getContext();
             if (mColumnCount <= 1) {
@@ -86,7 +94,7 @@ public class NewContactFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener));
+            recyclerView.setAdapter(new MyNewContactRecyclerViewAdapter(mNewContacts, mListener, mAddMember));
         }
 //        }
         return view;
@@ -121,9 +129,9 @@ public class NewContactFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnNewContactListFragmentInteractionListener {
-        void onNewContactListFragmentInteraction(NewContact item);
-        void onSearchClicked();
+        void onNewContactListFragmentInteraction(NewContact item, boolean addmember);
+        void onSearchClicked(boolean addmember);
         void onNoResults();
-        void onRequestSent(String email);
+        void onRequestSent(String email, boolean addmember);
     }
 }

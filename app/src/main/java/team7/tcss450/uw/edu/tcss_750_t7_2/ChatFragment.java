@@ -49,6 +49,7 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     private String mSendUrl;
     private String mGetUrl;
     private PushMessageReceiver mPushMessageReceiver;
+    private OnChatFragmentInteractionListener mListener;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -102,7 +103,7 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         addButt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mListener.onAddChatMemberClicked(mChatid);
             }
         });
         return view;
@@ -207,8 +208,8 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         mListener = null;
     }
 
-    public interface OnChatFragmentInteractionListener() {
-        void onAddChatMemberClicked
+    public interface OnChatFragmentInteractionListener {
+        void onAddChatMemberClicked(int chatid);
     }
 
     private class PushMessageReceiver extends BroadcastReceiver {

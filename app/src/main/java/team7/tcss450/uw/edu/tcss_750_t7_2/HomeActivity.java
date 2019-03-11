@@ -75,7 +75,8 @@ public class HomeActivity extends AppCompatActivity
         RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener,
         RequestContainer.OnRequestContainerFragmentInteractionListener,
         NewContactBlankFragment.OnFragmentInteractionListener,
-        NamesByChatIdFragment.OnRecentChatListFragmentInteractionListener {
+        NamesByChatIdFragment.OnRecentChatListFragmentInteractionListener,
+        ChatFragment.OnChatFragmentInteractionListener{
 
 
     private String mJwToken;
@@ -107,6 +108,9 @@ public class HomeActivity extends AppCompatActivity
 
     /** This is the hamburger that's going to be badged. */
     private BadgeDrawerArrowDrawable mBadgeDrawable;
+
+    /** True if user comes from a chatroom trying to add a new chat member. */
+    private boolean mAddMember;
 
 //    /** Navigation Item Requests Clicked */
 //    private boolean mLoadNavRequest = false;
@@ -494,7 +498,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onSearchClicked() {
+    public void onSearchClicked(boolean addmember) {
         Uri uri = new Uri.Builder().scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
                 .appendPath(getString(R.string.ep_contacts_base))
@@ -502,6 +506,8 @@ public class HomeActivity extends AppCompatActivity
 
         JSONObject msg = new JSONObject();
         EditText et = findViewById(R.id.new_contact_et_search);
+
+        mAddMember = addmember;
 
         if (!et.getText().toString().isEmpty()) {
             try {
@@ -514,21 +520,84 @@ public class HomeActivity extends AppCompatActivity
             if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
                 onWaitFragmentInteractionHide();
             }
-            new SendPostAsyncTask.Builder(uri.toString(), msg)
-                    .onPreExecute(this::onWaitFragmentInteractionShow)
-                    .onPostExecute(this::handleSearchOnPostExecute)
-                    .onCancelled(this::handleErrorsInTask)
-                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                    .build().execute();
+//            if (addmember) {
+//                new SendPostAsyncTask.Builder(uri.toString(), msg)
+//                        .onPreExecute(this::onWaitFragmentInteractionShow)
+//                        .onPostExecute(this::handleAddSearchOnPostExecute)
+//                        .onCancelled(this::handleErrorsInTask)
+//                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+//                        .build().execute();
+//            } else {
+                new SendPostAsyncTask.Builder(uri.toString(), msg)
+                        .onPreExecute(this::onWaitFragmentInteractionShow)
+                        .onPostExecute(this::handleSearchOnPostExecute)
+                        .onCancelled(this::handleErrorsInTask)
+                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                        .build().execute();
+//            }
         }
     }
 
+    public void handleAddSearchOnPostExecute(final String result) {
+//        Log.wtf("ADD_SEARCH_RESULT", result);
+//        try {
+//            JSONObject response = new JSONObject(result);
+//            if (response.has(getString(R.string.keys_json_contact_message))) {
+//                JSONArray data = response.getJSONArray(getString(R.string.keys_json_contact_message));
+//                List<NewContact> newContacts = new ArrayList<>();
+//                for (int i = 0; i < data.length(); i++) {
+//                    JSONObject jsonContact = data.getJSONObject(i);
+//                    newContacts.add(new NewContact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
+//                            .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
+//                            .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
+//                            .addMemberId(jsonContact.getInt("memberid"))
+//                            .build());
+//                }
+//                NewContact[] contactsAsArray = new NewContact[newContacts.size()];
+//                contactsAsArray = newContacts.toArray(contactsAsArray);
+//                Bundle args = new Bundle();
+//                args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
+//                Fragment frag = new NewContactFragment();
+//                frag.setArguments(args);
+//                onWaitFragmentInteractionHide();
+////                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//                FragmentTransaction transaction = getSupportFragmentManager()
+//                        .beginTransaction()
+//                        .replace(R.id.fragmentContainer, frag)
+//                        .addToBackStack(null);
+//                transaction.commit();
+//            } else {
+//                Log.wtf("ERROR", "no data in array");
+//                onWaitFragmentInteractionHide();
+//
+//                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//                Bundle args = new Bundle();
+//                args.putSerializable("new_contact_status", "No results.");
+//                newContactBlankFragment.setArguments(args);
+//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//                transaction.commit();
+//            }
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//            Log.wtf("ERROR", e.getMessage());
+//            onWaitFragmentInteractionHide();
+//            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+//            Bundle args = new Bundle();
+//            args.putSerializable("new_contact_status", "No results.");
+//            newContactBlankFragment.setArguments(args);
+//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+//            transaction.commit();
+//        }
+    }
+
     @Override
-    public void onRequestSent(String email_b) {
+    public void onRequestSent(String email_b, boolean addmember) {
         Uri uri = new Uri.Builder().scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
                 .appendPath(getString(R.string.ep_contacts_base))
                 .appendPath("connReq").build();
+
+        mAddMember = addmember;
 
         JSONObject msg = new JSONObject();
         try {
@@ -541,12 +610,34 @@ public class HomeActivity extends AppCompatActivity
         if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
             onWaitFragmentInteractionHide();
         }
-        new SendPostAsyncTask.Builder(uri.toString(), msg)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
-                .onPostExecute(this::handleSendConnReq)
-                .onCancelled(this::handleErrorsInTask)
-                .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                .build().execute();
+
+        if (addmember) {
+            try {
+                msg.put("email", email_b);
+                // TODO: need to put chatid!
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleConvoAdd) // TODO: handle add member request
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        } else {
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleSendConnReq)
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+        }
+    }
+
+    public void handleConvoAdd(final String result) {
+        Log.wtf("SEND_CONNREQ_RESULT", result);
+        onWaitFragmentInteractionHide();
+        Toast.makeText(this, "Member added!", Toast.LENGTH_SHORT).show();
     }
 
     private void handleSendConnReq(final String result){
@@ -578,6 +669,7 @@ public class HomeActivity extends AppCompatActivity
                 contactsAsArray = newContacts.toArray(contactsAsArray);
                 Bundle args = new Bundle();
                 args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
+                args.putSerializable("addmember", mAddMember);
                 Fragment frag = new NewContactFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
@@ -766,6 +858,21 @@ public class HomeActivity extends AppCompatActivity
         Log.wtf("WTF", "b: " + item.getContactName());
 
 
+    }
+
+    /**
+     *
+     * @param chatid Carried over from the chat which the user wants to add another user in.
+     */
+    @Override
+    public void onAddChatMemberClicked(int chatid) {
+        Bundle args = new Bundle();
+        args.putSerializable("chatid", chatid);
+        args.putSerializable("addmember", true);
+        NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
+        newContactBlankFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
+        transaction.commit();
     }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -1395,7 +1502,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onNewContactListFragmentInteraction(NewContact item) {
+    public void onNewContactListFragmentInteraction(NewContact item, boolean addmember) {
 
     }
 
