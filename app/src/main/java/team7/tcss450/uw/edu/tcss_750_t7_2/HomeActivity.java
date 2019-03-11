@@ -317,6 +317,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         startLocationUpdates();
+        setNotification();
     }
 
     @Override
@@ -351,12 +352,6 @@ public class HomeActivity extends AppCompatActivity
     public void onStart(){
         super.onStart();
 //        setNotification(); // TODO
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        setNotification();
     }
 
     @Override
@@ -1567,6 +1562,7 @@ public class HomeActivity extends AppCompatActivity
         /**Start the get query to return all requests from potential
          * contacts.
          */
+        Log.e("loadHome", "loading");
         Uri uri = new Uri.Builder()
                 .scheme("https")
                 .appendPath(getString(R.string.ep_base_url))
@@ -1574,7 +1570,6 @@ public class HomeActivity extends AppCompatActivity
                 .appendPath(getString(R.string.ep_contacts_getconnreq))
                 .appendQueryParameter("email", mCredentials.getEmail())
                 .build();
-
         JSONObject creds = mCredentials.asJSONObject();
         new GetAsyncTask.Builder(uri.toString())
                 .onPreExecute(this::onWaitFragmentInteractionShow)
@@ -1605,21 +1600,37 @@ public class HomeActivity extends AppCompatActivity
                             .addRequestType("received")
                             .build());
                 }
-                if(null != mRequestsRecieved){
-                    args.putSerializable(HomeFragment.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
-                }
-                args.putSerializable(HomeFragment.ARG_CREDS, mCredentials);
-                args.putSerializable(HomeFragment.ARG_JWT, mJwToken);
 
-                Fragment frag = new HomeFragment();
-                frag.setArguments(args);
-                onWaitFragmentInteractionHide();
-                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                loadFragment(frag);
+                Log.e("calling", "here");
+
+                    Uri uri = new Uri.Builder()
+                            .scheme("https")
+                            .appendPath(getString(R.string.ep_base_url))
+                            .appendPath(getString(R.string.ep_weather))
+                            .appendPath(getString(R.string.ep_location))
+                            .appendQueryParameter("location", "98402")
+                            .build();
+                    new GetAsyncTask.Builder(uri.toString())
+                            .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
+                            .build().execute();
+
 
 
             } else {
-                loadFragment(new HomeFragment());
+
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_location))
+                        .appendQueryParameter("location", "98402")
+                        .build();
+                    new GetAsyncTask.Builder(uri.toString())
+                            .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
+                            .build().execute();
+                    //loadFragment(new HomeFragment());
+
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1627,5 +1638,72 @@ public class HomeActivity extends AppCompatActivity
             onWaitFragmentInteractionHide();
         }
     }
+    private void handleHomeWeatherGetOnPostExecute(final String result) {
+        //parse JSON
+        Bundle args = new Bundle();
+        try {
+            JSONObject root = new JSONObject(result);
+            if (root.has(getString(R.string.keys_json_weather_location))
+                    && root.getJSONObject(getString(R.string.keys_json_weather_location)).length() != 0) {
+                Iterator<?> keys;
+                //Handle location JSONObject
+                JSONObject location = root.getJSONObject(getString(R.string.keys_json_weather_location));
+                mLocationData = new HashMap<>();
+                keys = location.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    String value = location.getString(key);
+                    mLocationData.put(key, value);
+                }
 
+                //Handle current observation JSONObject
+                JSONObject currentObservation = root.getJSONObject(getString(R.string.keys_json_weather_current_observation));
+                mCurrentObservationData = new HashMap<>();
+                keys = currentObservation.keys();
+                while(keys.hasNext()) {
+                    String outerKey = (String) keys.next();
+                    if (!outerKey.equals("pubDate")) {
+                        JSONObject innerObject = currentObservation.getJSONObject(outerKey);
+                        Iterator<?> innerKeys = innerObject.keys();
+                        while (innerKeys.hasNext()) {
+                            String innerKey = (String) innerKeys.next();
+                            String value = innerObject.getString(innerKey);
+                            mCurrentObservationData.put(outerKey + innerKey, value);
+                        }
+                    } else {
+                        mCurrentObservationData.put(outerKey, currentObservation.getString(outerKey));
+                    }
+                }
+                String lat = mLocationData.get("lat");
+                String lon = mLocationData.get("long");
+
+
+                if (null != mRequestsRecieved) {
+                    args.putSerializable(HomeFragment.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
+                }
+                args.putSerializable(HomeFragment.ARG_CREDS, mCredentials);
+                args.putSerializable(HomeFragment.ARG_JWT, mJwToken);
+                args.putSerializable(WeatherFragment.ARG_CURRENT_LOCATION, mLocationData);
+                args.putSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION, mCurrentObservationData);
+                Fragment frag = new HomeFragment();
+                frag.setArguments(args);
+                onWaitFragmentInteractionHide();
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                loadFragment(frag);
+
+            } else {
+                Log.e("ERROR!", "Invalid location entered");
+
+                //notify user
+                onWaitFragmentInteractionHide();
+            }
+
+        } catch (JSONException error) {
+            error.printStackTrace();
+            Log.e("ERROR!", error.getMessage());
+
+            //notify user
+            onWaitFragmentInteractionHide();
+        }
+    }
 }
