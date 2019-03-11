@@ -85,7 +85,7 @@ public class HomeFragment extends Fragment {
         }
 
         TextView city = v.findViewById(R.id.home_weather_city);
-        city.setText(mLocationData.get("city"));
+        city.setText(mLocationData.get("city") + "," + mLocationData.get("region"));
 
         TextView temp = v.findViewById(R.id.home_weather_temp);
         temp.setText(mCurrentObservationData.get("conditiontemperature") + "\u2109");

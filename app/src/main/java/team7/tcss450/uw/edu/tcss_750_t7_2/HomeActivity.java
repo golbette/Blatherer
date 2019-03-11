@@ -1554,7 +1554,7 @@ public class HomeActivity extends AppCompatActivity
         //ft.detach(frag).attach(frag).commit();
 
     }
-    
+
     @Override
     public void onWaitFragmentInteractionShow() {
         getSupportFragmentManager()
