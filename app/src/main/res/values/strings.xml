@@ -45,6 +45,7 @@
     <string name="action_logout">Logout</string>
     <string name="nav_message_activity_home">Messages</string>
     <string name="nav_weather_activity_home">Weather</string>
+    <string name="nav_weather_starred_locations">Starred weather locations</string>
 
     <!-- fragment_weather.xml -->
     <string name="text_weather_fragment_temp">40</string>

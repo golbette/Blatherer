@@ -1,21 +1,29 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,17 +36,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
+import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnWeatherFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link WeatherFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Fragment that holds all required information for
+ * daily, hourly, and ten day forecasts.
  */
 public class WeatherFragment extends Fragment {
 
@@ -50,11 +56,18 @@ public class WeatherFragment extends Fragment {
 
     public static final String ARG_FORTY_EIGHT_HOUR = "forty eight hour";
 
-    // TODO: Rename parameter arguments, choose names that match
+    public static final String ARG_SAVED_LOCATIONS = "saved";
+
+    public static final String ARG_CREDENTIALS = "credentials";
+
+    public static final String ARG_CURRENT_LOCATION = "current location";
+
+
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private Location mCurrentLocation;
 
     private HashMap<String, String> mLocationData;
 
@@ -64,13 +77,19 @@ public class WeatherFragment extends Fragment {
 
     private FortyEightHourWeather[] mFortyEightHourData;
 
+    private SavedLocations[] mSavedLocations;
+
+    private Credentials mCredentials;
+
     private TodayWeatherFragment mTodayWeatherFragment;
 
     private TenDayWeatherFragment mTenDayWeatherFragment;
 
     private FortyEightHourWeatherFragment mFortyEightHourWeatherFragment;
 
-    private OnWeatherFragmentInteractionListener mListener;
+    public static OnWeatherFragmentInteractionListener mListener;
+
+    private View mView;
 
     public WeatherFragment() {
         // Required empty public constructor
@@ -97,24 +116,90 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
+            Log.e("got it", "got something");
             mLocationData = (HashMap<String, String>) getArguments().getSerializable(ARG_LOCATION);
             mCurrentObservationData = (HashMap<String, String>) getArguments().getSerializable(ARG_CURRENT_OBSERVATION);
             mTenDayWeatherData = (TenDayWeather[]) getArguments().getSerializable(ARG_FORECASTS);
             mFortyEightHourData = (FortyEightHourWeather[]) getArguments().getSerializable(ARG_FORTY_EIGHT_HOUR);
+            mSavedLocations = (SavedLocations[]) getArguments().getSerializable(ARG_SAVED_LOCATIONS);
+            mCredentials = (Credentials) getArguments().getSerializable(ARG_CREDENTIALS);
+            if (getArguments().containsKey(WeatherFragment.ARG_CURRENT_LOCATION)) {
+                mCurrentLocation = (Location) getArguments().getParcelable(WeatherFragment.ARG_CURRENT_LOCATION);
+            }
         }
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e("resume", "resumed");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_weather, container, false);
+        mView = v;
 
+
+        Log.e("onCreateView", "weatherFragment");
         Bundle args;
 
-        EditText searchText = v.findViewById(R.id.search_text_view);
+        List<String> options = new ArrayList<>();
+        options.add("Choose on map...");
+
+        //Add previous saved entries here
+        if (mSavedLocations != null) {
+            for (int i = 0; i < mSavedLocations.length; i++) {
+                options.add(mSavedLocations[i].getNickname());
+            }
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, options);
+
+        AutoCompleteTextView searchText = v.findViewById(R.id.search_text_view);
+        searchText.setAdapter(adapter);
+        searchText.setThreshold(1);
+        searchText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                searchText.showDropDown();
+                return false;
+            }
+        });
+
+        searchText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("click", parent.getItemAtPosition(position).toString() + " " + position);
+                if (parent.getItemAtPosition(position).toString().equals("Choose on map...")) {
+
+                    mListener.onMapFragmentInteraction();
+                } else {
+                    SavedLocations selected = mSavedLocations[adapter.getPosition(parent.getItemAtPosition(position).toString()) - 1];
+
+                    if (selected.getLat().equals("null") && selected.getLong().equals("null")) {
+
+                        Log.e("update", "shoould update");
+                        doUpdate(selected.getZip());
+
+                    } else {
+                        doUpdateLatLon(selected.getLat(), selected.getLong());
+
+                    }
+                }
+
+                InputMethodManager inputManager = (InputMethodManager)
+                        getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
+
+            }
+        });
         searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -134,10 +219,32 @@ public class WeatherFragment extends Fragment {
             }
         });
 
+        Button searchButton = v.findViewById(R.id.search_button);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchText.getText().toString().isEmpty()) {
+                    Toast toast = Toast.makeText(getActivity(), "Please type in a valid search entry", Toast.LENGTH_LONG);
+                    toast.show();
+                } else {
+                    InputMethodManager inputManager = (InputMethodManager)
+                            getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                    doUpdate(searchText.getText().toString());
+
+                }
+            }
+        });
+
+
+
+
         mTodayWeatherFragment = new TodayWeatherFragment();
         args = new Bundle();
         args.putSerializable(ARG_LOCATION, mLocationData);
         args.putSerializable(ARG_CURRENT_OBSERVATION, mCurrentObservationData);
+        args.putSerializable(ARG_CREDENTIALS, mCredentials);
         mTodayWeatherFragment.setArguments(args);
 
         mFortyEightHourWeatherFragment = new FortyEightHourWeatherFragment();
@@ -157,6 +264,8 @@ public class WeatherFragment extends Fragment {
 
         TabLayout tabLayout = (TabLayout) v.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+
         return v;
     }
     private void updateFields() {
@@ -177,11 +286,11 @@ public class WeatherFragment extends Fragment {
         args.putSerializable(ARG_FORTY_EIGHT_HOUR, mFortyEightHourData);
         mFortyEightHourWeatherFragment.updateFields(mFortyEightHourData);
 
-        ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.viewpager);
+        ViewPager viewPager = (ViewPager) mView.findViewById(R.id.viewpager);
         Log.e("update", viewPager.toString());
         setupViewPager(viewPager);
 
-        TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) mView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
     }
 
@@ -190,7 +299,9 @@ public class WeatherFragment extends Fragment {
         adapter.addFragment(mTodayWeatherFragment, "Today");
         adapter.addFragment(mFortyEightHourWeatherFragment, "Hourly");
         adapter.addFragment(mTenDayWeatherFragment, "10 days");
+
         viewPager.setAdapter(adapter);
+        viewPager.getAdapter().notifyDataSetChanged();
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
@@ -204,6 +315,11 @@ public class WeatherFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
 
         @Override
@@ -235,6 +351,22 @@ public class WeatherFragment extends Fragment {
                 .onPostExecute(this::handleWeatherGetOnPostExecute)
                 .build().execute();
     }
+
+    public void doUpdateLatLon(final String lat, final String lon) {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath(getString(R.string.ep_weather))
+                .appendPath(getString(R.string.ep_coordinates))
+                .appendQueryParameter("lat", lat)
+                .appendQueryParameter("lon", lon)
+                .build();
+        new GetAsyncTask.Builder(uri.toString())
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleWeatherGetOnPostExecute)
+                .build().execute();
+    }
+
     private void onWaitFragmentInteractionShow() {
         mListener.onWaitFragmentInteractionShow();
     }
@@ -403,8 +535,12 @@ public class WeatherFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        //mListener = null;
     }
+
+
+
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -419,5 +555,6 @@ public class WeatherFragment extends Fragment {
     public interface OnWeatherFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onWeatherFragmentInteraction(Uri uri);
+        void onMapFragmentInteraction();
     }
 }
