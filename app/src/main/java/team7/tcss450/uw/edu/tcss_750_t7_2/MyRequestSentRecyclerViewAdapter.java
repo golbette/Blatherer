@@ -67,15 +67,15 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
                     .appendPath("blatherer-service.herokuapp.com")
                     .appendPath("contacts")
                     .appendPath("cancel")
-                    .appendQueryParameter("memberid_a", mValues.get(position).getmMemberId_a())
-                    .appendQueryParameter("memberid_b", mValues.get(position).getmMemberId_b())
+                    .appendQueryParameter("memberid_a", mValues.get(position).getmMemberId_b())
+                    .appendQueryParameter("memberid_b", mValues.get(position).getmMemberId_a())
                     .build();
             new GetAsyncTask.Builder(uri.toString())
                     .onPostExecute(this::handleRequestSentCancelGetOnPostExecute)
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
             Log.wtf("Cancelled Friend request", mCredentials.getEmail() + " "+ holder.mItem.getmOtherEmail());
-            Log.wtf("Cancelled Friend request", mValues.get(position).getmMemberId_b() + " "+ mValues.get(position).getmMemberId_a());
+            Log.wtf("Cancelled Friend request", mValues.get(position).getmMemberId_a() + " "+ mValues.get(position).getmMemberId_b());
 
             /**
              * Remove the item in the front end.
@@ -128,7 +128,7 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
             }
 
         } catch(JSONException e){
-            Log.wtf("FAILED TO CANCEL", "SENT REQUEST");
+            Log.wtf("FAILED TO CANCEL", "SENT REQUEST" + " " + e);
         }
 
     }
