@@ -59,7 +59,7 @@ public class PushReceiver extends BroadcastReceiver {
 
             context.sendBroadcast(i);
 
-        } //else { // Out-of-app notification
+        } else { // Out-of-app notification
             //app is in the background so create and post a notification
             Log.d("Blatherer", "Message received in background: " + messageText);
 
@@ -97,11 +97,6 @@ public class PushReceiver extends BroadcastReceiver {
 
             // Build the notification and display it
             notificationManager.notify(1, builder.build());
-        // }
+        }
     }
-
-//    public interface OnPushReceivedInteractionListener() {
-//        void setInAppNotification();
-//        void clearInAppNotification();
-//    }
 }
