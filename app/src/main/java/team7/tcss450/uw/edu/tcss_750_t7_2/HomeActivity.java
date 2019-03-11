@@ -130,16 +130,15 @@ public class HomeActivity extends AppCompatActivity
 
     private TenDayWeather[] mTenDay;
 
-<<<<<<< HEAD
     /** TextView for nav drawer items Messages, Contacts, and Requests */
     private TextView mMessagesTV, mContactsTV, mRequestsTV;
-=======
+
     /** List to hold JSON of user's received contact request */
     private List<Request> mRequestsRecieved;
 
     /** List to hold JSON of user's sent contact requests*/
     private List<Request> mRequestsSent;
->>>>>>> master
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -378,10 +377,9 @@ public class HomeActivity extends AppCompatActivity
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
         } else if (id == R.id.nav_requests_activity_home) {
-<<<<<<< HEAD
+
             clearNotification("connreq", null);
             loadFragment(new RequestFragment());
-=======
 
             /**Start the get query to return all requests from potential
              * contacts.
@@ -399,9 +397,6 @@ public class HomeActivity extends AppCompatActivity
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleRequestGetOnPostExecute)
                     .build().execute();
-
-
->>>>>>> master
         }
 
 //        case R.id.nav_recents:
@@ -1312,7 +1307,6 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 loadFragment(new HomeFragment());
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.wtf("ERROR", e.getMessage());

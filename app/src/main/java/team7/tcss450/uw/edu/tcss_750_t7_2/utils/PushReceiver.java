@@ -19,6 +19,8 @@ import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIB
 public class PushReceiver extends BroadcastReceiver {
 
     public static final String RECEIVED_NEW_MESSAGE = "New message on Blatherer";
+    public static final String RECEIVED_NEW_CONN_REQUEST = "New connection";
+    public static final String RECEIVED_NEW_CONVO_REQUEST = "New conversation";
 
     /** Stored as a chatid in the chats relation in the database. Reserved for request related push notifications. */
     public static final int REQUEST_ID = 21;
@@ -57,7 +59,7 @@ public class PushReceiver extends BroadcastReceiver {
 
             context.sendBroadcast(i);
 
-        } else { // Out-of-app notification
+        } //else { // Out-of-app notification
             //app is in the background so create and post a notification
             Log.d("Blatherer", "Message received in background: " + messageText);
 
@@ -70,6 +72,7 @@ public class PushReceiver extends BroadcastReceiver {
             //research more on notifications the how to display them
             //https://developer.android.com/guide/topics/ui/notifiers/notifications
             NotificationCompat.Builder builder;
+
             if (chatId == REQUEST_ID) {
                 builder = new NotificationCompat.Builder(context, mChatid)
                         .setAutoCancel(true)
@@ -94,6 +97,11 @@ public class PushReceiver extends BroadcastReceiver {
 
             // Build the notification and display it
             notificationManager.notify(1, builder.build());
-        }
+        // }
     }
+
+//    public interface OnPushReceivedInteractionListener() {
+//        void setInAppNotification();
+//        void clearInAppNotification();
+//    }
 }
