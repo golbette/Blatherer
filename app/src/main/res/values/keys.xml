@@ -45,6 +45,7 @@
     <string name="keys_json_request_response">response</string>
     <string name="keys_json_request_first_name">firstname</string>
     <string name="keys_json_request_last_name">lastname</string>
+    <string name="keys_json_request_memberid_b">memberid_b</string>
     <string name="keys_json_request_type">type</string>
 
     <!-- Could probably be removed. -->

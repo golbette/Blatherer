@@ -34,7 +34,7 @@
     <string name="register_butt_register">Register</string>
 
     <!-- activity_home.xml -->
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_home">Blatherer All Day Every Day</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -119,5 +119,11 @@
     <string name="nav_recents">Recents</string>
     <string name="nav_contacts">Contacts</string>
     <string name="nav_requests">Requests</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="button_request_sent_fragment_cancel">Cancel</string>
+    <string name="text_sent_request_textSent">Sent</string>
+    <string name="text_received_request_recycler">Received</string>
+    <string name="button_request_received_cancel">Cancel</string>
+    <string name="button_received_request_item_deny">Deny</string>
+    <string name="text_home_fragment_weather_today">Weather Today</string>
+    <string name="text_view_home_fragment_recyclers_new_messages">New Messages</string>
 </resources>

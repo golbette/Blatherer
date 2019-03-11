@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="@dimen/text_margin"
-        android:text="@string/request_tv_requests"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:background="@color/cardview_light_background" />
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingStart="@dimen/text_margin"-->
+        <!--android:text="@string/request_tv_requests"-->
+        <!--android:textSize="30sp"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textColor="@android:color/black"-->
+        <!--android:background="@color/cardview_light_background" />-->
 
 
     <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
@@ -40,16 +42,18 @@
 
     <!--</LinearLayout>-->
 
-    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/list"
         android:name="team7.tcss450.uw.edu.tcss_750_t7_2.RequestFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="56dp"
 
-        tools:context=".RequestFragment"
-        tools:listitem="@layout/fragment_request" />
+        tools:listitem="@layout/fragment_request" >
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

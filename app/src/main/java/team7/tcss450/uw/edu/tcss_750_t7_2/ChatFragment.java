@@ -145,7 +145,6 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
             if (res.has("success") && res.getBoolean("success")) {
                 // The web service got our message. Time to clear out the input in EditText
                 mMessageInputEditText.setText("");
-                // It's up to me to decide if I want to send the message to the output here or wait for the message to come back from the web service.
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -167,28 +166,6 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
             }
         }
     }
-
-//    private void loadChatTask(final String result) {
-//        Log.wtf("LOADCHAT", "in loadChatTask");
-//        try {
-//            // This is the result from the web service
-//            JSONObject res = new JSONObject(result);
-//            Log.wtf("LOADCHAT", res.toString());
-//            if (res.has("message")) {
-//                JSONArray ja = (JSONArray) res.get("message");
-//                for (int i = 0; i < ja.length(); i++) {
-//                    JSONObject msg = ja.getJSONObject(i);
-//                    mMessageOutputTextView.append(msg.getString("username") + ": " + msg.getString("message"));
-//                    mMessageOutputTextView.append(System.lineSeparator());
-//                    mMessageOutputTextView.append(System.lineSeparator());
-//                }
-//            }
-//            onWaitFragmentInteractionHide();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//            onWaitFragmentInteractionHide();
-//        }
-//    }
 
     @Override
     public void onWaitFragmentInteractionShow() {
