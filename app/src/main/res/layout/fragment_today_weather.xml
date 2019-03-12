@@ -16,12 +16,14 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="236dp"
         android:text="TextView"
+        android:textColor="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@+id/textView35"
         app:layout_constraintTop_toBottomOf="@+id/sunrise_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/wind_speed_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,6 +40,7 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/wind_direction_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -51,6 +54,7 @@
         app:layout_constraintTop_toBottomOf="@+id/wind_chill_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/visibility_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,6 +68,7 @@
         app:layout_constraintTop_toBottomOf="@+id/humidity_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/humidity_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,6 +82,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/pressure_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -90,6 +96,7 @@
         app:layout_constraintTop_toBottomOf="@+id/visibility_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/sunrise_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -103,6 +110,7 @@
         app:layout_constraintTop_toBottomOf="@+id/pressure_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/wind_chill_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,6 +124,7 @@
         app:layout_constraintTop_toBottomOf="@+id/sunset_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -126,6 +135,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView34"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -136,6 +146,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView39" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView35"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -146,6 +157,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView37" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView36"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -156,6 +168,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView33" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView37"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -166,6 +179,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView38" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView38"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -176,6 +190,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView36" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView39"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -186,6 +201,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView35" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/city_state_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -200,6 +216,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/date_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -244,11 +261,13 @@
         android:text="Description"
         android:textColor="@android:color/background_light"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/weather_icon_data"
         app:layout_constraintStart_toStartOf="@+id/weather_icon_data"
         app:layout_constraintTop_toBottomOf="@+id/weather_icon_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView18"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -263,6 +282,7 @@
         app:layout_constraintTop_toBottomOf="@+id/temp_data" />
 
     <TextView
+        android:textColor="@android:color/black"
         android:id="@+id/textView40"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

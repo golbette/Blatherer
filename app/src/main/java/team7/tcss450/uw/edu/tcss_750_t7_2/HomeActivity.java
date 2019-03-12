@@ -1536,7 +1536,7 @@ public class HomeActivity extends AppCompatActivity
             FragmentTransaction transaction = getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragmentContainer, fragment)
-                    ; //// remove this adding to backstack.
+                    .addToBackStack(null); //// remove this adding to backstack.
             // Commit the transaction
             transaction.commit();
         }
