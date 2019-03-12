@@ -100,7 +100,6 @@ public class MyTenDayRecyclerViewAdapter extends RecyclerView.Adapter<MyTenDayRe
             super(view);
             mView = view;
             mDate = (TextView) view.findViewById(R.id.weather_date);
-            Log.e("here", "here");
             mWeatherIcon = (ImageView) view.findViewById(R.id.weather_icon);
             mTemp = (TextView) view.findViewById(R.id.weather_temp);
         }

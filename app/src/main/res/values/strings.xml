@@ -18,6 +18,7 @@
     <string name="login_tv_morning">Good Morning</string>
     <string name="login_tv_afternoon">Good Afternoon</string>
     <string name="login_switch_remember_val">switch_value</string>
+    <string name="login_forgot_password">Forgot Password</string>
 
     <!-- fragment_register.xml -->
     <string name="register_hint_fname">First Name</string>
@@ -34,7 +35,7 @@
     <string name="register_butt_register">Register</string>
 
     <!-- activity_home.xml -->
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_home">Blatherer All Day Every Day</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -44,6 +45,7 @@
     <string name="action_logout">Logout</string>
     <string name="nav_message_activity_home">Messages</string>
     <string name="nav_weather_activity_home">Weather</string>
+    <string name="nav_weather_starred_locations">Starred weather locations</string>
 
     <!-- fragment_weather.xml -->
     <string name="text_weather_fragment_temp">40</string>
@@ -120,7 +122,19 @@
     <string name="nav_requests">Requests</string>
     <string name="button_request_sent_fragment_cancel">Cancel</string>
     <string name="text_sent_request_textSent">Sent</string>
-    <string name="text_received_request_recycler">Received</string>
+    <string name="text_received_request_recycler">New Friend Requests</string>
     <string name="button_request_received_cancel">Cancel</string>
     <string name="button_received_request_item_deny">Deny</string>
+    <string name="text_home_fragment_weather_today">Weather Today</string>
+    <string name="text_view_home_fragment_recyclers_new_messages">New Messages</string>
+
+    <string name="setting_reset_password">Change Password</string>
+
+    <string name="change_pw_title">Change Password</string>
+    <string name="change_pw_hint_old_pw">Old Password</string>
+    <string name="change_pw_hint_new_pw">New Password</string>
+    <string name="change_pw_hint_repeat_new_pw">Repeat New Password</string>
+    <string name="change_pw_butt_confirm">Confirm</string>
+
+    <string name="empty"></string>
 </resources>

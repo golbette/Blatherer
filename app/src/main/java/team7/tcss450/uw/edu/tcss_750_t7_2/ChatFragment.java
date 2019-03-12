@@ -49,6 +49,7 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
     private String mSendUrl;
     private String mGetUrl;
     private PushMessageReceiver mPushMessageReceiver;
+    private OnChatFragmentInteractionListener mListener;
 
     public ChatFragment() {
         // Required empty public constructor
@@ -97,7 +98,14 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         mMessageOutputTextView.setMovementMethod(new ScrollingMovementMethod());
         mMessageInputEditText = view.findViewById(R.id.edit_chat_message_display);
         ImageButton butt = (ImageButton) view.findViewById(R.id.button_chat_send);
+        ImageButton addButt = (ImageButton) view.findViewById(R.id.chat_new_chatmember);
         butt.setOnClickListener(this::handleSendClick);
+        addButt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onAddChatMemberClicked(mChatid);
+            }
+        });
         return view;
     }
 
@@ -145,7 +153,6 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
             if (res.has("success") && res.getBoolean("success")) {
                 // The web service got our message. Time to clear out the input in EditText
                 mMessageInputEditText.setText("");
-                // It's up to me to decide if I want to send the message to the output here or wait for the message to come back from the web service.
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -168,28 +175,6 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
         }
     }
 
-//    private void loadChatTask(final String result) {
-//        Log.wtf("LOADCHAT", "in loadChatTask");
-//        try {
-//            // This is the result from the web service
-//            JSONObject res = new JSONObject(result);
-//            Log.wtf("LOADCHAT", res.toString());
-//            if (res.has("message")) {
-//                JSONArray ja = (JSONArray) res.get("message");
-//                for (int i = 0; i < ja.length(); i++) {
-//                    JSONObject msg = ja.getJSONObject(i);
-//                    mMessageOutputTextView.append(msg.getString("username") + ": " + msg.getString("message"));
-//                    mMessageOutputTextView.append(System.lineSeparator());
-//                    mMessageOutputTextView.append(System.lineSeparator());
-//                }
-//            }
-//            onWaitFragmentInteractionHide();
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//            onWaitFragmentInteractionHide();
-//        }
-//    }
-
     @Override
     public void onWaitFragmentInteractionShow() {
         getActivity().getSupportFragmentManager()
@@ -204,6 +189,27 @@ public class ChatFragment extends Fragment implements WaitFragment.OnFragmentInt
                 .beginTransaction()
                 .remove(getActivity().getSupportFragmentManager().findFragmentByTag("WAIT"))
                 .commit();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnChatFragmentInteractionListener) {
+            mListener = (OnChatFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnHomeFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnChatFragmentInteractionListener {
+        void onAddChatMemberClicked(int chatid);
     }
 
     private class PushMessageReceiver extends BroadcastReceiver {

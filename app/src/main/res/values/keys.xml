@@ -87,4 +87,12 @@
     <string name="keys_json_weather_summary">summary</string>
     <string name="keys_json_weather_icon">icon</string>
     <string name="keys_json_weather_temperature">temperature</string>
+    <string name="keys_json_weather_Success">Success</string>
+    <string name="keys_json_weather_success">success</string>
+    <string name="keys_json_weather_status">status</string>
+    <string name="keys_json_weather_nickname">nickname</string>
+    <string name="keys_json_weather_lat">lat</string>
+    <string name="keys_json_weather_long">long</string>
+    <string name="keys_json_weather_zip">zip</string>
+    <string name="keys_json_weather_coordinates">coordinates</string>
 </resources>
