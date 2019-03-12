@@ -60,15 +60,14 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
 
 
         holder.mCancel.setOnClickListener(v -> {
-            Log.wtf("BEFORE CANCEL ", mValues.get(position).getmMemberId_a() + " " + mValues.get(position).getmMemberId_b());
             /**Delete the request in backend */
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath("blatherer-service.herokuapp.com")
                     .appendPath("contacts")
                     .appendPath("cancel")
-                    .appendQueryParameter("memberid_a", mValues.get(position).getmMemberId_b())
                     .appendQueryParameter("memberid_b", mValues.get(position).getmMemberId_a())
+                    .appendQueryParameter("memberid_a", mValues.get(position).getmMemberId_b())
                     .build();
             new GetAsyncTask.Builder(uri.toString())
                     .onPostExecute(this::handleRequestSentCancelGetOnPostExecute)
@@ -80,8 +79,13 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
             /**
              * Remove the item in the front end.
              */
-            mValues.remove(position);
-            this.notifyItemRemoved(position);
+
+                mValues.remove(position);
+                this.notifyItemRemoved(position);
+
+
+
+
                 });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
