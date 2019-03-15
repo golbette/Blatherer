@@ -1,17 +1,25 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
 import me.pushy.sdk.Pushy;
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 
 /**
  * This Activity is the host of Login and Registration Fragment.
@@ -19,7 +27,8 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 public class MainActivity extends AppCompatActivity implements
         LoginFragment.OnLoginFragmentInteractionListener,
         RegisterFragment.OnRegisterFragmentInteractionListener,
-        EmailVerificationFragment.OnEmailVerificationFragmentInteractionListener{
+        EmailVerificationFragment.OnEmailVerificationFragmentInteractionListener,
+        ForgotPasswordFragment.OnForgotFragmentInteractionListener{
 
     /**
      * Tag used in Log statements.
@@ -154,5 +163,82 @@ public class MainActivity extends AppCompatActivity implements
                 beginTransaction().replace(R.id.activity_main_container, loginFragment);
         transaction.commit();
 
+    }
+
+    @Override
+    public void onForgotPasswordClicked() {
+//        SharedPreferences prefs = getSharedPreferences(getString(R.string.keys_shared_prefs), Context.MODE_PRIVATE);
+//
+//        prefs.edit().remove(getString(R.string.keys_prefs_email)).apply();
+//        prefs.edit().remove(getString(R.string.keys_prefs_password)).apply();
+
+        Fragment frag = new ForgotPasswordFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction()
+                .replace(R.id.activity_main_container, frag).addToBackStack(null);
+        transaction.commit();
+    }
+
+    /**
+     * Actions for when the reset button is clicked.
+     * @param email passed from the forgot password fragment and is the email that the
+     *              user entered into the edit text (where you would want your temp password
+     *              sent to).
+     */
+    @Override
+    public void onResetClicked(String email) {
+        Log.wtf("RESET_EMAIL", email);
+
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath("login")
+                .appendPath("forgotpw")
+                .build();
+
+        JSONObject msg = new JSONObject();
+        try {
+            msg.put("email", email);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleForgotPasswordPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build().execute();
+    }
+
+    /** Handle errors that may occur during the AsyncTask.
+     * @param result the error message provide from the AsyncTask
+     */
+    private void handleErrorsInTask(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+    }
+
+    /**
+     * Shows a dialog informing the user that an email has been sent to them.
+     * @param result returned from server
+     */
+    private void handleForgotPasswordPost(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+        onWaitFragmentInteractionHide();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("An email with a temporary password has been sent to the email address you've provided. Please remember to login and reset your password.")
+                .setTitle("Reset Success");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Fragment frag = new LoginFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().
+                        beginTransaction().replace(R.id.activity_main_container, frag);
+                transaction.commit();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }

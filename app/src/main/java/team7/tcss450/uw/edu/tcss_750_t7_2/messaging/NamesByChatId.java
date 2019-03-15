@@ -1,6 +1,8 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2.messaging;
 
-public class NamesByChatId {
+import java.io.Serializable;
+
+public class NamesByChatId implements Serializable {
     private int mChatId;
     private String mNames;
 

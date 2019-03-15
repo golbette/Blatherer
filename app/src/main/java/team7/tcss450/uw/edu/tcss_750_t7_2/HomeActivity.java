@@ -3,6 +3,7 @@ package team7.tcss450.uw.edu.tcss_750_t7_2;
 import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -16,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -90,7 +92,8 @@ public class HomeActivity extends AppCompatActivity
         RequestContainer.OnRequestContainerFragmentInteractionListener,
         NewContactBlankFragment.OnFragmentInteractionListener,
         NamesByChatIdFragment.OnRecentChatListFragmentInteractionListener,
-        ChatFragment.OnChatFragmentInteractionListener{
+        ChatFragment.OnChatFragmentInteractionListener,
+        ChangePasswordFragment.OnChangePasswordFragmentInteractionListener{
 
 
     private String mJwToken;
@@ -480,7 +483,7 @@ public class HomeActivity extends AppCompatActivity
                     .onPreExecute(this::onWaitFragmentInteractionShow)
                     .onPostExecute(this::handleGetChatsPost)
                     .onCancelled(this::handleErrorsInTask)
-//                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .addHeaderField("content-type", "application/Json")
                     .build()
                     .execute();
@@ -1042,6 +1045,55 @@ public class HomeActivity extends AppCompatActivity
         newContactBlankFragment.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onResetPassword(String oldpassword, String newpassword) {
+        Uri uri = new Uri.Builder()
+                .scheme("https")
+                .appendPath(getString(R.string.ep_base_url))
+                .appendPath("login")
+                .appendPath("resetpw")
+                .build();
+
+        JSONObject msg = new JSONObject();
+
+        try {
+            msg.put("email", mCredentials.getEmail());
+            msg.put("oldpassword", oldpassword);
+            msg.put("newpassword", newpassword);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new SendPostAsyncTask.Builder(uri.toString(), msg)
+                .onPreExecute(this::onWaitFragmentInteractionShow)
+                .onPostExecute(this::handleResetPasswordPost)
+                .onCancelled(this::handleErrorsInTask)
+                .build().execute();
+    }
+
+    /**
+     * Shows a dialog informing the user that an email has been sent to them.
+     * @param result returned from server
+     */
+    private void handleResetPasswordPost(String result) {
+        Log.e("ASYNC_TASK_ERROR", result);
+        onWaitFragmentInteractionHide();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Your password has been changed.")
+                .setTitle("Reset Success");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked OK button
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 //    @Override
@@ -1690,6 +1742,7 @@ public class HomeActivity extends AppCompatActivity
     private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.wtf("BROADCAST", "onReceived");
             setNotification();
         }
     }
@@ -1869,6 +1922,11 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onRegisterClicked() {
+
+    }
+
+    @Override
+    public void onForgotPasswordClicked() {
 
     }
 

@@ -2,7 +2,7 @@ package team7.tcss450.uw.edu.tcss_750_t7_2.weather;
 
 import java.io.Serializable;
 
-public class FortyEightHourWeather {
+public class FortyEightHourWeather implements Serializable{
     private final String mDate;
     private final String mWeatherText;
     private final String mWeatherCode;

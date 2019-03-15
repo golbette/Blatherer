@@ -136,5 +136,7 @@
     <string name="change_pw_hint_repeat_new_pw">Repeat New Password</string>
     <string name="change_pw_butt_confirm">Confirm</string>
 
+    <string name="reset_pw_butt_reset">Reset</string>
+
     <string name="empty"></string>
 </resources>
