@@ -5,7 +5,6 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -29,7 +28,7 @@ import java.util.Locale;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Map fragment for weather selection
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -44,11 +43,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private LatLng mPosition;
 
 
+    /**
+     * Required empty public constructor
+     */
     public MapFragment() {
         // Required empty public constructor
     }
 
 
+    /**
+     * Creates view for map
+     * @param inflater inflates layout
+     * @param container of view group
+     * @param savedInstanceState bundle object
+     * @return view for reference
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -59,6 +68,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    /**
+     * After the view is created, handle map async
+     * @param view of view
+     * @param savedInstanceState bundle object
+     */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -68,6 +82,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
     }
 
+    /**
+     * On start to retrieve current location of map
+     */
     @Override
     public void onStart() {
         super.onStart();
@@ -84,6 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
+     *
+     * @param googleMap map
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -97,9 +116,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onMapClick(LatLng latLng) {
                 Log.d("LAT/LONG", latLng.toString());
-//                Marker marker = mMap.addMarker(new MarkerOptions()
-//                .position(latLng)
-//                .title("New Marker"));
                 mPosition = latLng;
                 String title = "";
                 Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
@@ -144,10 +160,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
-//        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
 
         LatLng current = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
         mMap.addMarker(new MarkerOptions().position(current).title("Current Location"));
@@ -156,6 +168,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    /**
+     * Attaches listener
+     * @param context of context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -167,6 +183,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Overrides when detached
+     */
     @Override
     public void onDetach() {
         super.onDetach();
@@ -183,8 +202,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnMapFragmentInteractionListener  {
-        // TODO: Update argument type and name
-
         void onMapLocationSelect(String lat, String lon);
     }
 }

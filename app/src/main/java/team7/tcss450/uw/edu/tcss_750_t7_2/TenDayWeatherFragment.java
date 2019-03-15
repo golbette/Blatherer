@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Fragment for ten day weather
  */
 public class TenDayWeatherFragment extends Fragment {
 
@@ -30,10 +29,17 @@ public class TenDayWeatherFragment extends Fragment {
 
     private List<TenDayWeather> mTenDay;
 
+    /**
+     * Required empty public constructor
+     */
     public TenDayWeatherFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * On create to set ten day weather
+     * @param savedInstanceState bundle object
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,13 @@ public class TenDayWeatherFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets recycler view based on ten day forecast
+     * @param inflater inflates layout
+     * @param container view group container
+     * @param savedInstanceState bundle object
+     * @return view for reference
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,6 +77,10 @@ public class TenDayWeatherFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Updates ten day forecast
+     * @param tenDay new ten day forecast infromation
+     */
     public void updateFields(TenDayWeather[] tenDay) {
         mTenDay = new ArrayList<TenDayWeather>(
                 Arrays.asList((TenDayWeather[]) tenDay));

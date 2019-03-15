@@ -31,7 +31,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PutAsyncTask;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * The current weather fragment class.
  */
 public class TodayWeatherFragment extends Fragment {
 
@@ -89,10 +89,17 @@ public class TodayWeatherFragment extends Fragment {
 
     private View mView;
 
+    /**
+     * Required empty public constructor
+     */
     public TodayWeatherFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * On create method for current weather details
+     * @param savedInstanceState bundle object
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,14 +109,21 @@ public class TodayWeatherFragment extends Fragment {
             mCurrentObservationData = (HashMap<String, String>) getArguments().getSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION);
             mCredentials = (Credentials) getArguments().getSerializable(WeatherFragment.ARG_CREDENTIALS);
         }
-
     }
 
+    /**
+     * Sets the required weather info for user
+     * @param inflater inflates layout
+     * @param container view group
+     * @param savedInstanceState bundle object
+     * @return view for fragment reuse
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_today_weather, container, false);
+
         TextView sunsetData = mView.findViewById(R.id.sunset_data);
         sunsetData.setText(mCurrentObservationData.get("astronomysunset"));
         TextView windSpeedData = mView.findViewById(R.id.wind_speed_data);
@@ -180,8 +194,6 @@ public class TodayWeatherFragment extends Fragment {
                 EditText nicknameText = view.findViewById(R.id.nickname_text);
                 nicknameText.setText(mLocationData.get("city") + "," + mLocationData.get("region"));
 
-
-
                 PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 window.showAtLocation(mView.findViewById(R.id.constraintLayout), Gravity.CENTER, 0, 0);
                 window.setFocusable(true);
@@ -202,6 +214,10 @@ public class TodayWeatherFragment extends Fragment {
         return mView;
     }
 
+    /**
+     * Calls async task to save weather location
+     * @param nickname requested nickname to save location
+     */
     private void doSave(String nickname) {
         Uri uri = new Uri.Builder()
                 .scheme("https")
@@ -220,6 +236,10 @@ public class TodayWeatherFragment extends Fragment {
                 .build().execute();
     }
 
+    /**
+     * Handles after save call is made
+     * @param result JSON object from backend
+     */
     private void handleSaveOnPost(final String result) {
         //parse JSON
         try {
@@ -251,69 +271,22 @@ public class TodayWeatherFragment extends Fragment {
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
+    /**
+     * Updates required fields when user changes weather location
+     * @param locationData hash map of location information
+     * @param currentObservationData hash map of weather information based on location
+     */
     public void updateFields(HashMap<String, String> locationData,HashMap<String, String> currentObservationData) {
         mLocationData = locationData;
         mCurrentObservationData = currentObservationData;
-
-        TextView sunsetData = mView.findViewById(R.id.sunset_data);
-        sunsetData.setText(mCurrentObservationData.get("astronomysunset"));
-        TextView windSpeedData = mView.findViewById(R.id.wind_speed_data);
-        windSpeedData.setText(mCurrentObservationData.get("windspeed") + " mph");
-        TextView windDirectionData = mView.findViewById(R.id.wind_direction_data);
-        windDirectionData.setText(mCurrentObservationData.get("winddirection") + "\u00B0");
-        TextView visibilityData = mView.findViewById(R.id.visibility_data);
-        visibilityData.setText(mCurrentObservationData.get("atmospherevisibility") + " mi");
-        TextView humidityData = mView.findViewById(R.id.humidity_data);
-        humidityData.setText(mCurrentObservationData.get("atmospherehumidity") + "%");
-        TextView pressureData = mView.findViewById(R.id.pressure_data);
-        pressureData.setText(mCurrentObservationData.get("atmospherepressure") + " inHg");
-        TextView sunriseData = mView.findViewById(R.id.sunrise_data);
-        sunriseData.setText(mCurrentObservationData.get("astronomysunrise"));
-        TextView windChillData = mView.findViewById(R.id.wind_chill_data);
-        windChillData.setText(mCurrentObservationData.get("windchill"));
-
-        TextView cityState = mView.findViewById(R.id.city_state_data);
-        cityState.setText(mLocationData.get("city") +", " + mLocationData.get("region"));
-
-        TextView monthDate = mView.findViewById(R.id.date_data);
-        int timeStamp = Integer.parseInt(mCurrentObservationData.get("pubDate"));
-        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
-        cal.setTimeInMillis(timeStamp * 1000L);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEEE, MMMM d");
-        simpleDateFormat.setTimeZone(cal.getTimeZone());
-        monthDate.setText(simpleDateFormat.format(cal.getTime()));
-
-        TextView currentTemp = mView.findViewById(R.id.temp_data);
-        currentTemp.setText(mCurrentObservationData.get("conditiontemperature") + "\u2109");
-
-        TextView weatherDescription = mView.findViewById(R.id.weather_text_data);
-        weatherDescription.setText(mCurrentObservationData.get("conditiontext"));
-
-        ImageView weatherIcon = mView.findViewById(R.id.weather_icon_data);
-        if (contains(CLEAR_DAY, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.clear_day);
-        } else if (contains(CLEAR_NIGHT, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.clear_night);
-        } else if(contains(CLOUDY, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.cloudy);
-        } else if (contains(CLOUDY_NIGHT, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.cloudy_night);
-        } else if (contains(FOG, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.fog);
-        } else if (contains(PARTLY_CLOUDY, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.partly_cloudy);
-        } else if (contains(RAIN, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.rain);
-        } else if (contains(SLEET, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.sleet);
-        } else if (contains(SNOW, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.snow);
-        } else if (contains(SUNNY, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.sunny);
-        } else if (contains(WIND, Integer.parseInt(mCurrentObservationData.get("conditioncode")))) {
-            weatherIcon.setImageResource(R.drawable.wind);
-        }
     }
+
+    /**
+     * Searches if the target is in the array
+     * @param array to be searched
+     * @param target to be found
+     * @return boolean if target is found
+     */
     private boolean contains(final int[] array, final int target) {
         boolean result = false;
         for (int i : array) {
@@ -325,14 +298,24 @@ public class TodayWeatherFragment extends Fragment {
         return result;
     }
 
+    /**
+     * Shows wait fragment
+     */
     private void onWaitFragmentInteractionShow() {
         mListener.onWaitFragmentInteractionShow();
     }
 
+    /**
+     * Hides wait fragment
+     */
     private void onWaitFragmentInteractionHide() {
         mListener.onWaitFragmentInteractionHide();
     }
 
+    /**
+     * Handles listener
+     * @param context
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -344,6 +327,9 @@ public class TodayWeatherFragment extends Fragment {
         }
     }
 
+    /**
+     * Overrides on detach
+     */
     @Override
     public void onDetach() {
         super.onDetach();

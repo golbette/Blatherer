@@ -230,7 +230,7 @@ public class HomeActivity extends AppCompatActivity
                             .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                             .build().execute();
                 } else {
-                   loadHomeWidgets();
+                   //loadHomeWidgets();
                 }
             }
         }
@@ -258,7 +258,7 @@ public class HomeActivity extends AppCompatActivity
                 for (Location location : locationResult.getLocations()) {
                     // Update UI with location data
                     setLocation(location);
-                    Log.d("LOCATION UPDATE", location.toString());
+                    //Log.d("LOCATION UPDATE", location.toString());
                 }
             }
         };
@@ -304,7 +304,8 @@ public class HomeActivity extends AppCompatActivity
                             // Got last known location. In some rare situations this can be null
                             if (location != null) {
                                 setLocation(location);
-                                Log.d("LOCATION", location.toString());
+                                //Log.d("LOCATION", location.toString());
+                                loadHomeWidgets();
                             }
                         }
                     });
@@ -483,13 +484,7 @@ public class HomeActivity extends AppCompatActivity
                     .addHeaderField("content-type", "application/Json")
                     .build()
                     .execute();
-        } else if (id == R.id.nav_weather_activity_home) { // Handle the camera action
-            //loadFragment(new WeatherFragment());
-
-            /* 98402 is hardcoded, eventually will make default
-               location based on device location
-             */
-
+        } else if (id == R.id.nav_weather_activity_home) {
             Uri uri = new Uri.Builder()
                     .scheme("https")
                     .appendPath(getString(R.string.ep_base_url))
@@ -1219,16 +1214,6 @@ public class HomeActivity extends AppCompatActivity
                 mFortyEightHour = new FortyEightHourWeather[fortyEightHour.size()];
                 mFortyEightHour = fortyEightHour.toArray(mFortyEightHour);
 
-//                Bundle args = new Bundle();
-//                args.putSerializable(WeatherFragment.ARG_LOCATION, mLocationData);
-//                args.putSerializable(WeatherFragment.ARG_CURRENT_OBSERVATION, mCurrentObservationData);
-//                args.putSerializable(WeatherFragment.ARG_FORECASTS, mTenDay);
-//                args.putSerializable(WeatherFragment.ARG_FORTY_EIGHT_HOUR, mFortyEightHour);
-//                Fragment weatherFragment = new WeatherFragment();
-//                weatherFragment.setArguments(args);
-//                onWaitFragmentInteractionHide();
-//                loadFragment(weatherFragment);
-
                 Uri uri = new Uri.Builder()
                         .scheme("https")
                         .appendPath(getString(R.string.ep_base_url))
@@ -1296,30 +1281,6 @@ public class HomeActivity extends AppCompatActivity
                 weatherFragment.setArguments(args);
                 onWaitFragmentInteractionHide();
                 loadFragment(weatherFragment);
-
-
-//                if (getSupportFragmentManager().findFragmentByTag("weatherFragment") != null) {
-//                    WeatherFragment frag = (WeatherFragment) getSupportFragmentManager().findFragmentByTag("weatherFragment");
-//                    Log.e("already exists", "should get arguments" + mLocationData.get("city"));
-//                    frag.setArguments(args);
-//                    FragmentTransaction transaction = getSupportFragmentManager()
-//                            .beginTransaction()
-//                            .replace(R.id.fragmentContainer, frag);
-//                    transaction.commit();
-//                    //frag.doUpdateLatLon(mLocationData.get("lat"), mLocationData.get("long"));
-//
-//                } else {
-//                    Fragment weatherFragment = new WeatherFragment();
-//
-//                    weatherFragment.setArguments(args);
-//                    FragmentTransaction transaction = getSupportFragmentManager()
-//                            .beginTransaction()
-//                            .replace(R.id.fragmentContainer, weatherFragment, "weatherFragment")
-//                            .addToBackStack(null);
-//                    transaction.commit();
-//                }
-
-
             }
         } catch (JSONException error) {
             error.printStackTrace();
@@ -1533,14 +1494,7 @@ public class HomeActivity extends AppCompatActivity
             args.putParcelable(WeatherFragment.ARG_CURRENT_LOCATION, mCurrentLocation);
             fragment.setArguments(args);
             loadFragment(fragment);
-            FragmentTransaction transaction = getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    ; //// remove this adding to backstack.
-            // Commit the transaction
-            transaction.commit();
         }
-
     }
 
     @Override
@@ -1556,18 +1510,6 @@ public class HomeActivity extends AppCompatActivity
         new GetAsyncTask.Builder(uri.toString())
                 .onPostExecute(this::handleWeatherGetOnPostExecute)
                 .build().execute();
-
-        //WeatherFragment frag = (WeatherFragment) getSupportFragmentManager().findFragmentByTag("weatherFragment");
-        //Log.e("already exists", "should get arguments" + mLocationData.get("city"));
-        //frag.setArguments(args);
-        //frag.doUpdateLatLon(lat, lon);
-//        FragmentTransaction transaction = getSupportFragmentManager()
-//                .beginTransaction()
-//                .replace(R.id.fragmentContainer, frag);
-//        transaction.commit();
-        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        //ft.detach(frag).attach(frag).commit();
-
     }
 
     @Override
@@ -1790,37 +1732,21 @@ public class HomeActivity extends AppCompatActivity
                             .addRequestType("received")
                             .build());
                 }
-
-                Log.e("calling", "here");
-
-                    Uri uri = new Uri.Builder()
-                            .scheme("https")
-                            .appendPath(getString(R.string.ep_base_url))
-                            .appendPath(getString(R.string.ep_weather))
-                            .appendPath(getString(R.string.ep_location))
-                            .appendQueryParameter("location", "98402")
-                            .build();
-                    new GetAsyncTask.Builder(uri.toString())
-                            .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
-                            .build().execute();
-
-
-
-            } else {
-
+            }
+            if (mCurrentLocation != null) {
                 Uri uri = new Uri.Builder()
                         .scheme("https")
                         .appendPath(getString(R.string.ep_base_url))
                         .appendPath(getString(R.string.ep_weather))
-                        .appendPath(getString(R.string.ep_location))
-                        .appendQueryParameter("location", "98402")
+                        .appendPath(getString(R.string.ep_coordinates))
+                        .appendQueryParameter("lat", String.valueOf(mCurrentLocation.getLatitude()))
+                        .appendQueryParameter("lon", String.valueOf(mCurrentLocation.getLongitude()))
                         .build();
-                    new GetAsyncTask.Builder(uri.toString())
-                            .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
-                            .build().execute();
-                    //loadFragment(new HomeFragment());
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
+                        .build().execute();
 
-
+                Log.e("url", uri.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1864,10 +1790,6 @@ public class HomeActivity extends AppCompatActivity
                         mCurrentObservationData.put(outerKey, currentObservation.getString(outerKey));
                     }
                 }
-                String lat = mLocationData.get("lat");
-                String lon = mLocationData.get("long");
-
-
                 if (null != mRequestsRecieved) {
                     args.putSerializable(HomeFragment.ARG_RECEIVED_REQUEST, (Serializable) mRequestsRecieved);
                 }
@@ -1878,9 +1800,7 @@ public class HomeActivity extends AppCompatActivity
                 Fragment frag = new HomeFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
-//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 loadFragment(frag);
-
             } else {
                 Log.e("ERROR!", "Invalid location entered");
 
@@ -1933,16 +1853,6 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onConversationFragmentInteraction(Uri uri) {
-
-    }
-
-    /**
-     * Interaction listener for weather fragment that loads
-     * on homepage when user is successfully logged in.
-     * @param uri
-     */
-    @Override
-    public void onWeatherFragmentInteraction(Uri uri) {
 
     }
 

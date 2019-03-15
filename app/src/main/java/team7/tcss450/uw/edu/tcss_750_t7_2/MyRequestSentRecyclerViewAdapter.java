@@ -58,7 +58,6 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
         holder.mItem = mValues.get(position);
         holder.mRequestContactName.setText(mValues.get(position).getContactName());
 
-
         holder.mCancel.setOnClickListener(v -> {
             /**Delete the request in backend */
             Uri uri = new Uri.Builder()
@@ -66,22 +65,28 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
                     .appendPath("blatherer-service.herokuapp.com")
                     .appendPath("contacts")
                     .appendPath("cancel")
-                    .appendQueryParameter("memberid_b", mValues.get(position).getmMemberId_a())
-                    .appendQueryParameter("memberid_a", mValues.get(position).getmMemberId_b())
+                    .appendQueryParameter("memberid_b", holder.mItem.getmMemberId_a())
+                    .appendQueryParameter("memberid_a", holder.mItem.getmMemberId_b())
                     .build();
             new GetAsyncTask.Builder(uri.toString())
                     .onPostExecute(this::handleRequestSentCancelGetOnPostExecute)
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
             Log.wtf("Cancelled Friend request", mCredentials.getEmail() + " "+ holder.mItem.getmOtherEmail());
-            Log.wtf("Cancelled Friend request", mValues.get(position).getmMemberId_a() + " "+ mValues.get(position).getmMemberId_b());
 
             /**
              * Remove the item in the front end.
              */
+            if(position == 1 && getItemCount() == 1) {
+              mValues.remove(0);
 
+            } else {
                 mValues.remove(position);
-                this.notifyItemRemoved(position);
+            }
+            this.notifyItemRemoved(position);
+
+
+
 
 
 

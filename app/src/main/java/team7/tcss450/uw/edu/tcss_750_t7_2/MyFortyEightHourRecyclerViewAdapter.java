@@ -1,7 +1,6 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,28 @@ import java.util.List;
 import java.util.Locale;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
-import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 
+/**
+ * Recycler view class for saved weather location
+ */
 public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<MyFortyEightHourRecyclerViewAdapter.ViewHolder> {
 
     private final List<FortyEightHourWeather> mValues;
 
+    /**
+     * Constructor for 48 hour adapter
+     * @param items of hourly forecast
+     */
     public MyFortyEightHourRecyclerViewAdapter(List<FortyEightHourWeather> items) {
         mValues = items;
     }
 
+    /**
+     * Creates view holder
+     * @param parent view group parent
+     * @param viewType int of view type
+     * @return viewHolder object
+     */
     @Override
     public MyFortyEightHourRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -31,6 +42,11 @@ public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<My
         return new MyFortyEightHourRecyclerViewAdapter.ViewHolder(view);
     }
 
+    /**
+     * Binds view
+     * @param holder view holder
+     * @param position int position
+     */
     @Override
     public void onBindViewHolder(final MyFortyEightHourRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
@@ -71,6 +87,12 @@ public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<My
         }
     }
 
+    /**
+     * Searches array for target
+     * @param array to be searched
+     * @param target to be found
+     * @return boolean if target is found
+     */
     private boolean contains(final String[] array, final String target) {
         boolean result = false;
         for (String i : array) {
@@ -81,11 +103,19 @@ public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<My
         }
         return result;
     }
+
+    /**
+     * Retrieves item count
+     * @return item size
+     */
     @Override
     public int getItemCount() {
         return mValues.size();
     }
 
+    /**
+     * Class extending recycler view
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mDate;
@@ -93,6 +123,10 @@ public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<My
         public final ImageView mWeatherIcon;
         public FortyEightHourWeather mItem;
 
+        /**
+         * ViewHolder constructor
+         * @param view of view
+         */
         public ViewHolder(View view) {
             super(view);
             mView = view;
@@ -101,6 +135,10 @@ public class MyFortyEightHourRecyclerViewAdapter extends RecyclerView.Adapter<My
             mTemp = (TextView) view.findViewById(R.id.weather_temp);
         }
 
+        /**
+         * Override to string
+         * @return string of temp
+         */
         @Override
         public String toString() {
             return super.toString() + " '" + mTemp.getText() + "'";
