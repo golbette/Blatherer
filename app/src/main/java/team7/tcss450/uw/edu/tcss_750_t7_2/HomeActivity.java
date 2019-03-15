@@ -1741,6 +1741,7 @@ public class HomeActivity extends AppCompatActivity
     private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.wtf("BROADCAST", "onReceived");
             setNotification();
         }
     }
