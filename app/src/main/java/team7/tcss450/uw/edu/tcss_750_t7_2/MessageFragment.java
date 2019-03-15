@@ -77,6 +77,9 @@ public class MessageFragment extends Fragment {
             }
             recyclerView.setAdapter(new MyMessagesRecyclerViewAdapter(mMessages, mListener));
         }
+
+
+
         return view;
     }
 

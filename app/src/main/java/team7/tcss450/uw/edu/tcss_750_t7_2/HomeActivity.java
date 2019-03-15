@@ -984,9 +984,16 @@ public class HomeActivity extends AppCompatActivity
                 List<Message> messages = new ArrayList<>();
                 for (int i = 0; i < data.length(); i++) {
                     JSONObject jsonMessage = data.getJSONObject(i);
+                    boolean isSender = false;
+                    if (jsonMessage.getString(getString(R.string.keys_json_message_username)) == mCredentials.getUsername()) {
+                        isSender = true;
+                    }
+
+
                     messages.add(new Message.Builder(jsonMessage.getString(getString(R.string.keys_json_message_username)),
                             jsonMessage.getString(getString(R.string.keys_json_message_message)),
-                            jsonMessage.getString(getString(R.string.keys_json_message_timestamp)))
+                            jsonMessage.getString(getString(R.string.keys_json_message_timestamp)),
+                            isSender)
                             .build());
                 }
                 Message[] messagesAsArray = new Message[messages.size()];
