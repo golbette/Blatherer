@@ -4,13 +4,11 @@ package team7.tcss450.uw.edu.tcss_750_t7_2;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +22,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Saved weather locations fragment
  */
 public class SavedWeatherLocationFragment extends Fragment {
 
@@ -36,10 +34,17 @@ public class SavedWeatherLocationFragment extends Fragment {
 
     private Credentials mCredentials;
 
+    /**
+     * Required empty public constructor
+     */
     public SavedWeatherLocationFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * Retrieves saved locations
+     * @param savedInstanceState bundle object
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +59,13 @@ public class SavedWeatherLocationFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets recycler view based on previous saved locations
+     * @param inflater inflates layout
+     * @param container view group
+     * @param savedInstanceState bundle object
+     * @return view for reference
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -80,43 +92,19 @@ public class SavedWeatherLocationFragment extends Fragment {
 
                     }
                 });
-//                builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        // call http delete here
-//
-//                        Uri uri = new Uri.Builder()
-//                                .scheme("https")
-//                                .appendPath(v.getContext().getResources().getString(R.string.ep_base_url))
-//                                .appendPath(v.getContext().getResources().getString(R.string.ep_weather))
-//                                .appendPath(v.getContext().getResources().getString(R.string.ep_location))
-//                                .appendQueryParameter("username", mCredentials.getUsername())
-//                                .appendQueryParameter("nickname", mValues.get(position).getNickname())
-//                                .build();
-//                        Log.e("url", uri.toString());
-//                        new DeleteAsyncTask.Builder(uri.toString(), new JSONObject())
-//                                .onPostExecute(MySavedWeatherLocationRecyclerViewAdapter.this::handleDeleteOnPost)
-//                                .build().execute();
-//                    }
-//                });
-//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        // cancel
-//                    }
-//                });
                 builder.show();
             }
-
-
         }
         return view;
     }
 
+    /**
+     * Update fields of saved locations
+     * @param savedLocations new array of saved locations
+     */
     public void updateFields(SavedLocations[] savedLocations) {
         mSavedLocation = new ArrayList<SavedLocations>(
                 Arrays.asList((SavedLocations[]) savedLocations));
     }
-
 
 }
