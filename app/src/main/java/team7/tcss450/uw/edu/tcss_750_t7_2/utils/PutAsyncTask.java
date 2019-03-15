@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Put async task class for backend
+ * Code is adopted from Charles
+ */
 public class PutAsyncTask extends AsyncTask<Void, String, String> {
 
     private final String mUrl;
@@ -25,6 +29,9 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
     private Consumer<String> mOnCancel;
     private final Map<String, String> mHeaders;
 
+    /**
+     * Helper class for building PutAsyncTasks
+     */
     public static class Builder {
 
         //Required Parameters
@@ -111,9 +118,9 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
         }
 
         /**
-         * Constructs a SendPostAsyncTask with the current attributes.
+         * Constructs a PutPostAsyncTask with the current attributes.
          *
-         * @return a SendPostAsyncTask with the current attributes
+         * @return a PutPostAsyncTask with the current attributes
          */
         public PutAsyncTask build() {
             return new PutAsyncTask(this);
@@ -121,6 +128,11 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
 
     }
 
+    /**
+     * Constructs a PutPostAsyncTask internally from a builder
+     *
+     * @param builder the builder used to construct this object
+     */
     private PutAsyncTask(final Builder builder) {
         mUrl = builder.mUrl;
         mJsonMsg = builder.mJsonMsg;
@@ -132,12 +144,20 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
         mHeaders = builder.headers;
     }
 
+    /**
+     * Override pre execute
+     */
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
         mOnPre.run();
     }
 
+    /**
+     * Override do in background for put task
+     * @param voids void arguments
+     * @return string of response
+     */
     @Override
     protected String doInBackground(Void... voids) {
 
@@ -183,12 +203,20 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
         return response.toString();
     }
 
+    /**
+     * Handle on cancelled
+     * @param result string
+     */
     @Override
     protected void onCancelled(String result) {
         super.onCancelled(result);
         mOnCancel.accept(result);
     }
 
+    /**
+     * Handle on progress update
+     * @param values of type string
+     */
     @Override
     protected void onProgressUpdate(String... values) {
         super.onProgressUpdate(values);
@@ -196,6 +224,10 @@ public class PutAsyncTask extends AsyncTask<Void, String, String> {
 
     }
 
+    /**
+     * Handle on post execute
+     * @param result of type string
+     */
     @Override
     protected void onPostExecute(String result) {
         mOnPost.accept(result);

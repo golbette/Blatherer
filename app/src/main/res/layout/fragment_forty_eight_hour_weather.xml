@@ -19,6 +19,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:textColor="@android:color/black"
                 android:id="@+id/weather_date"
                 android:layout_width="181dp"
                 android:layout_height="65dp"
@@ -35,6 +36,7 @@
                 tools:src="@tools:sample/avatars[3]" />
 
             <TextView
+                android:textColor="@android:color/black"
                 android:id="@+id/weather_temp"
                 android:layout_width="12dp"
                 android:layout_height="match_parent"

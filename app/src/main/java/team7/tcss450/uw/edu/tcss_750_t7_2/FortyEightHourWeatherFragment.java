@@ -20,7 +20,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * Hourly weawther fragment
  */
 public class FortyEightHourWeatherFragment extends Fragment {
 
@@ -30,10 +30,17 @@ public class FortyEightHourWeatherFragment extends Fragment {
 
     private List<FortyEightHourWeather> mFortyEightHour;
 
+    /**
+     * Required empty public constructor
+     */
     public FortyEightHourWeatherFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * On create to set hourly forecast
+     * @param savedInstanceState bundle object
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +51,13 @@ public class FortyEightHourWeatherFragment extends Fragment {
         }
     }
 
+    /**
+     * Sets hourly forecast for user to see
+     * @param inflater for layout inflation
+     * @param container of view group
+     * @param savedInstanceState bundle object
+     * @return view for reference
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -64,6 +78,10 @@ public class FortyEightHourWeatherFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Update fields when new location is searched
+     * @param fortyEightHour of new hourly forecast retrieved
+     */
     public void updateFields(FortyEightHourWeather[] fortyEightHour) {
         mFortyEightHour = new ArrayList<FortyEightHourWeather>(
                 Arrays.asList((FortyEightHourWeather[]) fortyEightHour));

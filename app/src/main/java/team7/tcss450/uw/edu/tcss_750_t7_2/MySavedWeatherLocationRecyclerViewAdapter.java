@@ -22,6 +22,9 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.DeleteAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 
+/**
+ * Recycler view class for saved weather location
+ */
 public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adapter<MySavedWeatherLocationRecyclerViewAdapter.ViewHolder> {
 
     private final List<SavedLocations> mValues;
@@ -31,12 +34,24 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
     private final Credentials mCredentials;
 
 
+    /**
+     * Constructor for recycler view
+     * @param items of saved locations
+     * @param fragment ontext
+     * @param credentials user credentials
+     */
     public MySavedWeatherLocationRecyclerViewAdapter(List<SavedLocations> items, Context fragment, Credentials credentials) {
         mValues = items;
         mContext = fragment;
         mCredentials = credentials;
     }
 
+    /**
+     * On create for view holder
+     * @param parent view group
+     * @param viewType int of view
+     * @return ViewHolder object
+     */
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -45,11 +60,15 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
     }
 
 
-
+    /**
+     * Override bind view
+     * @param holder of current view holder
+     * @param position of current holder
+     */
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        Log.e("test2", mValues.get(position).getNickname());
+
         //Set text of all the previously saved locations here
         holder.mLocation.setText(mValues.get(position).getNickname());
         holder.mDeleteButton.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +106,10 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
         });
     }
 
+    /**
+     * Handles deletion of saved location
+     * @param result JSON object returned from backend
+     */
     private void handleDeleteOnPost(final String result) {
         //parse JSON
         try {
@@ -118,17 +141,28 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
         }
     }
 
+    /**
+     * Retrieves item count
+     * @return item size
+     */
     @Override
     public int getItemCount() {
         return mValues.size();
     }
 
+    /**
+     * Class extending recycler view
+     */
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mLocation;
         public final Button mDeleteButton;
         public SavedLocations mItem;
 
+        /**
+         * ViewHolder constructor
+         * @param view of view
+         */
         public ViewHolder(View view) {
             super(view);
             mView = view;
@@ -136,6 +170,10 @@ public class MySavedWeatherLocationRecyclerViewAdapter extends RecyclerView.Adap
             mDeleteButton = (Button) view.findViewById(R.id.saved_location_delete_button);
         }
 
+        /**
+         * Override to string method
+         * @return super call of toString
+         */
         @Override
         public String toString() {
             return super.toString();
