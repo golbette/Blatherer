@@ -20,7 +20,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Show me the weather in.. city, state, or zip"
                 android:imeOptions="actionSearch"
-                android:inputType="none|text" />
+                android:inputType="none|text"
+                android:popupBackground="@color/badge_white"/>
 
             <Button
                 android:id="@+id/search_button"

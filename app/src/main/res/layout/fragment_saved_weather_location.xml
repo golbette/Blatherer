@@ -19,6 +19,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:textColor="@android:color/black"
                 android:id="@+id/saved_weather_location_name"
                 android:layout_width="283dp"
                 android:layout_height="wrap_content"
