@@ -147,7 +147,6 @@ public class RegisterFragment extends Fragment {
                         .onCancelled(this::handleErrorsInTask)
                         .build().execute();
             }
-            // This is the builder pattern and it's good for constructor that takes a lot of parameters.
         }
     }
 

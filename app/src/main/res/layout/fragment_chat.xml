@@ -29,6 +29,7 @@
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:textSize="18sp"
+        android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/edit_chat_message_display"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

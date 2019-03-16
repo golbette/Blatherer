@@ -112,6 +112,14 @@ public class LoginFragment extends Fragment {
 
         butt = (Button) view.findViewById(R.id.login_butt_register);
         butt.setOnClickListener(this::register);
+
+        Button forgotButton = view.findViewById(R.id.login_butt_forgot_password);
+        forgotButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onForgotPasswordClicked();
+            }
+        });
         return view;
     }
 
@@ -266,6 +274,7 @@ public class LoginFragment extends Fragment {
     public interface OnLoginFragmentInteractionListener extends WaitFragment.OnFragmentInteractionListener{
         void onLoginSuccess(Credentials credentials, String jwt);
         void onRegisterClicked();
+        void onForgotPasswordClicked();
     }
 
     private void handlePushyTokenOnPost(String result) {
