@@ -21,10 +21,9 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnHomeFragmentInteractionListener} interface
- * to handle interaction events.
+ * This class is the homefragment which is the focal point for the
+ * user once they are signed in. From here the current weather is shown
+ * in addition to any incoming friend requests.
  */
 public class HomeFragment extends Fragment {
     public static final String ARG_CREDS = "credentials";
@@ -34,13 +33,17 @@ public class HomeFragment extends Fragment {
 
     private OnHomeFragmentInteractionListener mListener;
 
+    /**Instance fields for the incoming contact requests */
     private RequestReceivedListFragment.OnRequestReceivedListFragmentInteractionListener mReceivedListener;
     private List<Request> mReceivedRequests;
     private RecyclerView mReceivedReqRecyclerView;
 
+    /**The users credentials  */
     private Credentials mCredentials;
+    /**The Token for the users.  */
     private String mJwtToken;
 
+    /**Location data instance fields */
     private HashMap<String, String> mLocationData;
 
     private HashMap<String, String> mCurrentObservationData;

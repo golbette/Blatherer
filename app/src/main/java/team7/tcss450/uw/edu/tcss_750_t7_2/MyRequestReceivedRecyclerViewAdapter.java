@@ -22,9 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link} and makes a call to the
- * specified {@link OnRequestReceivedListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ *Fragment handles the incoming contact request for the user.
+ * The options are either to accept or deny the friend requests.
  */
 public class MyRequestReceivedRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestReceivedRecyclerViewAdapter.ViewHolder> {
 
@@ -38,7 +37,6 @@ public class MyRequestReceivedRecyclerViewAdapter extends RecyclerView.Adapter<M
         if(null ==items){
             items = new ArrayList<>();
         }
-
         mValues = items;
         mListener = listener;
         mCredentials = credentials;

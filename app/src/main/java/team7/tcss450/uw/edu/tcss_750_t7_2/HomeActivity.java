@@ -134,28 +134,40 @@ public class HomeActivity extends AppCompatActivity
     /** True if user comes from a chatroom trying to add a new chat member. */
     private boolean mAddMember;
 
+    /** Array for weather fragment to pass args after received from DB*/
     private FortyEightHourWeather[] mFortyEightHour;
 
+    /**Current location data to be passed to fragment after call to DB  */
     private HashMap<String, String> mLocationData;
 
+    /**Current location data to be passed to fragment after call to DB  */
     private HashMap<String, String> mCurrentObservationData;
 
+    /**ten day  weather data to be passed to fragment after call to DB  */
     private TenDayWeather[] mTenDay;
 
+    /**Tag for Log cats and debugging */
     private static final String TAG = "HomeActivity";
 
+    /** Update interval  */
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
 
+    /**Update interval reduced time by half for faster updates */
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
+    /**Location permissions */
     private static final int MY_PERMISSIONS_LOCATIONS = 8414;
 
+    /**Location Request for weather */
     private LocationRequest mLocationRequest;
 
+    /**Current locaton for weather */
     private Location mCurrentLocation;
 
+    /**Fused location */
     private FusedLocationProviderClient mFusedLocationClient;
 
+    /**Weather Call back */
     private LocationCallback mLocationCallback;
 
     /** TextView for nav drawer items Messages, Contacts, and Requests */
@@ -229,7 +241,7 @@ public class HomeActivity extends AppCompatActivity
                             .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                             .build().execute();
                 } else {
-                   //loadHomeWidgets();
+
                 }
             }
         }
@@ -263,10 +275,14 @@ public class HomeActivity extends AppCompatActivity
         };
 
         createLocationRequest();
-
-
     }
 
+    /**
+     * Request permission to access location information.
+     * @param requestCode code for location approval
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -295,10 +311,12 @@ public class HomeActivity extends AppCompatActivity
                 return;
             }
 
-            // other 'case' lines to check for other permissions
         }
     }
 
+    /**
+     * Helper method for request permissions
+     */
     private void requestLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED
@@ -313,7 +331,7 @@ public class HomeActivity extends AppCompatActivity
                             // Got last known location. In some rare situations this can be null
                             if (location != null) {
                                 setLocation(location);
-                                //Log.d("LOCATION", location.toString());
+
                                 loadHomeWidgets();
                             }
                         }
@@ -321,6 +339,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Create location requests
+     */
     protected void createLocationRequest() {
         mLocationRequest = LocationRequest.create();
 
@@ -355,6 +376,10 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Start the location updated for the user if they are moving around while
+     * using the app
+     */
     protected void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED
@@ -365,6 +390,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Stop the location updates.
+     */
     protected void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback);
     }
@@ -649,7 +677,6 @@ public class HomeActivity extends AppCompatActivity
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
@@ -659,25 +686,12 @@ public class HomeActivity extends AppCompatActivity
             } else {
                 Log.wtf("ERROR", "no data in array");
                 onWaitFragmentInteractionHide();
-
-//                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
-//                Bundle args = new Bundle();
-//                args.putSerializable("new_contact_status", "No results.");
-//                newContactBlankFragment.setArguments(args);
-//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
-//                transaction.commit();
             }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.wtf("ERROR", e.getMessage());
             onWaitFragmentInteractionHide();
 
-//            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
-//            Bundle args = new Bundle();
-//            args.putSerializable("new_contact_status", "No results.");
-//            newContactBlankFragment.setArguments(args);
-//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
-//            transaction.commit();
         }
     }
 

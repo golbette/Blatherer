@@ -92,18 +92,6 @@
             tools:context=".RequestReceivedListFragment"
             tools:listitem="@layout/fragment_request_received_item" />
 
-
-        <TextView
-            android:id="@+id/text_home_fragment_new_messages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal|center_vertical"
-            android:paddingBottom="10dp"
-
-            android:text="@string/text_view_home_fragment_recyclers_new_messages"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rycycler_home_new_messages"
             android:name="team7.tcss450.uw.edu.tcss_750_t7_2.RequestContainer"

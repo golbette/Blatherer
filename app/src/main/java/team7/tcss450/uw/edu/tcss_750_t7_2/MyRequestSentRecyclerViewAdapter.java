@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link} and makes a call to the
- * specified {@link RequestSentListFragment.OnRequestSentListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
+ * Class is a recycler view which for the sent friend requests list.
+ * User may cancel pending requests sent to other contacts if user
+ * changes mind or sent request to incorrect user.
+ *
  */
 public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyRequestSentRecyclerViewAdapter.ViewHolder> {
 
@@ -58,6 +59,7 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
         holder.mItem = mValues.get(position);
         holder.mRequestContactName.setText(mValues.get(position).getContactName());
 
+        /**Cancel a sent friend request */
         holder.mCancel.setOnClickListener(v -> {
             /**Delete the request in backend */
             Uri uri = new Uri.Builder()
@@ -84,13 +86,6 @@ public class MyRequestSentRecyclerViewAdapter extends RecyclerView.Adapter<MyReq
                 mValues.remove(position);
             }
             this.notifyItemRemoved(position);
-
-
-
-
-
-
-
                 });
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
