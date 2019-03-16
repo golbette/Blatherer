@@ -20,7 +20,7 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
 
 
 /**
- * Hourly weawther fragment
+ * Hourly weather fragment
  */
 public class FortyEightHourWeatherFragment extends Fragment {
 

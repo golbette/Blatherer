@@ -11,6 +11,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -248,6 +249,10 @@ public class TodayWeatherFragment extends Fragment {
                     && root.getBoolean(getString(R.string.keys_json_weather_success)) == true) {
                 Toast toast = Toast.makeText(getActivity(), "Location saved", Toast.LENGTH_LONG);
                 toast.show();
+                InputMethodManager inputManager = (InputMethodManager)
+                        getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                        InputMethodManager.HIDE_NOT_ALWAYS);
             } else {
                 Toast toast = Toast.makeText(getActivity(), "Location failed to save (nickname already exists)", Toast.LENGTH_LONG);
                 toast.show();

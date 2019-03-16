@@ -1,6 +1,7 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +20,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -279,8 +279,18 @@ public class HomeActivity extends AppCompatActivity
                     // permission denied,
                     Log.e("PERMISSION DENIED", "Nothing to see or do here.");
 
-                    // Shuts down app
-                    finishAndRemoveTask();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Access to your current location allows the weather widget to" +
+                            " load weather data based on your current location\n\n" +
+                            "Loading weather for Tacoma, WA");
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                        }
+                    });
+                    builder.show();
+                    loadHomeWidgets();
                 }
                 return;
             }
@@ -491,17 +501,31 @@ public class HomeActivity extends AppCompatActivity
                     .build()
                     .execute();
         } else if (id == R.id.nav_weather_activity_home) {
-            Uri uri = new Uri.Builder()
-                    .scheme("https")
-                    .appendPath(getString(R.string.ep_base_url))
-                    .appendPath(getString(R.string.ep_weather))
-                    .appendPath(getString(R.string.ep_coordinates))
-                    .appendQueryParameter("lat", String.valueOf(mCurrentLocation.getLatitude()))
-                    .appendQueryParameter("lon", String.valueOf(mCurrentLocation.getLongitude()))
-                    .build();
-            new GetAsyncTask.Builder(uri.toString())
-                    .onPostExecute(this::handleWeatherGetOnPostExecute)
-                    .build().execute();
+            if (mCurrentLocation != null) {
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_coordinates))
+                        .appendQueryParameter("lat", String.valueOf(mCurrentLocation.getLatitude()))
+                        .appendQueryParameter("lon", String.valueOf(mCurrentLocation.getLongitude()))
+                        .build();
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPostExecute(this::handleWeatherGetOnPostExecute)
+                        .build().execute();
+            } else {
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_location))
+                        .appendQueryParameter("location", "Tacoma, WA")
+                        .build();
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPostExecute(this::handleWeatherGetOnPostExecute)
+                        .build().execute();
+            }
+
         } else if (id == R.id.nav_starred_weather_locations) {
             Uri uri = new Uri.Builder()
                     .scheme("https")
@@ -1135,6 +1159,10 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Handles weather parsing
+     * @param result JSON object returned from backend
+     */
     private void handleWeatherGetOnPostExecute(final String result) {
         //parse JSON
         try {
@@ -1283,6 +1311,10 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Handles previously saved location for weather
+     * @param result JSON object from backend
+     */
     private void handlePreviousSavedLocationOnPost(String result) {
         //parse JSON
         try {
@@ -1335,6 +1367,10 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Handles previous saved location fragment
+     * @param result JSON object from backend
+     */
     private void handleNavigationPreviousSavedLocationOnPost(String result) {
         //parse JSON
         try {
@@ -1533,6 +1569,9 @@ public class HomeActivity extends AppCompatActivity
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
+    /**
+     * Handles when the map option is clicked in the weather fragment
+     */
     @Override
     public void onMapFragmentInteraction() {
         if (mCurrentLocation != null) {
@@ -1544,6 +1583,11 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Handles when a location marker is selected in the map
+     * @param lat latitude of the marker
+     * @param lon longitude of the marker
+     */
     @Override
     public void onMapLocationSelect(String lat, String lon) {
         Uri uri = new Uri.Builder()
@@ -1799,6 +1843,18 @@ public class HomeActivity extends AppCompatActivity
                         .build().execute();
 
                 Log.e("url", uri.toString());
+            } else {
+                Uri uri = new Uri.Builder()
+                        .scheme("https")
+                        .appendPath(getString(R.string.ep_base_url))
+                        .appendPath(getString(R.string.ep_weather))
+                        .appendPath(getString(R.string.ep_location))
+                        .appendQueryParameter("location", "Tacoma, WA")
+                        .build();
+                new GetAsyncTask.Builder(uri.toString())
+                        .onPostExecute(this::handleHomeWeatherGetOnPostExecute)
+                        .build().execute();
+                Log.e("url", uri.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1806,6 +1862,11 @@ public class HomeActivity extends AppCompatActivity
             onWaitFragmentInteractionHide();
         }
     }
+
+    /**
+     * Handles home weather widget
+     * @param result JSON object from backend
+     */
     private void handleHomeWeatherGetOnPostExecute(final String result) {
         //parse JSON
         Bundle args = new Bundle();
