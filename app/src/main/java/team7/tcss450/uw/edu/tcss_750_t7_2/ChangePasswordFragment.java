@@ -59,6 +59,10 @@ public class ChangePasswordFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Check for incorrect inputs and reset user's password if all inputs are correct.
+     * @param view the RESET button.
+     */
     public void resetConfirm(View view) {
         boolean pass = true;
 

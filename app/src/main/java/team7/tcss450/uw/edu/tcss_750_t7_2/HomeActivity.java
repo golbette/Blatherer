@@ -1259,6 +1259,10 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Creates a list of hourly weather forecast.
+     * @param result JSON String that contains a list of hourly weather forecast.
+     */
     private void handleHourlyOnPost(String result) {
         //parse JSON
         try {
@@ -1784,6 +1788,9 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Loads the widgets on the home page.
+     */
     private void loadHomeWidgets(){
         /**
          * Start the get query to return all requests from potential contacts.
@@ -1930,7 +1937,24 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Takes user to the page to change their password.
+     */
+    @Override
+    public void onChangePasswordClicked() {
+        Bundle args = new Bundle();
+        args.putSerializable("credentials", mCredentials);
+        Fragment frag = new ChangePasswordFragment();
+        frag.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, frag)
+                .addToBackStack(null);
+        transaction.commit();
+    }
+
     /** vvv Orphan methods vvv */
+    /** These methods are not used in this activity */
 
     /**
      * Weather options fragments listener
@@ -1951,18 +1975,6 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onChangePasswordClicked() {
-        Bundle args = new Bundle();
-        args.putSerializable("credentials", mCredentials);
-        Fragment frag = new ChangePasswordFragment();
-        frag.setArguments(args);
-        FragmentTransaction transaction = getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, frag)
-                .addToBackStack(null);
-        transaction.commit();
-    }
 
     @Override
     public void onConversationFragmentInteraction(Uri uri) {
