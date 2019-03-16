@@ -152,7 +152,12 @@ public class WeatherFragment extends Fragment {
         Bundle args;
 
         List<String> options = new ArrayList<>();
-        options.add("Choose on map...");
+
+        //Adds map option only when location permission granted
+        if (mCurrentLocation != null) {
+            options.add("Choose on map...");
+        }
+
 
         //Add previous saved entries here
         if (mSavedLocations != null) {
@@ -171,6 +176,18 @@ public class WeatherFragment extends Fragment {
             public boolean onTouch(View v, MotionEvent event) {
                 searchText.showDropDown();
                 return false;
+            }
+        });
+
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    InputMethodManager inputManager = (InputMethodManager)
+                            getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(v.getWindowToken(),
+                            InputMethodManager.HIDE_NOT_ALWAYS);
+                }
             }
         });
 
@@ -554,9 +571,6 @@ public class WeatherFragment extends Fragment {
                                     getString(R.string.keys_json_weather_temperature)
                             )
                     ).build());
-                }
-                for (int i = 0; i < fortyEightHour.size(); i++) {
-                    Log.e("check", fortyEightHour.get(i).getTemp());
                 }
                 mFortyEightHourData = new FortyEightHourWeather[fortyEightHour.size()];
                 mFortyEightHourData = fortyEightHour.toArray(mFortyEightHourData);
