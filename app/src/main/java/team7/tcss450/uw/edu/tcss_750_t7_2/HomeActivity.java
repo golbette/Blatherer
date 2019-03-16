@@ -1,10 +1,12 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.content.pm.PackageManager;
@@ -64,10 +66,14 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.BadgeDrawerArrowDrawable;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
+
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
 
 /**
  * Container for fragments after user is successfully
@@ -95,7 +101,7 @@ public class HomeActivity extends AppCompatActivity
         ChatFragment.OnChatFragmentInteractionListener,
         ChangePasswordFragment.OnChangePasswordFragmentInteractionListener{
 
-
+    /** This token is used to verify the identity of the user. */
     private String mJwToken;
 
     /** Credentials passed in from MainActivity when loginSuccess. */
@@ -103,7 +109,9 @@ public class HomeActivity extends AppCompatActivity
 
     /** This is the receiver used to receive broadcast messages */
     private PushMessageReceiver mPushMessageReceiver;
-//    private CustomReceiver mReceiver = new CustomReceiver(); // TODO
+
+    /** This is the receiver used to receive broadcast messages when app is in the foreground */
+//    private MyPushReceiver mReceiver;
 
     /** This chatid is used when user comes from the push notification. This is the chatid of the chatroom that initiated the notification. */
     private int mChatId;
@@ -202,6 +210,14 @@ public class HomeActivity extends AppCompatActivity
         mRequestsTV = (TextView) MenuItemCompat.getActionView(navigationView.getMenu().findItem(R.id.nav_requests_activity_home));
 
         navigationView.setNavigationItemSelectedListener(this);
+
+        //to Register custom Broadcast Receiver defined in separate class
+//        MyBroadcastReceiver myBroadcastReceiver=new MyBroadcastReceiver();
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction("Intent.RECEIVED_NEW_MESSAGE");
+//        registerReceiver(myBroadcastReceiver, filter);
+
+//        mReceiver = new MyPushReceiver();
 
         if (savedInstanceState == null) {
             if (findViewById(R.id.fragmentContainer) != null) {
@@ -328,12 +344,25 @@ public class HomeActivity extends AppCompatActivity
         super.onResume();
         startLocationUpdates();
         setNotification();
+        if (mPushMessageReceiver == null) {
+            mPushMessageReceiver = new PushMessageReceiver();
+        }
+        IntentFilter iFilter = new IntentFilter(PushReceiver.RECEIVED_NEW_MESSAGE);
+        registerReceiver(mPushMessageReceiver, iFilter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         stopLocationUpdates();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPushMessageReceiver != null) {
+            unregisterReceiver(mPushMessageReceiver);
+        }
     }
 
     protected void startLocationUpdates() {
@@ -692,7 +721,7 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    public void handleAddSearchOnPostExecute(final String result) {
+//    public void handleAddSearchOnPostExecute(final String result) {
 //        Log.wtf("ADD_SEARCH_RESULT", result);
 //        try {
 //            JSONObject response = new JSONObject(result);
@@ -742,7 +771,7 @@ public class HomeActivity extends AppCompatActivity
 //            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
 //            transaction.commit();
 //        }
-    }
+//    }
 
     @Override
     public void onRequestSent(String email_b, boolean addmember, int chatid) {
@@ -1095,16 +1124,6 @@ public class HomeActivity extends AppCompatActivity
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-//    @Override
-//    public void onFragmentInteraction(Uri uri) {
-//
-//    }
-//
-//    @Override
-//    public void onConfirmClicked(JSONObject msg) {
-//
-//    }
 
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -1620,7 +1639,7 @@ public class HomeActivity extends AppCompatActivity
             onWaitFragmentInteractionHide();
         }
         new SendPostAsyncTask.Builder(uri.toString(), msg)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
+//                .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleSetNotificationPost)
                 .onCancelled(this::handleErrorsInTask)
                 .addHeaderField("authorization", mJwToken) // Add the JWT as a header
@@ -1742,7 +1761,6 @@ public class HomeActivity extends AppCompatActivity
     private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.wtf("BROADCAST", "onReceived");
             setNotification();
         }
     }

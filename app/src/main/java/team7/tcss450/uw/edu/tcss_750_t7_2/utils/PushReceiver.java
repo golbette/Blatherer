@@ -47,7 +47,7 @@ public class PushReceiver extends BroadcastReceiver {
 
         if (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE) { // In app notification
             //app is in the foreground so send the message to the active Activities
-            Log.d("Blatherer", "Message received in foreground: " + messageText);
+            Log.wtf("Blatherer", "Message received in foreground: " + messageText);
 
             //create an Intent to broadcast a message to other parts of the app.
             Intent i = new Intent(RECEIVED_NEW_MESSAGE);
