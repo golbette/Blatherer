@@ -1,10 +1,12 @@
 package team7.tcss450.uw.edu.tcss_750_t7_2;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.content.pm.PackageManager;
@@ -64,10 +66,14 @@ import team7.tcss450.uw.edu.tcss_750_t7_2.model.BadgeDrawerArrowDrawable;
 import team7.tcss450.uw.edu.tcss_750_t7_2.messaging.Request;
 
 import team7.tcss450.uw.edu.tcss_750_t7_2.model.Credentials;
+import team7.tcss450.uw.edu.tcss_750_t7_2.utils.PushReceiver;
 import team7.tcss450.uw.edu.tcss_750_t7_2.utils.SendPostAsyncTask;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.FortyEightHourWeather;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.SavedLocations;
 import team7.tcss450.uw.edu.tcss_750_t7_2.weather.TenDayWeather;
+
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND;
+import static android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE;
 
 /**
  * Container for fragments after user is successfully
@@ -95,7 +101,7 @@ public class HomeActivity extends AppCompatActivity
         ChatFragment.OnChatFragmentInteractionListener,
         ChangePasswordFragment.OnChangePasswordFragmentInteractionListener{
 
-
+    /** This token is used to verify the identity of the user. */
     private String mJwToken;
 
     /** Credentials passed in from MainActivity when loginSuccess. */
@@ -166,12 +172,6 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-        // Setting up broadcast receiver
-//        IntentFilter filter = new IntentFilter(PushReceiver.RECEIVED_NEW_MESSAGE);
-
-//        IntentFilter filter = new IntentFilter();
-//        filter.addAction(Intent.RECEIVED_); // TODO
 
         Intent intent = getIntent(); // intent from MainActivity
         Bundle args = intent.getExtras();
@@ -324,12 +324,25 @@ public class HomeActivity extends AppCompatActivity
         super.onResume();
         startLocationUpdates();
         setNotification();
+        if (mPushMessageReceiver == null) {
+            mPushMessageReceiver = new PushMessageReceiver();
+        }
+        IntentFilter iFilter = new IntentFilter(PushReceiver.RECEIVED_NEW_MESSAGE);
+        registerReceiver(mPushMessageReceiver, iFilter);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         stopLocationUpdates();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPushMessageReceiver != null) {
+            unregisterReceiver(mPushMessageReceiver);
+        }
     }
 
     protected void startLocationUpdates() {
@@ -403,6 +416,7 @@ public class HomeActivity extends AppCompatActivity
     /**
      * @author Hari Vignesh Jayapalan
      * This tutorial is found at: https://android.jlelse.eu/android-adding-badge-or-count-to-the-navigation-drawer-84c93af1f4d9
+     * This is used to draw the badge and number of notifications.
      */
     private void initializeCountDrawer() {
         if (mTotalChatCount > 0 || mConnCount > 0 || mConvoCount > 0) {
@@ -420,13 +434,6 @@ public class HomeActivity extends AppCompatActivity
         } else {
             mMessagesTV.setText("");
         }
-
-//        if (mContactsTV) {
-//            mContactsTV.setGravity(Gravity.CENTER_VERTICAL);
-//            mContactsTV.setTypeface(null, Typeface.BOLD);
-//            mContactsTV.setTextColor(getResources().getColor(R.color.badge_red));
-//            mContactsTV.setText(mTotalChatCount);
-//        }
 
         if (mConnCount > 0 || mConvoCount > 0) {
             mRequestsTV.setGravity(Gravity.CENTER_VERTICAL);
@@ -580,6 +587,10 @@ public class HomeActivity extends AppCompatActivity
         new DeleteTokenAsyncTask().execute();
     }
 
+    /**
+     * This is called when the user enters a chat room.
+     * @param result returned list of chats from the server's database.
+     */
     public void handleGetChatsPost(final String result) {
         Log.wtf("CHATS_RESULT", result);
         try {
@@ -646,6 +657,12 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method returns a list of contacts which the user can send request or add as chat members with.
+     * @param addmember And addmember is true, it adds the contact as a new member to the chatroom.
+     *                  If false, it sends a connection request on behave of the user.
+     * @param chatid
+     */
     @Override
     public void onSearchClicked(boolean addmember, int chatid) {
         Uri uri = new Uri.Builder().scheme("https")
@@ -670,80 +687,26 @@ public class HomeActivity extends AppCompatActivity
             if (getSupportFragmentManager().findFragmentByTag("WAIT") != null) {
                 onWaitFragmentInteractionHide();
             }
-//            if (addmember) {
-//                new SendPostAsyncTask.Builder(uri.toString(), msg)
-//                        .onPreExecute(this::onWaitFragmentInteractionShow)
-//                        .onPostExecute(this::handleAddSearchOnPostExecute)
-//                        .onCancelled(this::handleErrorsInTask)
-//                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-//                        .build().execute();
-//            } else {
-                new SendPostAsyncTask.Builder(uri.toString(), msg)
-                        .onPreExecute(this::onWaitFragmentInteractionShow)
-                        .onPostExecute(this::handleSearchOnPostExecute)
-                        .onCancelled(this::handleErrorsInTask)
-                        .addHeaderField("authorization", mJwToken) // Add the JWT as a header
-                        .build().execute();
-//            }
+
+            new SendPostAsyncTask.Builder(uri.toString(), msg)
+                    .onPreExecute(this::onWaitFragmentInteractionShow)
+                    .onPostExecute(this::handleSearchOnPostExecute)
+                    .onCancelled(this::handleErrorsInTask)
+                    .addHeaderField("authorization", mJwToken) // Add the JWT as a header
+                    .build().execute();
+
         }
     }
 
-    public void handleAddSearchOnPostExecute(final String result) {
-//        Log.wtf("ADD_SEARCH_RESULT", result);
-//        try {
-//            JSONObject response = new JSONObject(result);
-//            if (response.has(getString(R.string.keys_json_contact_message))) {
-//                JSONArray data = response.getJSONArray(getString(R.string.keys_json_contact_message));
-//                List<NewContact> newContacts = new ArrayList<>();
-//                for (int i = 0; i < data.length(); i++) {
-//                    JSONObject jsonContact = data.getJSONObject(i);
-//                    newContacts.add(new NewContact.Builder(jsonContact.getString(getString(R.string.keys_json_contact_first_name)), jsonContact.getString(getString(R.string.keys_json_contact_last_name)))
-//                            .addEmail(jsonContact.getString(getString(R.string.keys_json_contact_email)))
-//                            .addUsername(jsonContact.getString(getString(R.string.keys_json_contact_username)))
-//                            .addMemberId(jsonContact.getInt("memberid"))
-//                            .build());
-//                }
-//                NewContact[] contactsAsArray = new NewContact[newContacts.size()];
-//                contactsAsArray = newContacts.toArray(contactsAsArray);
-//                Bundle args = new Bundle();
-//                args.putSerializable(NewContactFragment.ARG_NEW_CONTACT_LIST, contactsAsArray);
-//                Fragment frag = new NewContactFragment();
-//                frag.setArguments(args);
-//                onWaitFragmentInteractionHide();
-////                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//                FragmentTransaction transaction = getSupportFragmentManager()
-//                        .beginTransaction()
-//                        .replace(R.id.fragmentContainer, frag)
-//                        .addToBackStack(null);
-//                transaction.commit();
-//            } else {
-//                Log.wtf("ERROR", "no data in array");
-//                onWaitFragmentInteractionHide();
-//
-//                NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
-//                Bundle args = new Bundle();
-//                args.putSerializable("new_contact_status", "No results.");
-//                newContactBlankFragment.setArguments(args);
-//                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
-//                transaction.commit();
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//            Log.wtf("ERROR", e.getMessage());
-//            onWaitFragmentInteractionHide();
-//            NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
-//            Bundle args = new Bundle();
-//            args.putSerializable("new_contact_status", "No results.");
-//            newContactBlankFragment.setArguments(args);
-//            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, newContactBlankFragment).addToBackStack(null);
-//            transaction.commit();
-//        }
-    }
-
+    /**
+     * This method sends out the connection request or adds a member to the specified chatroom.
+     * @param email_b email of the receiver of this request
+     * @param addmember if true, adds contact as new chatmember. if false, add as new connection.
+     * @param chatid if addmember is true, chatid is needed to determine which chatroom such new member
+     *               should be added to.
+     */
     @Override
     public void onRequestSent(String email_b, boolean addmember, int chatid) {
-
-
         mAddMember = addmember;
         mChatId = chatid;
 
@@ -772,7 +735,7 @@ public class HomeActivity extends AppCompatActivity
                     .appendPath("convoAdd").build();
             new SendPostAsyncTask.Builder(uri.toString(), msg)
                     .onPreExecute(this::onWaitFragmentInteractionShow)
-                    .onPostExecute(this::handleConvoAdd) // TODO: handle add member request
+                    .onPostExecute(this::handleConvoAdd)
                     .onCancelled(this::handleErrorsInTask)
                     .addHeaderField("authorization", mJwToken) // Add the JWT as a header
                     .build().execute();
@@ -790,18 +753,31 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Displays toast to inform user that such actions has been completed.
+     * @param result the result is needed but not used here.
+     */
     public void handleConvoAdd(final String result) {
         Log.wtf("SEND_CONNREQ_RESULT", result);
         onWaitFragmentInteractionHide();
         Toast.makeText(this, "Member added!", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Displays toast to inform user that such actions has been completed.
+     * @param result the result is needed but not used here.
+     */
     private void handleSendConnReq(final String result){
         Log.wtf("SEND_CONNREQ_RESULT", result);
         onWaitFragmentInteractionHide();
         Toast.makeText(this, "Request sent!", Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * This method creates the list of contacts that matches the user's search term and passes it to
+     * the NewContactsFragment
+     * @param result a JSON String that is the list of contacts searched.
+     */
     private void handleSearchOnPostExecute(final String result) {
         Log.wtf("SEARCH_RESULT", result);
         try {
@@ -830,8 +806,6 @@ public class HomeActivity extends AppCompatActivity
                 Fragment frag = new NewContactFragment();
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
-
-//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
@@ -863,6 +837,11 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * This method puts the returned JSON String (a list of contacts) into an array and passes it along to the ContactFragment.
+     * Shown as a recycler view for the user to see their connections.
+     * @param result JSON String that contains a list of contacts.
+     */
     private void handleContactGetOnPostExecute(final String result) {
         Log.wtf("CONTACT_RESULT", result);
         try {
@@ -890,8 +869,6 @@ public class HomeActivity extends AppCompatActivity
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, frag)
@@ -908,6 +885,11 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Launches the chat with the selected contact.
+     * @param item Each item is a contact card of the recycler view
+     * @throws JSONException when msg.put failes
+     */
     @Override
     public void onContactListFragmentInteraction(Contact item) throws JSONException {
         Uri uri = new Uri.Builder().scheme("https")
@@ -930,6 +912,12 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Gets a list of Recent personal chats or group chats and passes them as an array.
+     * @param item Each item is a chat room (could be group or personal).
+     * @param username The username of the user. Sending a message requires username.
+     * @throws JSONException when msg.put fails.
+     */
     @Override
     public void onRecentChatListFragmentInteraction(NamesByChatId item, String username) throws JSONException {
         Uri uri = new Uri.Builder().scheme("https")
@@ -956,6 +944,9 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Takes the user to the search contact page.
+     */
     @Override
     public void onNewContactClicked() {
         NewContactBlankFragment newContactBlankFragment = new NewContactBlankFragment();
@@ -963,6 +954,10 @@ public class HomeActivity extends AppCompatActivity
         transaction.commit();
     }
 
+    /**
+     * This method gets the chat history from the server's database.
+     * @param result JSON String that contains a list of messages.
+     */
     private void handleMessageGetOnPostExecute(final String result) {
         Log.wtf("MESSAGE_RESULT", result);
         try {
@@ -985,7 +980,6 @@ public class HomeActivity extends AppCompatActivity
                         isSender = true;
                     }
 
-
                     messages.add(new Message.Builder(jsonMessage.getString(getString(R.string.keys_json_message_username)),
                             jsonMessage.getString(getString(R.string.keys_json_message_message)),
                             jsonMessage.getString(getString(R.string.keys_json_message_timestamp)),
@@ -1000,7 +994,6 @@ public class HomeActivity extends AppCompatActivity
                 frag.setArguments(args);
                 onWaitFragmentInteractionHide();
 
-//                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 FragmentTransaction transaction = getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.fragmentContainer, frag)
@@ -1017,19 +1010,20 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Handles Send Request.
+     * @param v the button
+     * @param item the card of the recycler view
+     */
     @Override
     public void onRequestSentListFragmentInteraction(View v, Request item) {
-
-
         Button b = (Button) findViewById(v.getId());
         Log.wtf("WTF", "b: " + b.getText().toString());
         Log.wtf("WTF", "b: " + item.getContactName());
-
-
     }
 
     /**
-     *
+     * Takes the user through the process of adding a new chat member to an existing chat.
      * @param chatid Carried over from the chat which the user wants to add another user in.
      */
     @Override
@@ -1043,6 +1037,11 @@ public class HomeActivity extends AppCompatActivity
         transaction.commit();
     }
 
+    /**
+     * The action that resets the user's password.
+     * @param oldpassword User's old password.
+     * @param newpassword User's desired new password.
+     */
     @Override
     public void onResetPassword(String oldpassword, String newpassword) {
         Uri uri = new Uri.Builder()
@@ -1092,16 +1091,9 @@ public class HomeActivity extends AppCompatActivity
         dialog.show();
     }
 
-//    @Override
-//    public void onFragmentInteraction(Uri uri) {
-//
-//    }
-//
-//    @Override
-//    public void onConfirmClicked(JSONObject msg) {
-//
-//    }
-
+    /**
+     * The AsyncTask that handles deleting tokens.
+     */
     class DeleteTokenAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
@@ -1567,6 +1559,9 @@ public class HomeActivity extends AppCompatActivity
                 .build().execute();
     }
 
+    /**
+     * Displays a progress bar during wait time.
+     */
     @Override
     public void onWaitFragmentInteractionShow() {
         getSupportFragmentManager()
@@ -1576,6 +1571,9 @@ public class HomeActivity extends AppCompatActivity
                 .commit();
     }
 
+    /**
+     * Remove the progress bar from screen when task is done.
+     */
     @Override
     public void onWaitFragmentInteractionHide() {
         getSupportFragmentManager()
@@ -1616,7 +1614,7 @@ public class HomeActivity extends AppCompatActivity
             onWaitFragmentInteractionHide();
         }
         new SendPostAsyncTask.Builder(uri.toString(), msg)
-                .onPreExecute(this::onWaitFragmentInteractionShow)
+//                .onPreExecute(this::onWaitFragmentInteractionShow)
                 .onPostExecute(this::handleSetNotificationPost)
                 .onCancelled(this::handleErrorsInTask)
                 .addHeaderField("authorization", mJwToken) // Add the JWT as a header
@@ -1738,7 +1736,6 @@ public class HomeActivity extends AppCompatActivity
     private class PushMessageReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.wtf("BROADCAST", "onReceived");
             setNotification();
         }
     }
