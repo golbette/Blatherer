@@ -103,7 +103,6 @@ public class HomeActivity extends AppCompatActivity
 
     /** This is the receiver used to receive broadcast messages */
     private PushMessageReceiver mPushMessageReceiver;
-//    private CustomReceiver mReceiver = new CustomReceiver(); // TODO
 
     /** This chatid is used when user comes from the push notification. This is the chatid of the chatroom that initiated the notification. */
     private int mChatId;
@@ -128,9 +127,6 @@ public class HomeActivity extends AppCompatActivity
 
     /** True if user comes from a chatroom trying to add a new chat member. */
     private boolean mAddMember;
-
-//    /** Navigation Item Requests Clicked */
-//    private boolean mLoadNavRequest = false;
 
     private FortyEightHourWeather[] mFortyEightHour;
 
