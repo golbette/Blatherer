@@ -20,7 +20,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -1191,6 +1190,10 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    /**
+     * Handles weather parsing
+     * @param result JSON object returned from backend
+     */
     private void handleWeatherGetOnPostExecute(final String result) {
         //parse JSON
         try {
@@ -1597,6 +1600,9 @@ public class HomeActivity extends AppCompatActivity
         Log.e("ASYNC_TASK_ERROR", result);
     }
 
+    /**
+     * Handles when the map option is clicked in the weather fragment
+     */
     @Override
     public void onMapFragmentInteraction() {
         if (mCurrentLocation != null) {
